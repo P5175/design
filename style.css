@@ -1,0 +1,26 @@
+.container{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    border: 1px solid black;
+    margin:180px 167px 22px 157px;
+    padding: 18px 51px 34px 51px;
+    background-color: aqua;
+}
+
+
+#i{
+    width: 50px;
+    height: 50px;
+}
+button{
+    width:20%;
+    margin-top: 20px;
+}
+#ab{
+    margin-top: 20px;
+}
+.second{
+    margin-top: 20px;
+}
