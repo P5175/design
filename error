@@ -1,0 +1,47 @@
+public async Task<UpdateAllInformationByIdResponse> UpdateAllInformationById(UpdateAllInformationByIdRequest request)
+        {
+            UpdateAllInformationByIdResponse response = new UpdateAllInformationByIdResponse();
+            try
+            {
+                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
+                {
+                    await _npgsqlConnection.OpenAsync();
+                }
+                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(SqlQueries.UpdateAllInformationById, _npgsqlConnection))
+                {
+                    sqlcommand.CommandType = System.Data.CommandType.Text;
+                    sqlcommand.CommandTimeout = 180;
+                    sqlcommand.Parameters.AddWithValue("@id", request.studentid);
+                    sqlcommand.Parameters.AddWithValue("@mark", request.studentmark);
+                    sqlcommand.Parameters.AddWithValue("@name", request.studentname);
+
+
+                    int status = await sqlcommand.ExecuteNonQueryAsync();
+                    Console.WriteLine(status);
+                    if (status <= 0)
+                    {
+                        response.IsSuccess = false;
+                        response.Message = "Query not executed";
+                        return response;
+
+                    }
+                    else
+                    {
+                        response.IsSuccess = true;
+                        response.Message = " No of raw affected is " + status;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            finally
+            {
+                await _npgsqlConnection.CloseAsync();
+                await _npgsqlConnection.DisposeAsync();
+            }
+            return response;
+
+        }
