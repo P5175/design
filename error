@@ -1,5 +1,6 @@
 create or replace function studentsearch(studentid int default null, studentname varchar default null, studentmark INT default null, sort varchar default 'studentname', pageno int default 1, pagetotal int default 5)
-  returns table( studentid INT, studentname varchar, studentmark INT) AS
+  returns table( student_id INT, student_name varchar, student_mark INT) as
+  
 $$
 declare 
 	tempr text;
@@ -9,9 +10,18 @@ begin
 	|| case when studentid is not null then ' and studentid=$1 ' else '' end
 	|| case when studentname is not null then ' and studentname=$2 ' else '' end
 	|| case when studentmark is not null then ' and studentmark=$3 ' else '' end
-    || ' order by '||sort||' offset ($5- 1) * $6 fetch next $6 row only ';
+    || ' order by '||sort||' offset ($4- 1) * $5 fetch next $5 row only ';
     return QUERY execute  tempr using studentid,studentname,studentmark, pageno, pagetotal ;
    raise notice '%',tempr ;
 end;
 $$
   language plpgsql ;
+  
+
+select
+	*
+from
+	studentsearch(studentname =>'string');
+	
+	Returned type text does not match expected type character varying in column 2.
+  Where: PL/pgSQL function studentsearch(integer,character varying,integer,character varying,integer,integer) line 11 at RETURN QUERY
