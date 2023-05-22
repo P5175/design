@@ -1,20 +1,18 @@
-public async Task<UpdateAllInformationByIdResponse> UpdateAllInformationById(UpdateAllInformationByIdRequest request)
+public async Task<DeleteInformationByIdResponse> DeleteInformationById(DeleteInformationByIdRequest request)
         {
-            UpdateAllInformationByIdResponse response = new UpdateAllInformationByIdResponse();
+            DeleteInformationByIdResponse response = new DeleteInformationByIdResponse();
             try
             {
                 if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
                 {
                     await _npgsqlConnection.OpenAsync();
                 }
-                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(SqlQueries.UpdateAllInformationById, _npgsqlConnection))
+                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(SqlQueries.DeleteInformationById, _npgsqlConnection))
                 {
                     sqlcommand.CommandType = System.Data.CommandType.Text;
                     sqlcommand.CommandTimeout = 180;
                     sqlcommand.Parameters.AddWithValue("@id", request.studentid);
-                    sqlcommand.Parameters.AddWithValue("@mark", request.studentmark);
-                    sqlcommand.Parameters.AddWithValue("@name", request.studentname);
-
+                  
 
                     int status = await sqlcommand.ExecuteNonQueryAsync();
                     Console.WriteLine(status);
@@ -43,5 +41,4 @@ public async Task<UpdateAllInformationByIdResponse> UpdateAllInformationById(Upd
                 await _npgsqlConnection.DisposeAsync();
             }
             return response;
-
         }
