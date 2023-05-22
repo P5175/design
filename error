@@ -1,44 +1,20 @@
-public async Task<DeleteInformationByIdResponse> DeleteInformationById(DeleteInformationByIdRequest request)
-        {
-            DeleteInformationByIdResponse response = new DeleteInformationByIdResponse();
-            try
-            {
-                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
-                {
-                    await _npgsqlConnection.OpenAsync();
-                }
-                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(SqlQueries.DeleteInformationById, _npgsqlConnection))
-                {
-                    sqlcommand.CommandType = System.Data.CommandType.Text;
-                    sqlcommand.CommandTimeout = 180;
-                    sqlcommand.Parameters.AddWithValue("@id", request.studentid);
-                  
-
-                    int status = await sqlcommand.ExecuteNonQueryAsync();
-                    Console.WriteLine(status);
-                    if (status <= 0)
-                    {
-                        response.IsSuccess = false;
-                        response.Message = "Query not executed";
-                        return response;
-
-                    }
-                    else
-                    {
-                        response.IsSuccess = true;
-                        response.Message = " No of raw affected is " + status;
-                    }
-                }
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
-            finally
-            {
-                await _npgsqlConnection.CloseAsync();
-                await _npgsqlConnection.DisposeAsync();
-            }
-            return response;
-        }
+create or replace function patientsearch(p1_id int default null, first_name varchar default null, last_name varchar default null, sex1 varchar default null, dob date  default null, sort varchar default 'firstname', pageno int default 1, pagetotal int default 5)
+  returns table( p_id INT, firstname varchar, lastname varchar, dateofbirth DATE, sex varchar) AS
+$$
+declare 
+	tempr text;
+begin
+	
+	 tempr='select patient.p_id, patient.firstname, patient.lastname, patient.dateofbirth, sex.sex FROM patient  inner join sex  on sex.sex_id = patient.sex_id where 1=1 '
+	|| case when p1_id is not null then ' and p_id=$1 ' else '' end
+	|| case when first_name is not null then ' and firstname=$2 ' else '' end
+	|| case when last_name is not null then ' and lastname=$3 ' else '' end
+	|| case when sex1 is not null then ' and sex=$4 ' else '' end
+	|| case when dob is not null then ' and dateofbirth=$5 ' else '' end
+    || ' order by '||sort||' offset ($6- 1) * $7 fetch next $7 row only ';
+    return QUERY execute  tempr using p1_id, first_name, last_name, sex1, dob, pageno, pagetotal ;
+   raise notice '%',tempr ;
+end;
+$$
+  language plpgsql ;
+  
