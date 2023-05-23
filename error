@@ -4,8 +4,7 @@ $$
 declare 
 	tempr text;
 begin
-	
-	 tempr='select student.studentid, student.studentname, student.studentmark from student where 1=1'
+	tempr='select student.studentid, student.studentname, student.studentmark from student where 1=1'
 	|| case when studentid is not null then ' and studentid=$1 ' else '' end
 	|| case when studentname is not null then ' and studentname=$2 ' else '' end
 	|| case when studentmark is not null then ' and studentmark=$3 ' else '' end
@@ -18,6 +17,6 @@ $$
 
 select * from studentsearch(studentname=>'z' );
 
-: ERROR: relation "student" does not exist
-  Where: PL/pgSQL function studentsearch(integer,character varying,integer,character varying,integer,integer) line 11 at RETURN QUERY
-
+ERROR: structure of query does not match function result type
+  Detail: Returned type text does not match expected type character varying in column 2.
+  Where: PL/pgSQL function studentsearch(integer,character varying,integer,character varying,integer,integer) line 10 at RETURN QUERY
