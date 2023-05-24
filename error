@@ -1,7 +1,1 @@
-SELECT * From public."user-details"
-	WHERE "user-name"="p" AND "user-password"="p";
-	SQL Error [42703]: ERROR: column "p" does not exist
-  Position: 57
-
-
-Error position: line: 21 pos: 56
+int status = await sqlcommand.ExecuteNonQueryAsync();
