@@ -1,13 +1,27 @@
-<div>time phrase: morning <input id="morning" type="checkbox" #morning  [(ngModel)]="morningcheck">
-                        afternoon<input id="afternoon" type="checkbox" #afternoon  [(ngModel)]="afternooncheck">
-                        night<input id="night" type="checkbox" #night [(ngModel)]="nightcheck"></div>
-                    <div>
-                        quantity <input id="morning-quantity" style="width:90px" type="number" [disabled]="!morningcheck"> 
-                        <input id="afternoon-quantity" style="width:90px" type="number" [disabled]="!afternooncheck">
-                        <input id="night-quantity" style="width:90px" type="number" [disabled]="!nightcheck">
-                    </div>
-                    <div>time quantity
-                        <input type="time" [disabled]="!morning.checked">
-                        <input type="time" [disabled]="!afternoon.checked">
-                        <input type="time" [disabled]="!night.checked">
-                    </div>
+medicinedata={
+    medicinename:" ",
+    days:[],
+    timephrase:[],
+    quantity:[],
+    timequantity:[]
+  }
+moncheck="";
+tuecheck="";
+wedcheck="";
+thucheck="";
+fricheck="";
+satcheck="";
+suncheck="";
+morningcheck="";
+afternooncheck="";
+nightcheck="";
+
+
+
+
+  add_schedule(){
+    const medicinename:any= document.getElementById('medicinename') ;
+    this.medicinedata.medicinename=medicinename.value;
+ if(this.moncheck=="true"){
+  this.medicinedata.days.push("mon");
+ }
