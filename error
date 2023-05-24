@@ -1,10 +1,10 @@
-<div>time phrase: morning <input id="morning" type="checkbox" #morning  >
-                        afternoon<input id="afternoon" type="checkbox" #afternoon  >
-                        night<input id="night" type="checkbox" #night ></div>
+<div>time phrase: morning <input id="morning" type="checkbox" #morning  [(ngModel)]="morningcheck">
+                        afternoon<input id="afternoon" type="checkbox" #afternoon  [(ngModel)]="afternooncheck">
+                        night<input id="night" type="checkbox" #night [(ngModel)]="nightcheck"></div>
                     <div>
-                        quantity <input id="morning-quantity" style="width:90px" type="number" [disabled]="!morning.checked"> 
-                        <input id="afternoon-quantity" style="width:90px" type="number" [disabled]="!afternoon.checked">
-                        <input id="night-quantity" style="width:90px" type="number" [disabled]="!night.checked">
+                        quantity <input id="morning-quantity" style="width:90px" type="number" [disabled]="!morningcheck"> 
+                        <input id="afternoon-quantity" style="width:90px" type="number" [disabled]="!afternooncheck">
+                        <input id="night-quantity" style="width:90px" type="number" [disabled]="!nightcheck">
                     </div>
                     <div>time quantity
                         <input type="time" [disabled]="!morning.checked">
