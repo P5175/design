@@ -1,4 +1,4 @@
-medicinedata={
+ medicinedata={
     medicinename:" ",
     days:[],
     timephrase:[],
@@ -23,5 +23,5 @@ nightcheck="";
     const medicinename:any= document.getElementById('medicinename') ;
     this.medicinedata.medicinename=medicinename.value;
  if(this.moncheck=="true"){
-  this.medicinedata.days.push("mon");
+  this.medicinedata[days].push("mon");
  }
