@@ -1,22 +1,7 @@
-create or replace function studentsearch(studentid int default null, studentname varchar default null, studentmark int default null, sort varchar default 'studentname', pageno int default 1, pagetotal int default 5)
-  returns table( student_id INT, student_name varchar, student_mark int) AS
-$$
-declare 
-	tempr text;
-begin
-	tempr='select student.studentid, student.studentname, student.studentmark from student where 1=1'
-	|| case when studentid is not null then ' and studentid=$1 ' else '' end
-	|| case when studentname is not null then ' and studentname=$2 ' else '' end
-	|| case when studentmark is not null then ' and studentmark=$3 ' else '' end
-    || ' order by '||sort||' offset ($4- 1) * $5 fetch next $5 row only ';
-    return QUERY execute  tempr using studentid, studentname, studentmark,  pageno, pagetotal ;
-   raise notice '%',tempr ;
-end;
-$$
-  language plpgsql ;
+SELECT * From public."user-details"
+	WHERE "user-name"="p" AND "user-password"="p";
+	SQL Error [42703]: ERROR: column "p" does not exist
+  Position: 57
 
-select * from studentsearch(studentname=>'z' );
 
-ERROR: structure of query does not match function result type
-  Detail: Returned type text does not match expected type character varying in column 2.
-  Where: PL/pgSQL function studentsearch(integer,character varying,integer,character varying,integer,integer) line 10 at RETURN QUERY
+Error position: line: 21 pos: 56
