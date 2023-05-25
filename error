@@ -1,1 +1,1 @@
-INSERT INTO medicine_1  (medicinename) SELECT " + request.medicinename + "WHERE  NOT EXISTS(  SELECT medicine_id FROM medicine_1  WHERE medicinename =" + request.medicinename;
+INSERT INTO medicine_1  (medicinename) SELECT 'm3' WHERE  NOT EXISTS(  SELECT medicine_id FROM medicine_1  WHERE medicinename ='m3')  returning medicine_id
