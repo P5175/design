@@ -1,2 +1,1 @@
-SELECT COUNT(*) From public."user-details"
-	WHERE "user-name"=@name AND "user-password"='g';
+NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync()
