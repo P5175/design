@@ -1,2 +1,1 @@
- const newmedicinedata={...medicinedata,{userid=localStorage.getItem("userid")||0 as number}};
- property assignment expected
+INSERT INTO medicine_1  (medicinename) SELECT " + request.medicinename + "WHERE  NOT EXISTS(  SELECT medicine_id FROM medicine_1  WHERE medicinename =" + request.medicinename;
