@@ -1,9 +1,2 @@
-moncheck="";
-if(this.moncheck=='true'){
- this.medicinedata.days.push("mon");
- }
- 
- 
- 
- 
-   mon <input id="mon" type="checkbox" [(ngModel)]="moncheck">
+<input type="time" [disabled]="!morningcheck" [(ngModel)]="morningtime">
+morningtime:Time=16:32:55;
