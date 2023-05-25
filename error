@@ -1,1 +1,2 @@
-NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync()
+ const newmedicinedata={...medicinedata,{userid=localStorage.getItem("userid")||0 as number}};
+ property assignment expected
