@@ -1,2 +1,2 @@
-<input type="time" [disabled]="!morningcheck" [(ngModel)]="morningtime">
-morningtime:Time=16:32:55;
+SELECT COUNT(*) From public."user-details"
+	WHERE "user-name"=@name AND "user-password"='g';
