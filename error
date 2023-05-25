@@ -1,27 +1,9 @@
- medicinedata={
-    medicinename:" ",
-    days:[],
-    timephrase:[],
-    quantity:[],
-    timequantity:[]
-  }
 moncheck="";
-tuecheck="";
-wedcheck="";
-thucheck="";
-fricheck="";
-satcheck="";
-suncheck="";
-morningcheck="";
-afternooncheck="";
-nightcheck="";
-
-
-
-
-  add_schedule(){
-    const medicinename:any= document.getElementById('medicinename') ;
-    this.medicinedata.medicinename=medicinename.value;
- if(this.moncheck=="true"){
-  this.medicinedata[days].push("mon");
+if(this.moncheck=='true'){
+ this.medicinedata.days.push("mon");
  }
+ 
+ 
+ 
+ 
+   mon <input id="mon" type="checkbox" [(ngModel)]="moncheck">
