@@ -1,1 +1,107 @@
-INSERT INTO medicine_1  (medicinename) SELECT 'm3' WHERE  NOT EXISTS(  SELECT medicine_id FROM medicine_1  WHERE medicinename ='m3')  returning medicine_id
+ public async Task<InsertAllResponse> InsertAll(InsertAllRequest request)
+        {
+            InsertAllResponse response = new InsertAllResponse();
+            try
+            {
+                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
+                {
+                    await _npgsqlConnection.OpenAsync();
+                }
+                string queryformedicine = " INSERT INTO medicine_1  (medicinename) SELECT '" + request.medicinename + "' WHERE  NOT EXISTS(  SELECT medicine_id FROM medicine_1  WHERE medicinename ='" + request.medicinename+ "')  returning medicine_id ";
+
+
+                int medicineid = 0;
+                int patientmedicine_id = 0;
+
+
+                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(queryformedicine, _npgsqlConnection))
+                {
+                    sqlcommand.CommandType = System.Data.CommandType.Text;
+                    sqlcommand.CommandTimeout = 180;
+
+
+
+                    using (NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync())
+                    { 
+                        if (await dataReader.ReadAsync())
+                        {
+
+                            medicineid = dataReader["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["medicine_id"]) : 0;
+                           
+                            response.IsSuccess = true;
+                            response.Message = "medicineid";
+                            dataReader.Close();
+                            _npgsqlConnection.Close();
+                        }
+                        else
+                        {
+                            if (medicineid == 0)
+                            {
+                                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
+                                {
+                                    await _npgsqlConnection.OpenAsync();
+                                }
+                                string queryformedicinef = "select * from medicine_1 where medicinename='" + request.medicinename + "'";
+                                using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(queryformedicinef, _npgsqlConnection))
+                                {
+                                    sqlcommand1.CommandType = System.Data.CommandType.Text;
+                                    sqlcommand1.CommandTimeout = 180;
+                                    using (NpgsqlDataReader dataReader1 = await sqlcommand.ExecuteReaderAsync())
+                                    {
+                                        if (await dataReader1.ReadAsync())
+                                        {
+
+                                            medicineid = dataReader1["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader1["medicine_id"]) : 0;
+
+                                        }
+                                    }
+                                }
+
+                            }
+                            response.IsSuccess = true;
+                            response.Message = "medicineid";
+                        }
+                       
+                    }
+                   
+
+                }
+
+                string queryforpatientmedicine = "INSERT INTO public.patientmedicine_1 (patient_id,medicine_id) VALUES("+request.userid+","+medicineid+")";
+
+
+
+                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(queryforpatientmedicine, _npgsqlConnection))
+                {
+                    sqlcommand.CommandType = System.Data.CommandType.Text;
+                    sqlcommand.CommandTimeout = 180;
+
+
+
+                    using (NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync())
+                    {
+                        if (await dataReader.ReadAsync())
+                        {
+
+                            patientmedicine_id = dataReader["patientmedicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["patientmedicine_id"]) : 0;
+                            response.IsSuccess = true;
+                            response.Message = "patientmedicineid";
+                        }
+
+                    }
+
+
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            finally
+            {
+                await _npgsqlConnection.CloseAsync();
+                await _npgsqlConnection.DisposeAsync();
+            }
+            return response;
+        }
