@@ -1,1 +1,40 @@
-SELECT patientmedicine_id FROM public.patientmedicine WHERE patient_id=1 AND medicine_id=5;
+"medicinename": "m1",
+  "days": [
+    "mon","sat","sun"
+  ],
+  "timephrase": [
+    "morning","night"
+  ],
+  "timequantity": ["8", "0", "AM", "9", "0", "PM"],
+  "userid": 5,
+  "quantity": [
+    5,6
+  ]
+}'
+message
+: 
+"Input string was not in a correct format."
+backend model
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace CrudApplicationWithMysql.CommonLayer.Model
+{
+    public class InsertAllRequest
+    {
+        public string medicinename { get; set; }
+        public string[] days { get; set; }
+        public string[] timephrase { get; set; }
+        public string[] timequantity { get; set; }
+        public int userid { get; set; }
+        public int[] quantity { get; set; }
+
+    }
+    public class InsertAllResponse
+    {
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
+    }
+}
