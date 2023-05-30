@@ -1,7 +1,8 @@
- public async Task<getallResponse> getall(getallRequest request)
+public async Task<getallResponse> getall(getallRequest request)
         {
             getallResponse response = new getallResponse();
-            List<medicine> templist = response.getall.ToList();
+         /*   response.getall = { };*/
+            List<medicine> templist =  response.getall!=null? response.getall.ToList():new List<medicine>() ;
             try
             {
                 if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
@@ -29,16 +30,16 @@
                             medicineid = dataReader["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["medicine_id"]) : 0;
                             patientmedicine_id = dataReader["patientmedicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["patientmedicine_id"]) : 0;
 
-                            string query1 = $"select m.medicinename from patientmedicine_1 p inner join medicine_1 m on p.medicine_id = m.medicine_id where patient_id={medicineid} and patientmedicine_id={patientmedicine_id}";
-                            using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            string query1 = $"select m.medicinename from patientmedicine_1 p inner join medicine_1 m on p.medicine_id = m.medicine_id where m.medicine_id={medicineid}";
+                            using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(query1, _npgsqlConnection))
                             {
                                 sqlcommand1.CommandType = System.Data.CommandType.Text;
                                 sqlcommand1.CommandTimeout = 180;
-
+                                dataReader.Close();
                                 using (NpgsqlDataReader dataReader1 = await sqlcommand1.ExecuteReaderAsync())
 
                                 {
-                                    temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicine_id"]) : "";
+                                    temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicinename"]) : "";
                                     dataReader1.Close();
                                 }
 
@@ -112,13 +113,14 @@
                             templist.Add(temp);
 
                             
-                            dataReader.Close();
+                            
 
                         }
 
 
                     }
                     response.getall = templist.ToArray();
+                    response.IsSuccess = true;
                 }
             }
             catch (Exception ex)
