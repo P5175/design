@@ -1,4 +1,4 @@
-public async Task<getallResponse> getall(getallRequest request)
+   public async Task<getallResponse> getall(getallRequest request)
         {
             getallResponse response = new getallResponse();
          /*   response.getall = { };*/
@@ -22,6 +22,7 @@ public async Task<getallResponse> getall(getallRequest request)
 
                     using (NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync())
 
+
                     {
                         while (await dataReader.ReadAsync())
                         {
@@ -29,17 +30,21 @@ public async Task<getallResponse> getall(getallRequest request)
 
                             medicineid = dataReader["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["medicine_id"]) : 0;
                             patientmedicine_id = dataReader["patientmedicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["patientmedicine_id"]) : 0;
+                            
 
                             string query1 = $"select m.medicinename from patientmedicine_1 p inner join medicine_1 m on p.medicine_id = m.medicine_id where m.medicine_id={medicineid}";
                             using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(query1, _npgsqlConnection))
                             {
                                 sqlcommand1.CommandType = System.Data.CommandType.Text;
                                 sqlcommand1.CommandTimeout = 180;
-                                dataReader.Close();
+                               
                                 using (NpgsqlDataReader dataReader1 = await sqlcommand1.ExecuteReaderAsync())
 
                                 {
-                                    temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicinename"]) : "";
+                                    if (await dataReader1.ReadAsync())
+                                    {
+                                        temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicinename"]) : "";
+                                    }
                                     dataReader1.Close();
                                 }
 
@@ -48,7 +53,7 @@ public async Task<getallResponse> getall(getallRequest request)
                             }
 
                             string query2 = $"select d.day_name from patientmedicine_days_1 pd inner join days_1 d on pd.day_id =d.day_id where patientmedicine_id ={patientmedicine_id}";
-                            using (NpgsqlCommand sqlcommand2 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            using (NpgsqlCommand sqlcommand2 = new NpgsqlCommand(query2, _npgsqlConnection))
                             {
                                 sqlcommand2.CommandType = System.Data.CommandType.Text;
                                 sqlcommand2.CommandTimeout = 180;
@@ -77,7 +82,7 @@ public async Task<getallResponse> getall(getallRequest request)
                                
                             string query3 = $"select pt.quantity ,t.timephase  from patientmedicine_timephase_1 pt inner join timephase_1 t on t.timephase_id =pt.timephase_id where patientmedicine_id ={patientmedicine_id}";
 
-                            using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(query3, _npgsqlConnection))
                                 {
                                     sqlcommand3.CommandType = System.Data.CommandType.Text;
                                     sqlcommand3.CommandTimeout = 180;
@@ -93,8 +98,8 @@ public async Task<getallResponse> getall(getallRequest request)
                                             {
                                                 string timephrase = "";
                                                 int quantity = -10;
-                                                timephrase = dataReader3["day_name"] != DBNull.Value ? Convert.ToString(dataReader3["day_name"]) : string.Empty;
-                                                quantity = dataReader3["day_name"] != DBNull.Value ? Convert.ToInt32(dataReader3["day_name"]) : 0;
+                                                timephrase = dataReader3["timephase"] != DBNull.Value ? Convert.ToString(dataReader3["timephase"]) : string.Empty;
+                                                quantity = dataReader3["quantity"] != DBNull.Value ? Convert.ToInt32(dataReader3["quantity"]) : 0;
                                                 qlist.Add(quantity);
                                                 timephlist.Add(timephrase);
                                             }
