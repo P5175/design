@@ -1,32 +1,134 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+ public async Task<getallResponse> getall(getallRequest request)
+        {
+            getallResponse response = new getallResponse();
+            List<medicine> templist = response.getall.ToList();
+            try
+            {
+                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
+                {
+                    await _npgsqlConnection.OpenAsync();
+                }
+                string queryforgetmedicine = $"SELECT patientmedicine_id,  medicine_id FROM public.patientmedicine_1 where patient_id ={request.patient_id};";
+                int medicineid = 0;
+                int patientmedicine_id = 0;
 
-namespace CrudApplicationWithMysql.CommonLayer.Model
-{
-    public class getallRequest
-    {
-        public int patient_id { get; set; }
-    }
-    public class getallResponse
-    {
-      public medicine[] getall { get; set; }
-        public bool IsSuccess { get; set; }
-        public string Message { get; set; }
-    }
-}
+                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                {
+                    sqlcommand.CommandType = System.Data.CommandType.Text;
+                    sqlcommand.CommandTimeout = 180;
 
 
-public class medicine
-    {
-        public string medicinename { get; set; }
-        public string[] days { get; set; }
-        public string[] timephrase { get; set; }
-        public string[] timequantity { get; set; }
 
-        public int[] quantity { get; set; }
-    }
-    but i am not able to run this
-     response.getall.medicinename because it says
-     medicine[] does not contain defination for medicinename
+                    using (NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync())
+
+                    {
+                        while (await dataReader.ReadAsync())
+                        {
+                            medicine temp = new medicine();
+
+                            medicineid = dataReader["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["medicine_id"]) : 0;
+                            patientmedicine_id = dataReader["patientmedicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["patientmedicine_id"]) : 0;
+
+                            string query1 = $"select m.medicinename from patientmedicine_1 p inner join medicine_1 m on p.medicine_id = m.medicine_id where patient_id={medicineid} and patientmedicine_id={patientmedicine_id}";
+                            using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            {
+                                sqlcommand1.CommandType = System.Data.CommandType.Text;
+                                sqlcommand1.CommandTimeout = 180;
+
+                                using (NpgsqlDataReader dataReader1 = await sqlcommand1.ExecuteReaderAsync())
+
+                                {
+                                    temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicine_id"]) : "";
+                                    dataReader1.Close();
+                                }
+
+
+
+                            }
+
+                            string query2 = $"select d.day_name from patientmedicine_days_1 pd inner join days_1 d on pd.day_id =d.day_id where patientmedicine_id ={patientmedicine_id}";
+                            using (NpgsqlCommand sqlcommand2 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            {
+                                sqlcommand2.CommandType = System.Data.CommandType.Text;
+                                sqlcommand2.CommandTimeout = 180;
+
+                                using (NpgsqlDataReader dataReader2 = await sqlcommand2.ExecuteReaderAsync())
+
+                                {
+                                    if (dataReader2.HasRows)
+                                    {
+
+                                        List<string> dayslist = new List<string>();
+                                        while (await dataReader2.ReadAsync())
+                                        {
+                                            string getdata = "";
+
+                                            getdata = dataReader2["day_name"] != DBNull.Value ? Convert.ToString(dataReader2["day_name"]) : string.Empty;
+
+                                            dayslist.Add(getdata);
+                                        }
+                                        temp.days = dayslist.ToArray();
+                                    }
+
+                                    dataReader2.Close();
+                                }
+
+                                string query3 = $"select pt.quantity ,t.timephase  from patientmedicine_timephase_1 pt inner join timephase_1 t on t.timephase_id =pt.timephase_id where patientmedicine_id ={patientmedicine_id}";
+
+                                using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                                {
+                                    sqlcommand3.CommandType = System.Data.CommandType.Text;
+                                    sqlcommand3.CommandTimeout = 180;
+
+                                    using (NpgsqlDataReader dataReader3 = await sqlcommand3.ExecuteReaderAsync())
+
+                                    {
+                                        if (dataReader3.HasRows)
+                                        {
+                                            List<int> qlist = new List<int>();
+                                            List<string> timephlist = new List<string>();
+                                            while (await dataReader3.ReadAsync())
+                                            {
+                                                string timephrase = "";
+                                                int quantity = -10;
+                                                timephrase = dataReader3["day_name"] != DBNull.Value ? Convert.ToString(dataReader3["day_name"]) : string.Empty;
+                                                quantity = dataReader3["day_name"] != DBNull.Value ? Convert.ToInt32(dataReader3["day_name"]) : 0;
+                                                qlist.Add(quantity);
+                                                timephlist.Add(timephrase);
+                                            }
+                                            temp.quantity = qlist.ToArray();
+                                            temp.timephrase = timephlist.ToArray();
+                                        }
+
+                                        dataReader3.Close();
+                                    }
+                                }
+
+
+
+
+
+                                templist.Add(temp);
+
+                            }
+                            dataReader.Close();
+
+                        }
+
+
+                    }
+                    response.getall = templist.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                response.IsSuccess = false;
+                response.Message = ex.Message;
+            }
+            finally
+            {
+                await _npgsqlConnection.CloseAsync();
+                await _npgsqlConnection.DisposeAsync();
+            }
+            return response;
+        }
