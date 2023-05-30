@@ -72,10 +72,11 @@
 
                                     dataReader2.Close();
                                 }
+                            }
+                               
+                            string query3 = $"select pt.quantity ,t.timephase  from patientmedicine_timephase_1 pt inner join timephase_1 t on t.timephase_id =pt.timephase_id where patientmedicine_id ={patientmedicine_id}";
 
-                                string query3 = $"select pt.quantity ,t.timephase  from patientmedicine_timephase_1 pt inner join timephase_1 t on t.timephase_id =pt.timephase_id where patientmedicine_id ={patientmedicine_id}";
-
-                                using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
+                            using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
                                 {
                                     sqlcommand3.CommandType = System.Data.CommandType.Text;
                                     sqlcommand3.CommandTimeout = 180;
@@ -108,9 +109,9 @@
 
 
 
-                                templist.Add(temp);
+                            templist.Add(temp);
 
-                            }
+                            
                             dataReader.Close();
 
                         }
