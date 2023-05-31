@@ -1,142 +1,48 @@
-   public async Task<getallResponse> getall(getallRequest request)
+{
+aquantity: 0
+days: ['fri']
+medicinename: ""
+mquantity: 0
+nquantity: 0
+patient_id: 7
+quantity: []
+timephrase: []
+}
+this is my angular data which i send to backend 
+this is the backend model
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace CrudApplicationWithMysql.CommonLayer.Model
+{
+    public class filterRequest
+    {
+       
+        public medicine1 getall { get; set; }
+        
+    }
+    public class filterResponse
+    {
+        public medicine[] getall { get; set; }
+        public bool IsSuccess { get; set; }
+        public string Message { get; set; }
+    }
+    public class medicine1
+    {
+        public int patient_id { get; set; }
+        public string medicinename { get; set; }
+        public string[] days { get; set; }
+        public string[] timephrase { get; set; }
+        
+        public int[] quantity { get; set; }
+        public int  mquantity { get; set; }
+        public int aquantity { get; set; }
+        public int nquantity { get; set; }
+    }
+}
+public async Task<filterResponse> filter(filterRequest request)
         {
-            getallResponse response = new getallResponse();
-         /*   response.getall = { };*/
-            List<medicine> templist =  response.getall!=null? response.getall.ToList():new List<medicine>() ;
-            try
-            {
-                if (_npgsqlConnection.State != System.Data.ConnectionState.Open)
-                {
-                    await _npgsqlConnection.OpenAsync();
-                }
-                string queryforgetmedicine = $"SELECT patientmedicine_id,  medicine_id FROM public.patientmedicine_1 where patient_id ={request.patient_id};";
-                int medicineid = 0;
-                int patientmedicine_id = 0;
-
-                using (NpgsqlCommand sqlcommand = new NpgsqlCommand(queryforgetmedicine, _npgsqlConnection))
-                {
-                    sqlcommand.CommandType = System.Data.CommandType.Text;
-                    sqlcommand.CommandTimeout = 180;
-
-
-
-                    using (NpgsqlDataReader dataReader = await sqlcommand.ExecuteReaderAsync())
-
-
-                    {
-                        while (await dataReader.ReadAsync())
-                        {
-                            medicine temp = new medicine();
-
-                            medicineid = dataReader["medicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["medicine_id"]) : 0;
-                            patientmedicine_id = dataReader["patientmedicine_id"] != DBNull.Value ? Convert.ToInt32(dataReader["patientmedicine_id"]) : 0;
-                            
-
-                            string query1 = $"select m.medicinename from patientmedicine_1 p inner join medicine_1 m on p.medicine_id = m.medicine_id where m.medicine_id={medicineid}";
-                            using (NpgsqlCommand sqlcommand1 = new NpgsqlCommand(query1, _npgsqlConnection))
-                            {
-                                sqlcommand1.CommandType = System.Data.CommandType.Text;
-                                sqlcommand1.CommandTimeout = 180;
-                               
-                                using (NpgsqlDataReader dataReader1 = await sqlcommand1.ExecuteReaderAsync())
-
-                                {
-                                    if (await dataReader1.ReadAsync())
-                                    {
-                                        temp.medicinename = dataReader1["medicinename"] != DBNull.Value ? Convert.ToString(dataReader1["medicinename"]) : "";
-                                    }
-                                    dataReader1.Close();
-                                }
-
-
-
-                            }
-
-                            string query2 = $"select d.day_name from patientmedicine_days_1 pd inner join days_1 d on pd.day_id =d.day_id where patientmedicine_id ={patientmedicine_id}";
-                            using (NpgsqlCommand sqlcommand2 = new NpgsqlCommand(query2, _npgsqlConnection))
-                            {
-                                sqlcommand2.CommandType = System.Data.CommandType.Text;
-                                sqlcommand2.CommandTimeout = 180;
-
-                                using (NpgsqlDataReader dataReader2 = await sqlcommand2.ExecuteReaderAsync())
-
-                                {
-                                    if (dataReader2.HasRows)
-                                    {
-
-                                        List<string> dayslist = new List<string>();
-                                        while (await dataReader2.ReadAsync())
-                                        {
-                                            string getdata = "";
-
-                                            getdata = dataReader2["day_name"] != DBNull.Value ? Convert.ToString(dataReader2["day_name"]) : string.Empty;
-
-                                            dayslist.Add(getdata);
-                                        }
-                                        temp.days = dayslist.ToArray();
-                                    }
-
-                                    dataReader2.Close();
-                                }
-                            }
-                               
-                            string query3 = $"select pt.quantity ,t.timephase  from patientmedicine_timephase_1 pt inner join timephase_1 t on t.timephase_id =pt.timephase_id where patientmedicine_id ={patientmedicine_id}";
-
-                            using (NpgsqlCommand sqlcommand3 = new NpgsqlCommand(query3, _npgsqlConnection))
-                                {
-                                    sqlcommand3.CommandType = System.Data.CommandType.Text;
-                                    sqlcommand3.CommandTimeout = 180;
-
-                                    using (NpgsqlDataReader dataReader3 = await sqlcommand3.ExecuteReaderAsync())
-
-                                    {
-                                        if (dataReader3.HasRows)
-                                        {
-                                            List<int> qlist = new List<int>();
-                                            List<string> timephlist = new List<string>();
-                                            while (await dataReader3.ReadAsync())
-                                            {
-                                                string timephrase = "";
-                                                int quantity = -10;
-                                                timephrase = dataReader3["timephase"] != DBNull.Value ? Convert.ToString(dataReader3["timephase"]) : string.Empty;
-                                                quantity = dataReader3["quantity"] != DBNull.Value ? Convert.ToInt32(dataReader3["quantity"]) : 0;
-                                                qlist.Add(quantity);
-                                                timephlist.Add(timephrase);
-                                            }
-                                            temp.quantity = qlist.ToArray();
-                                            temp.timephrase = timephlist.ToArray();
-                                        }
-
-                                        dataReader3.Close();
-                                    }
-                                }
-
-
-
-
-
-                            templist.Add(temp);
-
-                            
-                            
-
-                        }
-
-
-                    }
-                    response.getall = templist.ToArray();
-                    response.IsSuccess = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                response.IsSuccess = false;
-                response.Message = ex.Message;
-            }
-            finally
-            {
-                await _npgsqlConnection.CloseAsync();
-                await _npgsqlConnection.DisposeAsync();
-            }
-            return response;
         }
+        but still while executing the this request.getall showing null
