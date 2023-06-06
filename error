@@ -1,34 +1,62 @@
-this is search.component file
-import { Component } from '@angular/core';
-import { Route, Router } from '@angular/router';
+this is home.ts
+import { Component, OnInit } from '@angular/core';
+import { FoodService } from '../food.service';
+import { food } from '../model/food';
+import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-search',
-  templateUrl: './search.component.html',
-  styleUrls: ['./search.component.css']
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
 })
-export class SearchComponent {
-  searchitem:string="";
- constructor(private router:Router){
+export class HomeComponent implements OnInit {
+food:food[]=[];
+constructor(private food1:FoodService,private router:ActivatedRoute){
 
 }
-
-
-  search(){
-    // console.log(this.searchitem);
-    if(this.searchitem=""){
-      this.router.navigateByUrl("");
-      console.log("if");
-      
-    }else{
-    this.router.navigateByUrl('/search/'+this.searchitem)
-    
-    // console.log("else1");
+  ngOnInit(): void {
+    this.food=this.food1.Food;
+    // console.log(this.food);
+    this.router.params.subscribe(params=>{
+      if(params['search']){
+       
+        
+        this.food=this.food1.Food.filter(food=>food.name.toLowerCase().includes(params['search'].toLowerCase()))
+        console.log(this.food);
+      }
+      if(params['tag']){
+      //  console.log("type");
+       
+        this.food=this.food1.Food.filter(food=>food.type.toLowerCase()==params['tag'])
+        // console.log(this.food);
+        
+        
+      }
+      if(params['tagg']){
+        this.food=this.food1.Food.filter(food=>food.price > 30)
+        // console.log(this.food);
+      }
+      if(params['tagl']){
+        this.food=this.food1.Food.filter(food=>food.price <= 30)
+        // console.log(this.food);
+      }
+      else{
+       
+        
+        this.food=this.food1.Food;
+      }
+    })
     
   }
-  }
+
 }
+this is home.html
 
-this is search.html file
-<input type="text" (change)="search()" [(ngModel)]="searchitem">
-but when i run this and input a then loose focus then path become search/ instead of search/a
+<app-search></app-search>
+<app-tag></app-tag>
+<div *ngFor="let item of food">
+    <div>
+        {{item.id}} {{item.name}} {{item.price}} {{item.type}}
+    </div>
+</div>
+url is generating when i click the link  but data not updataing on home.html 
