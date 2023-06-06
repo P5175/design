@@ -1,32 +1,51 @@
-Type 'food | undefined' is not assignable to type 'food'.
-  Type 'undefined' is not assignable to type 'food'.
-  import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
-import { FoodService } from '../food.service';
-import { food } from '../model/food';
+this is  a cart.service 
+import { Injectable } from '@angular/core';
+import { cart } from './model/cart';
+import { cartitem } from './model/cartitem';
 
-@Component({
-  selector: 'app-product',
-  templateUrl: './product.component.html',
-  styleUrls: ['./product.component.css']
+@Injectable({
+  providedIn: 'root'
 })
-export class ProductComponent implements OnInit{
-  constructor(private food1:FoodService,private router:ActivatedRoute,private route:Router){
+export class CartService {
 
+  constructor() { }
+
+  private cart:cart=new cart();
+  changequantity(id:number,quantity:number){
+   let cartitem=this.cart.items.find(item=>item.food.id===id);
+   if(!cartitem){
+    return;
+   }
+   cartitem.quantity=quantity;
   }
-  onefood:food={
-    id: 0,
-    name: '',
-    price: 0,
-    type: ''
-  };
-  ngOnInit(): void {
-    this.router.params.subscribe(params=>{
-      if(params['id']){
-       
-        this.onefood=this.food1.Food.find(food=>food.id==params['id']);
-      }
-    })
+  addtocart(id:number){
+    let cartitem=this.cart.items.find(item=>item.food.id===id)
+if(cartitem){
+  this.changequantity(id,cartitem.quantity+1)
+  return
+}
+this.cart.items.push(cartitem);   
   }
-  
+}
+this is cartitem.ts
+import { food } from "./food";
+export class cartitem{
+    food!: food; 
+quantity:number=1;
+get price():number{
+    return this.food.price*this.quantity;
+}}
+this is cart.ts
+
+import { cartitem } from "./cartitem";
+
+export class cart{
+    items:cartitem[]=[];
+    get totalprice():number{
+        let totalprice=0;
+        this.items.forEach(item=>{
+            totalprice += item.price;
+        })
+        return totalprice;
+    }
 }
