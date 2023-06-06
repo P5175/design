@@ -1,62 +1,32 @@
-this is home.ts
-import { Component, OnInit } from '@angular/core';
+Type 'food | undefined' is not assignable to type 'food'.
+  Type 'undefined' is not assignable to type 'food'.
+  import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router } from '@angular/router';
 import { FoodService } from '../food.service';
 import { food } from '../model/food';
-import { ActivatedRoute } from '@angular/router';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: 'app-product',
+  templateUrl: './product.component.html',
+  styleUrls: ['./product.component.css']
 })
-export class HomeComponent implements OnInit {
-food:food[]=[];
-constructor(private food1:FoodService,private router:ActivatedRoute){
+export class ProductComponent implements OnInit{
+  constructor(private food1:FoodService,private router:ActivatedRoute,private route:Router){
 
-}
+  }
+  onefood:food={
+    id: 0,
+    name: '',
+    price: 0,
+    type: ''
+  };
   ngOnInit(): void {
-    this.food=this.food1.Food;
-    // console.log(this.food);
     this.router.params.subscribe(params=>{
-      if(params['search']){
+      if(params['id']){
        
-        
-        this.food=this.food1.Food.filter(food=>food.name.toLowerCase().includes(params['search'].toLowerCase()))
-        console.log(this.food);
-      }
-      if(params['tag']){
-      //  console.log("type");
-       
-        this.food=this.food1.Food.filter(food=>food.type.toLowerCase()==params['tag'])
-        // console.log(this.food);
-        
-        
-      }
-      if(params['tagg']){
-        this.food=this.food1.Food.filter(food=>food.price > 30)
-        // console.log(this.food);
-      }
-      if(params['tagl']){
-        this.food=this.food1.Food.filter(food=>food.price <= 30)
-        // console.log(this.food);
-      }
-      else{
-       
-        
-        this.food=this.food1.Food;
+        this.onefood=this.food1.Food.find(food=>food.id==params['id']);
       }
     })
-    
   }
-
+  
 }
-this is home.html
-
-<app-search></app-search>
-<app-tag></app-tag>
-<div *ngFor="let item of food">
-    <div>
-        {{item.id}} {{item.name}} {{item.price}} {{item.type}}
-    </div>
-</div>
-url is generating when i click the link  but data not updataing on home.html 
