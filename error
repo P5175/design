@@ -1,51 +1,39 @@
-this is  a cart.service 
-import { Injectable } from '@angular/core';
-import { cart } from './model/cart';
-import { cartitem } from './model/cartitem';
-
-@Injectable({
-  providedIn: 'root'
+app.ts file
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms'
+@Component({
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	styleUrls: [ './app.component.css' ]
 })
-export class CartService {
-
-  constructor() { }
-
-  private cart:cart=new cart();
-  changequantity(id:number,quantity:number){
-   let cartitem=this.cart.items.find(item=>item.food.id===id);
-   if(!cartitem){
-    return;
-   }
-   cartitem.quantity=quantity;
+export class AppComponent implements OnInit {
+  
+  restricatednames=['pratham'];
+  signupform!: FormGroup;
+  
+  ngOnInit(): void {
+   this.signupform=new FormGroup({
+    'username':new FormControl(null,[Validators.required,this.isrestrictednames])
+   })
   }
-  addtocart(id:number){
-    let cartitem=this.cart.items.find(item=>item.food.id===id)
-if(cartitem){
-  this.changequantity(id,cartitem.quantity+1)
-  return
-}
-this.cart.items.push(cartitem);   
-  }
-}
-this is cartitem.ts
-import { food } from "./food";
-export class cartitem{
-    food!: food; 
-quantity:number=1;
-get price():number{
-    return this.food.price*this.quantity;
-}}
-this is cart.ts
-
-import { cartitem } from "./cartitem";
-
-export class cart{
-    items:cartitem[]=[];
-    get totalprice():number{
-        let totalprice=0;
-        this.items.forEach(item=>{
-            totalprice += item.price;
-        })
-        return totalprice;
+	isrestrictednames(control:FormControl):{[s:string]:boolean}{
+    if(this.restricatednames.includes(control.value)){
+      return {namer:true};
     }
+    return {namer:false};
+  }
+  onsubmit(){
+    console.log(this.signupform);
+    
+  }
 }
+html file
+<br>
+<form [formGroup]="signupform" (ngSubmit)="onsubmit()">
+	<input formControlName="username" placeholder="Name">
+	
+<br>
+<button type='submit'>Submit</button>
+<br>
+<br>
+</form>
