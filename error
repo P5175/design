@@ -12,14 +12,21 @@ export class AppComponent implements OnInit {
   signupform!: FormGroup;
   
   ngOnInit(): void {
+    // console.log(this)
    this.signupform=new FormGroup({
-    'username':new FormControl(null,[Validators.required,this.isrestrictednames])
+    'username':new FormControl(null,[Validators.required,this.isrestrictednames.bind(this)])
+    
    })
   }
 	isrestrictednames(control:FormControl):{[s:string]:boolean}{
     if(this.restricatednames.includes(control.value)){
+      console.log(this)
+      console.log("true");
+      
       return {namer:true};
     }
+    console.log("false");
+    
     return {namer:false};
   }
   onsubmit(){
@@ -27,6 +34,7 @@ export class AppComponent implements OnInit {
     
   }
 }
+
 html file
 <br>
 <form [formGroup]="signupform" (ngSubmit)="onsubmit()">
