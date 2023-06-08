@@ -1,1 +1,45 @@
-...Array(7).keys()
+import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+
+@Component({
+  selector: 'app-page',
+  templateUrl: './page.component.html',
+  styleUrls: ['./page.component.css']
+})
+export class PageComponent implements OnInit,OnChanges{
+  ngOnChanges(changes: SimpleChanges): void {
+    if (
+      (changes.current && changes.current.currentValue) ||
+      (changes.total && changes.total.currentValue)
+    ) {
+      this.pages = this.getpages(this.current, this.total)
+    }
+  }
+  ngOnInit(): void {
+    console.log([...Array(7).keys()].map(x=>x+1));
+  }
+  
+  @Input() current: number = 0
+  @Input() total: number = 0
+
+  pages:number[]=[];
+
+  @Output() goTo: EventEmitter<number> = new EventEmitter<number>()
+  @Output() next: EventEmitter<number> = new EventEmitter<number>()
+  @Output() previous: EventEmitter<number> = new EventEmitter<number>()
+
+  public onGoTo(page: number): void {
+    this.goTo.emit(page)
+  }
+  public onNext(): void {
+    this.next.emit(this.current)
+  }
+  public onPrevious(): void {
+    this.previous.next(this.current)
+  }
+  private getpages(current:number,total:number):number[]{
+    
+    
+    return  [...Array(7).keys()].map(x=>x);
+   
+  }
+}
