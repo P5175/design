@@ -1,3 +1,61 @@
-app-after-view-component' is not a known element:
-1. If 'app-after-view-component' is an Angular component, then verify that it is part of this module.
-2. If 'app-after-view-component' is a Web Component then add 'CUSTOM_ELEMENTS_SCHEMA' to the '@NgModule.schemas' of this component to suppress this message.
+app.html
+
+<app-after-view-component></app-after-view-component>
+
+after-view-component.component.ts
+
+import { Component, ViewChild } from '@angular/core';
+import { ChildViewComponentComponent } from '../child-view-component/child-view-component.component';
+
+@Component({
+  selector: 'app-after-view-component',
+  template: `<div>child view begins</div>
+  <app-child-view-component></app-child-view-component>
+<div>child view ends</div>`,
+  
+})
+export class AfterViewComponentComponent {
+  private prevHero = '';
+
+  // Query for a VIEW child of type `ChildViewComponent`
+  @ViewChild(ChildViewComponentComponent) viewChild!: ChildViewComponentComponent;
+  
+
+  ngAfterViewInit() {
+    // viewChild is set after the view has been initialized
+    // console.log();
+    console.log('afterviewinit');
+   
+    
+  }
+
+  ngAfterViewChecked() {
+    console.log(this.prevHero+" "+this.viewChild.hero)
+    // viewChild is updated after the view has been checked
+    if (this.prevHero === this.viewChild.hero) {
+      console.log('AfterViewChecked (no change)');
+     
+    } else {
+      this.prevHero = this.viewChild.hero;
+      console.log('AfterViewChecked');
+      ;
+      
+    }
+  }
+}
+
+child-view-component.component.ts
+
+import { Component } from '@angular/core';
+
+@Component({
+  selector: 'app-child-view-component',
+  template: `<label for="hero-name">Hero name: </label>
+  <input type="text" id="hero-name" [(ngModel)]="hero"> `
+  
+})
+export class ChildViewComponentComponent {
+  hero = 'Magneta';
+}
+ in this ngafterviewchecked three times when i dont change any input value after intiatilized why in 
+
