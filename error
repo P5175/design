@@ -1,32 +1,41 @@
-import {Component, Directive, Input, ViewChild} from '@angular/core';
+this is the app.module.ts file
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
 
-@Directive({selector: 'pane'})
-export class Pane {
-  @Input() id!: string;
-}
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ChildViewComponentComponent } from './child-view-component/child-view-component.component';
+import { AfterViewComponentComponent } from './after-view-component/after-view-component.component';
 
-@Component({
-  selector: 'example-app',
-  template: `
-    <pane id="1" *ngIf="shouldShow"></pane>
-    <pane id="2" *ngIf="!shouldShow"></pane>
-
-    <button (click)="toggle()">Toggle</button>
-
-    <div>Selected: {{selectedPane}}</div>
-  `,
+@NgModule({
+  declarations: [
+    ChildViewComponentComponent, AfterViewComponentComponent
+  ],
+  imports: [
+    BrowserModule,
+    AppRoutingModule,
+    ReactiveFormsModule,
+    FormsModule
+  ],
+  providers: [],
+  bootstrap: [AppComponent]
 })
-export class ViewChildComp {
-  @ViewChild(Pane)
-  set pane(v: Pane) {
-    setTimeout(() => {
-      this.selectedPane = v.id;
-    }, 0);
-  }
-  selectedPane: string = '';
-  shouldShow = true;
-  toggle() {
-    this.shouldShow = !this.shouldShow;
-  }
+export class AppModule { }
+
+this is the app.component
+import { Component, Inject, OnInit } from '@angular/core';
+import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms'
+@Component({
+	selector: 'app-root',
+	templateUrl: './app.component.html',
+	
+})
+export class AppComponent  {
+  
+  // restricatednames=['pratham'];
+  
 }
-why this code not working in angular what change we need to done
+this is the app.html
+<app-after-view-component></app-after-view-component>
+and i also created AfterViewComponent name component   still it give error
