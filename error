@@ -1,47 +1,32 @@
-app.ts file
-import { Component, Inject, OnInit } from '@angular/core';
-import { FormGroup, FormControl, FormArray, Validators } from '@angular/forms'
-@Component({
-	selector: 'app-root',
-	templateUrl: './app.component.html',
-	styleUrls: [ './app.component.css' ]
-})
-export class AppComponent implements OnInit {
-  
-  restricatednames=['pratham'];
-  signupform!: FormGroup;
-  
-  ngOnInit(): void {
-    // console.log(this)
-   this.signupform=new FormGroup({
-    'username':new FormControl(null,[Validators.required,this.isrestrictednames.bind(this)])
-    
-   })
-  }
-	isrestrictednames(control:FormControl):{[s:string]:boolean}{
-    if(this.restricatednames.includes(control.value)){
-      console.log(this)
-      console.log("true");
-      
-      return {namer:true};
-    }
-    console.log("false");
-    
-    return {namer:false};
-  }
-  onsubmit(){
-    console.log(this.signupform);
-    
-  }
+import {Component, Directive, Input, ViewChild} from '@angular/core';
+
+@Directive({selector: 'pane'})
+export class Pane {
+  @Input() id!: string;
 }
 
-html file
-<br>
-<form [formGroup]="signupform" (ngSubmit)="onsubmit()">
-	<input formControlName="username" placeholder="Name">
-	
-<br>
-<button type='submit'>Submit</button>
-<br>
-<br>
-</form>
+@Component({
+  selector: 'example-app',
+  template: `
+    <pane id="1" *ngIf="shouldShow"></pane>
+    <pane id="2" *ngIf="!shouldShow"></pane>
+
+    <button (click)="toggle()">Toggle</button>
+
+    <div>Selected: {{selectedPane}}</div>
+  `,
+})
+export class ViewChildComp {
+  @ViewChild(Pane)
+  set pane(v: Pane) {
+    setTimeout(() => {
+      this.selectedPane = v.id;
+    }, 0);
+  }
+  selectedPane: string = '';
+  shouldShow = true;
+  toggle() {
+    this.shouldShow = !this.shouldShow;
+  }
+}
+why this code not working in angular what change we need to done
