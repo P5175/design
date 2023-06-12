@@ -1,12 +1,22 @@
-AdBannerComponent takes an array of AdItem objects as input, which ultimately comes from AdService. AdItem objects specify the type of component to load and any data to bind to the component.AdService returns the actual ads making up the ad campaign.
+import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AdDirective } from '../ad.directive';
+import { AdComponent } from '../ad.component';
+import { AdItem } from '../AdItem';
+import { Ad1Component } from '../ad1/ad1.component';
+import { Ad2Component } from '../ad2/ad2.component';
 
-Passing an array of components to AdBannerComponent allows for a dynamic list of ads without static elements in the template.
-
-With its getAds() method, AdBannerComponent cycles through the array of AdItems and loads a new component every 3 seconds by calling loadComponent(). based on this below code other required code to achieve above ouput
-
-
+@Component({
+  selector: 'app-ad-banner',
+  template: `
+  <div class="ad-banner-example">
+    <h3>Advertisements</h3>
+    <ng-template adHost></ng-template>
+  </div>
+`
+ 
+})
 export class AdBannerComponent implements OnInit, OnDestroy {
-  @Input() ads: AdItem[] = [];
+  @Input() ads: AdItem[] = [new AdItem(Ad1Component,'ad1'),new AdItem(Ad1Component,'ad2'),new AdItem(Ad2Component,'ad3')];
 
   currentAdIndex = -1;
 
@@ -20,24 +30,30 @@ export class AdBannerComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    this.clearTimer?.();
+    console.log();
+    ;
   }
 
   loadComponent() {
     this.currentAdIndex = (this.currentAdIndex + 1) % this.ads.length;
     const adItem = this.ads[this.currentAdIndex];
+// console.log(adItem);
 
     const viewContainerRef = this.adHost.viewContainerRef;
+    // console.log(viewContainerRef);
+    
     viewContainerRef.clear();
 
     const componentRef = viewContainerRef.createComponent<AdComponent>(adItem.component);
     componentRef.instance.data = adItem.data;
+    console.log(componentRef);
+    
   }
 
   getAds() {
     const interval = setInterval(() => {
       this.loadComponent();
     }, 3000);
-    this.clearTimer = () => clearInterval(interval);
+    // this.clearTimer = () => clearInterval(interval);
   }
 }
