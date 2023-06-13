@@ -1,59 +1,188 @@
-import {  Component, Input, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { AdDirective } from '../ad.directive';
-import { AdComponent } from '../ad.component';
-import { AdItem } from '../AdItem';
-import { Ad1Component } from '../ad1/ad1.component';
-import { Ad2Component } from '../ad2/ad2.component';
+this is login.state.ts
+import { Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { LoginAction } from "../actions/login.action";
+import { DatabaseService } from "src/app/database.service";
+import { tap } from "rxjs";
+
+export class LoginStateModel{
+     sucess:boolean;
+     loaded:boolean;
+}
+
+@State<LoginStateModel>({
+    name:'login',
+    defaults:{
+       sucess:false,
+       loaded:false
+    }
+})
+
+@Injectable()
+export class LoginState{
+    constructor(private databaseservice:DatabaseService){
+
+    }
+       @Selector()
+       static loginlist(state:LoginStateModel){
+return state.sucess;
+}
+
+@Selector()
+       static loaded(state:LoginStateModel){
+return state.loaded;
+
+
+       }
+       @Action(LoginAction)
+       loginaction({getState,setState}:StateContext<LoginStateModel>,{username}:LoginAction,{userpassword}:LoginAction){
+return this.databaseservice.login_user(username,userpassword)
+   
+
+}      
+}
+
+
+
+this is database.service.ts
+
+import { HttpClient,HttpParams } from '@angular/common/http';
+import { EventEmitter, Injectable } from '@angular/core';
+@Injectable({
+  providedIn: 'root'
+})
+export class DatabaseService {
+
+apiurl:string="https://localhost:44353/api/CrudApplication";
+
+// isloggin:boolean=false;
+
+getdata:any[]=[];
+
+  constructor(private http:HttpClient) { }
+
+dataemitter=new EventEmitter<any>;
+raiseemit(data:any){
+  this.dataemitter.emit(data);
+}
+
+  register_user(user:any){
+    console.log(user);
+    
+this.http.post(this.apiurl+"/InsertUser",user).subscribe((res)=>{
+  console.log(res);
+});}
+
+login_user(name:string,password:string){
+  let params=new HttpParams();
+ params=params.append('username',name);
+ params=params.append('userpassword',password)
+ return this.http.get(this.apiurl+"/loginuser",{params:params});
+}
+
+
+add_schedule_call(medicinedata:any){
+  
+  const newmedicinedata={...medicinedata,userid:Number(localStorage.getItem("userid"))||0 as number};
+
+  console.log(newmedicinedata);
+  
+ return this.http.post(this.apiurl+"/InsertAll",newmedicinedata)
+}
+
+add_filter(medicinedataf:any){
+ let params=new HttpParams();
+ console.log(Number(localStorage.getItem("userid")));
+ 
+ 
+ const newmedicinedataf={...medicinedataf,patient_id:Number(localStorage.getItem("userid"))||0 as number};
+ console.log(newmedicinedataf);
+return this.http.post(this.apiurl+"/filter",newmedicinedataf)
+}
+  
+getall(userid:number){
+let params=new HttpParams();
+params=params.append('patient_id',Number(userid))
+// console.log(this.http.get(this.apiurl+"/getall",{params:params}));
+
+return this.http.get(this.apiurl+"/getall",{params:params})
+}
+
+
+}
+
+this is login.action.ts
+     export class LoginAction{
+        static readonly type='[Login] login';
+        constructor(public username:string,public userpassword:string){}
+     }
+     
+     
+     this is login.component.ts
+     
+     import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+import { Select, Store } from '@ngxs/store';
+import { LoginAction } from '../store/actions/login.action';
+import { Observable } from 'rxjs';
+import { LoginState } from '../store/state/login.state';
 
 @Component({
-  selector: 'app-ad-banner',
-  template: `
-  <div class="ad-banner-example">
-    <h3>Advertisements</h3>
-    <ng-template adHost></ng-template>
-  </div>
-`
- 
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class AdBannerComponent implements OnInit, OnDestroy {
-  @Input() ads: AdItem[] = [new AdItem(Ad1Component,'ad1'),new AdItem(Ad1Component,'ad2'),new AdItem(Ad2Component,'ad3')];
+export class LoginComponent {
 
-  currentAdIndex = -1;
+  constructor(private databaseservice: DatabaseService, private router: Router,private store:Store) {
 
-  @ViewChild(AdDirective, {static: true}) adHost!: AdDirective;
-
-  private clearTimer: VoidFunction | undefined;
-
-  ngOnInit(): void {
-    this.loadComponent();
-    this.getAds();
   }
+  @Select(LoginState.loginlist) login$:Observable<boolean>;
+  @Select(LoginState.loginlist) loaded$:Observable<boolean>;
 
-  ngOnDestroy() {
-    console.log();
-    ;
-  }
+  username: string = "";
+  password: string = "";
 
-  loadComponent() {
-    this.currentAdIndex = (this.currentAdIndex + 1) % this.ads.length;
-    const adItem = this.ads[this.currentAdIndex];
-// console.log(adItem);
-
-    const viewContainerRef = this.adHost.viewContainerRef;
-    // console.log(viewContainerRef);
+  onlogin(){
+    this.loaded$.subscribe(res=>{
+      if(!res){
+        this.store.dispatch(new LoginAction(this.username,this.password))
+      }
+    })
+   
+    this.login$.subscribe(res=>{console.log('state slice',res);})
     
-    viewContainerRef.clear();
+    // this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
+    //   console.log(res);
+    //   if(res.isSuccess==true){
+       
+       
+    //   this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
+    //   //  console.log(res1.getall);
+    //   this.databaseservice.getdata=res1.getall;
+    //   // console.log(this.databaseservice.getdata);
+    //   this.databaseservice.raiseemit(res1.getall);
+    //   })
 
-    const componentRef = viewContainerRef.createComponent<AdComponent>(adItem.component);
-    componentRef.instance.data = adItem.data;
-    console.log(componentRef);
-    
-  }
+// localStorage.setItem('isloggin','true');
 
-  getAds() {
-    const interval = setInterval(() => {
-      this.loadComponent();
-    }, 3000);
-    // this.clearTimer = () => clearInterval(interval);
+
+//         }
+     
+//       if (res.isSuccess) {
+//         this.router.navigateByUrl('/main');
+//       localStorage.setItem("userid",res.userid);
+        
+//       }
+//       else {
+//         this.router.navigateByUrl('/register');
+//       }
+//     });
+
   }
 }
+ now after running it gave error at this.login$.subscribe 
+ TypeError: Cannot destructure property 'userpassword' of 'undefined' as it is undefined.
+     
+
