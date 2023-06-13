@@ -1,95 +1,63 @@
-this is login.component.ts
+login.state.ts
 
-import { Component } from '@angular/core';
-import { DatabaseService } from '../database.service';
-import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { LoginAction } from '../store/actions/login.action';
-import { Observable } from 'rxjs';
-import { LoginState } from '../store/state/login.state';
+import { Injectable } from "@angular/core";
+import { Action, Selector, State, StateContext } from "@ngxs/store";
+import { LoginAction } from "../actions/login.action";
+import { DatabaseService } from "src/app/database.service";
+import { tap } from "rxjs";
+import { state } from "@angular/animations";
 
-@Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
-})
-export class LoginComponent {
-
-  constructor(private databaseservice: DatabaseService, private router: Router,private store:Store) {
-
-  }
-  @Select(LoginState.loginlist) login$:Observable<boolean>;
-  @Select(LoginState.loginlist) loaded$:Observable<boolean>;
-
-  username: string = "";
-  password: string = "";
-
-  onlogin(){
-    this.loaded$.subscribe(res=>{
-      if(!res){
-        this.store.dispatch(new LoginAction({username:this.username,userpassword:this.password}))
-      }
-    })
-   
-    this.login$.subscribe((res:any)=>{
-      console.log(res);
-      if(res.isSuccess==true){
-       
-       
-      this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
-      //  console.log(res1.getall);
-      this.databaseservice.getdata=res1.getall;
-      // console.log(this.databaseservice.getdata);
-      this.databaseservice.raiseemit(res1.getall);
-      })
-
-localStorage.setItem('isloggin','true');
-
-
-        }
-     
-      if (res.isSuccess) {
-        this.router.navigateByUrl('/main');
-      localStorage.setItem("userid",res.userid);
-        
-      }
-      else {
-        this.router.navigateByUrl('/register');
-      } } );
-    
-//     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
-//       console.log(res);
-//       if(res.isSuccess==true){
-       
-       
-//       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
-//       //  console.log(res1.getall);
-//       this.databaseservice.getdata=res1.getall;
-//       // console.log(this.databaseservice.getdata);
-//       this.databaseservice.raiseemit(res1.getall);
-//       })
-
-// localStorage.setItem('isloggin','true');
-
-
-//         }
-     
-//       if (res.isSuccess) {
-//         this.router.navigateByUrl('/main');
-//       localStorage.setItem("userid",res.userid);
-        
-//       }
-//       else {
-//         this.router.navigateByUrl('/register');
-//       }
-//     });
-
-  
-  
-  }
+export class LoginStateModel{
+     sucess:boolean;
+     loaded:boolean;
+     userid:number;
 }
 
-this is databaseservice.ts
+@State<LoginStateModel>({
+    name:'login',
+    defaults:{
+       sucess:false,
+       loaded:false,
+       userid:0
+    }
+})
+
+@Injectable()
+export class LoginState{
+    constructor(private databaseservice:DatabaseService){
+
+    }
+       @Selector()
+       static loginlist(state:LoginStateModel){
+return state.sucess;
+}
+
+@Selector()
+       static loaded(state:LoginStateModel){
+return state.loaded;
+
+
+       }
+       @Action(LoginAction)
+       loginaction({getState,setState}:StateContext<LoginStateModel>,{payload}:LoginAction){
+        const {username,userpassword}=payload;
+return this.databaseservice.login_user(username,userpassword).pipe(tap((res:any)=>{
+const state=getState();
+setState({
+    ...state,
+sucess:res.isSuccess,
+loaded:true,
+userid:res.userid
+})
+    
+}));
+   
+
+}      
+}
+
+
+database.service.ts
 
 import { HttpClient,HttpParams } from '@angular/common/http';
 import { EventEmitter, Injectable } from '@angular/core';
@@ -159,72 +127,152 @@ return this.http.get(this.apiurl+"/getall",{params:params})
 
 login.action.ts
 
-
-
      export class LoginAction{
         static readonly type='[Login] login';
         constructor(public payload:{ username:string, userpassword:string}){}
      }
      
-     this is login.state.ts
-   import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { LoginAction } from "../actions/login.action";
-import { DatabaseService } from "src/app/database.service";
-import { tap } from "rxjs";
-import { state } from "@angular/animations";
+login.component.ts
 
-export class LoginStateModel{
-     sucess:boolean;
-     loaded:boolean;
-     userid:number;
-}
+     import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+import { Select, Store } from '@ngxs/store';
+import { LoginAction } from '../store/actions/login.action';
+import { Observable } from 'rxjs';
+import { LoginState } from '../store/state/login.state';
 
-@State<LoginStateModel>({
-    name:'login',
-    defaults:{
-       sucess:false,
-       loaded:false,
-       userid:0
-    }
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
+export class LoginComponent {
 
-@Injectable()
-export class LoginState{
-    constructor(private databaseservice:DatabaseService){
+  constructor(private databaseservice: DatabaseService, private router: Router,private store:Store) {
 
-    }
-       @Selector()
-       static loginlist(state:LoginStateModel){
-return state.sucess;
-}
+  }
+  @Select(LoginState.loginlist) login$:Observable<boolean>;
+  @Select(LoginState.loginlist) loaded$:Observable<boolean>;
 
-@Selector()
-       static loaded(state:LoginStateModel){
-return state.loaded;
+  username: string = "";
+  password: string = "";
 
-
-       }
-       @Action(LoginAction)
-       loginaction({getState,setState}:StateContext<LoginStateModel>,{payload}:LoginAction){
-        const {username,userpassword}=payload;
-return this.databaseservice.login_user(username,userpassword).pipe(tap((res:any)=>{
-const state=getState();
-setState({
-    ...state,
-sucess:res.isSuccess,
-loaded:true,
-userid:res.userid
-})
+  onlogin(){
+    this.loaded$.subscribe(res=>{
+      if(!res){
+        this.store.dispatch(new LoginAction({username:this.username,userpassword:this.password})).subscribe((res:any)=>{
+          console.log(res.login.sucess);
+          if(res.login.sucess==true){
+           
+           
+          this.databaseservice.getall(res.login.userid).subscribe((res1:any)=>{
+          //  console.log(res1.getall);
+          this.databaseservice.getdata=res1.getall;
+          // console.log(this.databaseservice.getdata);
+          this.databaseservice.raiseemit(res1.getall);
+          })
     
-}));
+    localStorage.setItem('isloggin','true');
+    
+    
+            }
+         
+          if (res.login.sucess) {
+            this.router.navigateByUrl('/main');
+          localStorage.setItem("userid",res.login.userid);
+            
+          }
+          else {
+            this.router.navigateByUrl('/register');
+          } } );
+      }
+    })
    
+   
+    
+//     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
+//       console.log(res);
+//       if(res.isSuccess==true){
+       
+       
+//       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
+//       //  console.log(res1.getall);
+//       this.databaseservice.getdata=res1.getall;
+//       // console.log(this.databaseservice.getdata);
+//       this.databaseservice.raiseemit(res1.getall);
+//       })
 
-}      
+// localStorage.setItem('isloggin','true');
+
+
+//         }
+     
+//       if (res.isSuccess) {
+//         this.router.navigateByUrl('/main');
+//       localStorage.setItem("userid",res.userid);
+        
+//       }
+//       else {
+//         this.router.navigateByUrl('/register');
+//       }
+//     });
+
+  
+  
+  }
+}
+this is header.html
+
+
+<div>
+<a [routerLink]="['/']"  >home </a> ... 
+<a [routerLink]="['/']"  >about</a>...
+<a [routerLink]="['/']"  >contact</a>...
+<!-- <a [routerLink]="['/login']"   *ngIf="!isloggin()">login/register</a>...
+<a [routerLink]="['/']"   *ngIf="!islogout()" (click)="logout()">logout</a> -->
+<a [routerLink]="['/login']"  *ngIf="!isloggin()" >login/register</a>...
+<a [routerLink]="['/']"  *ngIf="isloggin()" (click)="logout()">logout</a>
+</div>
+
+
+this is header.ts
+
+import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent {
+  constructor(private databaseservice: DatabaseService, private router: Router) {
+
+  }
+//  isloggin(){
+//   return this.databaseservice.isloggin;
+// }
+// islogout(){
+//   return !this.databaseservice.isloggin
+// }
+// logout(){
+//   this.databaseservice.isloggin=false;
+// }
+isloggin(){
+  return localStorage.getItem('isloggin')==='true';
+}
+logout(){
+  localStorage.setItem('isloggin','false');
+}
 }
 
-  in login.component.ts 
-  
-   this.login$.subscribe((res:any)=>{
-      console.log(res); 
-      this console printing two time when i login firts it give false value and then true due that user not loggin and redirect to register
+
+this is the app.component.html
+
+<app-header></app-header>
+<router-outlet></router-outlet>
+<app-footer></app-footer>
+
+in this code when is login first time i logged in but then when i logout and again try to login anything not happen
