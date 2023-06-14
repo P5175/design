@@ -11,6 +11,7 @@ export class LoginStateModel{
      sucess:boolean;
      loaded:boolean;
      userid:number;
+     payload:{ username:string, userpassword:string}
 }
 
 @State<LoginStateModel>({
@@ -18,7 +19,8 @@ export class LoginStateModel{
     defaults:{
        sucess:false,
        loaded:false,
-       userid:0
+       userid:0,
+       payload:{ username:'', userpassword:''}
     }
 })
 
@@ -34,10 +36,17 @@ return state.sucess;
 
 @Selector()
        static loaded(state:LoginStateModel){
-return state.loaded;
+return state.loaded;}
 
-
-       }
+@Selector()
+static payload(state:LoginStateModel){
+    return state.payload;
+}
+    
+@Selector()
+static userid(state:LoginStateModel){
+    return state.userid;
+}
        @Action(LoginAction)
        loginaction({getState,setState}:StateContext<LoginStateModel>,{payload}:LoginAction){
         const {username,userpassword}=payload;
@@ -47,7 +56,8 @@ setState({
     ...state,
 sucess:res.isSuccess,
 loaded:true,
-userid:res.userid
+userid:res.userid,
+payload:{username:username,userpassword:userpassword}
 })
     
 }));
@@ -149,130 +159,138 @@ import { LoginState } from '../store/state/login.state';
 })
 export class LoginComponent {
 
-  constructor(private databaseservice: DatabaseService, private router: Router,private store:Store) {
+  constructor(private databaseservice: DatabaseService, private router: Router, private store: Store) {
 
   }
-  @Select(LoginState.loginlist) login$:Observable<boolean>;
-  @Select(LoginState.loginlist) loaded$:Observable<boolean>;
+  @Select(LoginState.loginlist) login$: Observable<boolean>;
+  @Select(LoginState.loaded) loaded$: Observable<boolean>;
+  @Select(LoginState.payload) payload$: Observable<{ username: string, userpassword: string }>;
+  @Select(LoginState.userid) userid$: Observable<number>;
 
   username: string = "";
   password: string = "";
 
-  onlogin(){
-    this.loaded$.subscribe(res=>{
-      if(!res){
-        this.store.dispatch(new LoginAction({username:this.username,userpassword:this.password})).subscribe((res:any)=>{
-          console.log(res.login.sucess);
-          if(res.login.sucess==true){
-           
-           
-          this.databaseservice.getall(res.login.userid).subscribe((res1:any)=>{
-          //  console.log(res1.getall);
-          this.databaseservice.getdata=res1.getall;
-          // console.log(this.databaseservice.getdata);
-          this.databaseservice.raiseemit(res1.getall);
-          })
-    
-    localStorage.setItem('isloggin','true');
-    
-    
-            }
-         
+  onlogin() {
+    // console.log("clicked");
+
+    this.loaded$.subscribe(res => {
+      console.log(res);
+
+      if (!res) {
+
+        this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
+          // console.log(res.login.sucess);
+          if (res.login.sucess == true) {
+
+
+            this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
+              //  console.log(res1.getall);
+              this.databaseservice.getdata = res1.getall;
+              // console.log(this.databaseservice.getdata);
+              this.databaseservice.raiseemit(res1.getall);
+            })
+
+            localStorage.setItem('isloggin', 'true');
+
+
+          }
+
           if (res.login.sucess) {
             this.router.navigateByUrl('/main');
-          localStorage.setItem("userid",res.login.userid);
-            
+            localStorage.setItem("userid", res.login.userid);
+
           }
           else {
             this.router.navigateByUrl('/register');
-          } } );
+          }
+        });
+      } else {
+
+        this.payload$.subscribe(res => {
+          if (res.username == this.username && res.userpassword == this.password) {
+            this.loaded$.subscribe(res => {
+              if (res == true) {
+                this.userid$.subscribe(res => {
+                  this.databaseservice.getall(res).subscribe((res1: any) => {
+                    //  console.log(res1.getall);
+                    this.databaseservice.getdata = res1.getall;
+                    console.log(this.databaseservice.getdata);
+                    this.databaseservice.raiseemit(res1.getall);
+                    localStorage.setItem('isloggin', 'true');
+                    this.router.navigateByUrl('/main');
+
+                  })
+                  localStorage.setItem("userid", res.toString());
+                })
+              }
+            }
+            )
+          } else {
+            this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
+              console.log(res.login.sucess);
+              if (res.login.sucess == true) {
+
+
+                this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
+                  //  console.log(res1.getall);
+                  this.databaseservice.getdata = res1.getall;
+                  // console.log(this.databaseservice.getdata);
+                  this.databaseservice.raiseemit(res1.getall);
+                })
+
+                localStorage.setItem('isloggin', 'true');
+
+
+              }
+
+              if (res.login.sucess) {
+                this.router.navigateByUrl('/main');
+                localStorage.setItem("userid", res.login.userid);
+
+              }
+              else {
+                this.router.navigateByUrl('/register');
+              }
+            });
+          }
+        })
+
+
       }
+
     })
-   
-   
-    
-//     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
-//       console.log(res);
-//       if(res.isSuccess==true){
-       
-       
-//       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
-//       //  console.log(res1.getall);
-//       this.databaseservice.getdata=res1.getall;
-//       // console.log(this.databaseservice.getdata);
-//       this.databaseservice.raiseemit(res1.getall);
-//       })
-
-// localStorage.setItem('isloggin','true');
 
 
-//         }
-     
-//       if (res.isSuccess) {
-//         this.router.navigateByUrl('/main');
-//       localStorage.setItem("userid",res.userid);
-        
-//       }
-//       else {
-//         this.router.navigateByUrl('/register');
-//       }
-//     });
 
-  
-  
-  }
-}
-this is header.html
+    //     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
+    //       console.log(res);
+    //       if(res.isSuccess==true){
 
 
-<div>
-<a [routerLink]="['/']"  >home </a> ... 
-<a [routerLink]="['/']"  >about</a>...
-<a [routerLink]="['/']"  >contact</a>...
-<!-- <a [routerLink]="['/login']"   *ngIf="!isloggin()">login/register</a>...
-<a [routerLink]="['/']"   *ngIf="!islogout()" (click)="logout()">logout</a> -->
-<a [routerLink]="['/login']"  *ngIf="!isloggin()" >login/register</a>...
-<a [routerLink]="['/']"  *ngIf="isloggin()" (click)="logout()">logout</a>
-</div>
+    //       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
+    //       //  console.log(res1.getall);
+    //       this.databaseservice.getdata=res1.getall;
+    //       // console.log(this.databaseservice.getdata);
+    //       this.databaseservice.raiseemit(res1.getall);
+    //       })
+
+    // localStorage.setItem('isloggin','true');
 
 
-this is header.ts
+    //         }
 
-import { Component } from '@angular/core';
-import { DatabaseService } from '../database.service';
-import { Router } from '@angular/router';
+    //       if (res.isSuccess) {
+    //         this.router.navigateByUrl('/main');
+    //       localStorage.setItem("userid",res.userid);
 
-@Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
-})
-export class HeaderComponent {
-  constructor(private databaseservice: DatabaseService, private router: Router) {
+    //       }
+    //       else {
+    //         this.router.navigateByUrl('/register');
+    //       }
+    //     });
+
+
 
   }
-//  isloggin(){
-//   return this.databaseservice.isloggin;
-// }
-// islogout(){
-//   return !this.databaseservice.isloggin
-// }
-// logout(){
-//   this.databaseservice.isloggin=false;
-// }
-isloggin(){
-  return localStorage.getItem('isloggin')==='true';
 }
-logout(){
-  localStorage.setItem('isloggin','false');
-}
-}
-
-
-this is the app.component.html
-
-<app-header></app-header>
-<router-outlet></router-outlet>
-<app-footer></app-footer>
-
-in this code when is login first time i logged in but then when i logout and again try to login anything not happen
+after executing this code it doesnt give error but in login component onlogin method both if and else condition working but i executed onlogin only once login button clicked 
