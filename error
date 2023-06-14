@@ -1,5 +1,740 @@
-login.state.ts
+this is header component
 
+in the header component this is the  header.html
+
+
+
+<div>
+<a [routerLink]="['/']"  >home </a> ... 
+<a [routerLink]="['/']"  >about</a>...
+<a [routerLink]="['/']"  >contact</a>...
+<!-- <a [routerLink]="['/login']"   *ngIf="!isloggin()">login/register</a>...
+<a [routerLink]="['/']"   *ngIf="!islogout()" (click)="logout()">logout</a> -->
+<a [routerLink]="['/login']"  *ngIf="!isloggin()" >login/register</a>...
+<a [routerLink]="['/']"  *ngIf="isloggin()" (click)="logout()">logout</a>
+</div>
+
+
+in the header component this is the  header.ts
+
+import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent {
+  constructor(private databaseservice: DatabaseService, private router: Router) {
+
+  }
+
+isloggin(){
+  return localStorage.getItem('isloggin')==='true';
+}
+logout(){
+  localStorage.setItem('isloggin','false');
+}
+}
+
+
+this is the home component
+
+in the home component this is the  home.html
+
+<p>home works!</p>
+
+in the home component this is the  home.ts
+
+import { Component, DoCheck, OnInit } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-home',
+  templateUrl: './home.component.html',
+  styleUrls: ['./home.component.css']
+})
+export class HomeComponent implements OnInit{
+
+constructor (private databaseservice:DatabaseService){}
+  ngOnInit(): void {
+    // console.log(this.databaseservice.isloggin);
+   
+  }
+ }
+
+this is the login component
+
+
+in the login component this is the  login.html
+
+user name <input type="text" required [(ngModel)]="username">
+password <input type="text" required [(ngModel)]="password">
+<button (click)="onlogin()">log in </button>
+if not then register <button routerLink="/register" >register</button>
+
+in the login component this is the  login.ts
+
+import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+import { Select, Store } from '@ngxs/store';
+import { LoginAction } from '../store/actions/login.action';
+import { Observable, first } from 'rxjs';
+import { LoginState } from '../store/state/login.state';
+
+@Component({
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
+})
+export class LoginComponent {
+
+  constructor(private databaseservice: DatabaseService, private router: Router, private store: Store) {
+
+  }
+  @Select(LoginState.loginlist) login$: Observable<boolean>;
+  @Select(LoginState.loaded) loaded$: Observable<boolean>;
+  @Select(LoginState.payload) payload$: Observable<{ username: string, userpassword: string }>;
+  @Select(LoginState.userid) userid$: Observable<number>;
+
+  username: string = "";
+  password: string = "";
+
+  onlogin() {
+    // console.log("clicked");
+
+    this.loaded$.pipe(first()).subscribe(res => {
+      console.log("clicked");
+
+      if (!res) {
+
+        this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
+          // console.log(res.login.sucess);
+          if (res.login.sucess == true) {
+
+
+            this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
+              //  console.log(res1.getall);
+              this.databaseservice.getdata = res1.getall;
+              // console.log(this.databaseservice.getdata);
+              this.databaseservice.raiseemit(res1.getall);
+            })
+
+            localStorage.setItem('isloggin', 'true');
+
+
+          }
+
+          if (res.login.sucess) {
+            this.router.navigateByUrl('/main');
+            localStorage.setItem("userid", res.login.userid);
+
+          }
+          else {
+            this.router.navigateByUrl('/register');
+          }
+        });
+      } else {
+
+        this.payload$.pipe(first()).subscribe(res => {
+          if (res.username == this.username && res.userpassword == this.password) {
+            this.loaded$.pipe(first()).subscribe(res => {
+              if (res == true) {
+                this.userid$.pipe(first()).subscribe(res => {
+                  this.databaseservice.getall(res).subscribe((res1: any) => {
+                    //  console.log(res1.getall);
+                    this.databaseservice.raiseemit(res1.getall);
+                    this.databaseservice.getdata = res1.getall;
+                    console.log(this.databaseservice.getdata);
+                    
+                    localStorage.setItem('isloggin', 'true');
+                    this.router.navigateByUrl('/main');
+
+                  })
+                  localStorage.setItem("userid", res.toString());
+                })
+              }
+            }
+            )
+          } else {
+            this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
+              console.log(res.login.sucess);
+              if (res.login.sucess == true) {
+
+
+                this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
+                  //  console.log(res1.getall);
+                  this.databaseservice.getdata = res1.getall;
+                  // console.log(this.databaseservice.getdata);
+                  this.databaseservice.raiseemit(res1.getall);
+                })
+
+                localStorage.setItem('isloggin', 'true');
+
+
+              }
+
+              
+              else {
+                this.router.navigateByUrl('/register');
+              }
+            });
+          }
+        })
+
+
+      }
+
+    })
+
+
+
+    //     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
+    //       console.log(res);
+    //       if(res.isSuccess==true){
+
+
+    //       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
+    //       //  console.log(res1.getall);
+    //       this.databaseservice.getdata=res1.getall;
+    //       // console.log(this.databaseservice.getdata);
+    //       this.databaseservice.raiseemit(res1.getall);
+    //       })
+
+    // localStorage.setItem('isloggin','true');
+
+
+    //         }
+
+    //       if (res.isSuccess) {
+    //         this.router.navigateByUrl('/main');
+    //       localStorage.setItem("userid",res.userid);
+
+    //       }
+    //       else {
+    //         this.router.navigateByUrl('/register');
+    //       }
+    //     });
+
+
+
+  }
+}
+
+
+
+this is the main component
+
+in the main component this is the main.html
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta id="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+        add schedule
+    </button>
+    <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal1">
+        filter
+    </button>
+    <!--filter -->
+    <div class="modal fade" id="exampleModal1" tabindex="-1" role="dialog" aria-labelledby="exampleModal1Label"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModal1Label">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    medicine name <input type="text" id="medicinenamef">
+                    <div>
+                        mon <input id="monf" type="checkbox" [(ngModel)]="moncheckf">
+                        tue <input id="tuef" type="checkbox" [(ngModel)]="tuecheckf">
+                        wed <input id="wedf" type="checkbox" [(ngModel)]="wedcheckf">
+                        thu <input id="thuf" type="checkbox" [(ngModel)]="thucheckf">
+                        fri <input id="frif" type="checkbox" [(ngModel)]="fricheckf">
+                        sat <input id="satf" type="checkbox" [(ngModel)]="satcheckf">
+                        sun <input id="sunf" type="checkbox" [(ngModel)]="suncheckf">
+                    </div>
+
+                    <div>time phrase: morning <input id="morningf" type="checkbox" [(ngModel)]="morningcheckf">
+                        afternoon<input id="afternoonf" type="checkbox" [(ngModel)]="afternooncheckf">
+                        night<input id="nightf" type="checkbox" [(ngModel)]="nightcheckf"></div>
+                    <div>
+                        quantity <input id="morning-quantityf" style="width:90px" type="number" [(ngModel)]="morningqf">
+                        <input id="afternoon-quantityf" style="width:90px" type="number" [(ngModel)]="afternoonqf">
+                        <input id="night-quantityf" style="width:90px" type="number" [(ngModel)]="nightqf">
+                    </div>
+                    
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" (click)="filter()">Save changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!--add -->
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    medicine name <input type="text" id="medicinename">
+                    <div>
+                        mon <input id="monf" type="checkbox" [(ngModel)]="moncheck">
+                        tue <input id="tuef" type="checkbox" [(ngModel)]="tuecheck">
+                        wed <input id="wedf" type="checkbox" [(ngModel)]="wedcheck">
+                        thu <input id="thuf" type="checkbox" [(ngModel)]="thucheck">
+                        fri <input id="frif" type="checkbox" [(ngModel)]="fricheck">
+                        sat <input id="satf" type="checkbox" [(ngModel)]="satcheck">
+                        sun <input id="sunf" type="checkbox" [(ngModel)]="suncheck">
+                    </div>
+
+                    <div>time phrase: morning <input id="morning" type="checkbox" [(ngModel)]="morningcheck">
+                        afternoon<input id="afternoon" type="checkbox" [(ngModel)]="afternooncheck">
+                        night<input id="night" type="checkbox" [(ngModel)]="nightcheck"></div>
+                    <div>
+                        quantity <input id="morning-quantity" style="width:90px" type="number"
+                            [disabled]="!morningcheck" [(ngModel)]="morningq">
+                        <input id="afternoon-quantity" style="width:90px" type="number" [disabled]="!afternooncheck"
+                            [(ngModel)]="afternoonq">
+                        <input id="night-quantity" style="width:90px" type="number" [disabled]="!nightcheck"
+                            [(ngModel)]="nightq">
+                    </div>
+                    <div>time quantity
+                        <div>
+                            <input type="number" name="mtime1" [disabled]="!morningcheck" [(ngModel)]="morningtimeh">
+                            <input type="number" name="mtime2" [disabled]="!morningcheck" [(ngModel)]="morningtimem">
+                            <select name="mtime3" [disabled]="!morningcheck" id="" [(ngModel)]="morningtimet">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+
+                        <div><input type="string" name="atime1" [disabled]="!afternooncheck"
+                                [(ngModel)]="afternoontimeh">
+                            <input type="number" name="atime2" [disabled]="!afternooncheck"
+                                [(ngModel)]="afternoontimem">
+                            <select name="atime3" [disabled]="!afternooncheck" id="" [(ngModel)]="morningtimet">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+
+                        <div><input type="string" name="ntime1" [disabled]="!nightcheck" [(ngModel)]="nighttimeh">
+                            <input type="number" name="ntime2" [disabled]="!nightcheck" [(ngModel)]="nighttimem">
+                            <select name="ntime3" [disabled]="!nightcheck" id="" [(ngModel)]="nighttimet">
+                                <option value="AM">AM</option>
+                                <option value="PM">PM</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" (click)="add_schedule()" class="btn btn-primary">submit</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <app-scroll></app-scroll>
+</body>
+
+</html>
+
+in the main component this is the main.ts
+
+import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Time } from '@angular/common';
+import { isNgContainer } from '@angular/compiler';
+
+@Component({
+  selector: 'app-main',
+  templateUrl: './main.component.html',
+  styleUrls: ['./main.component.css']
+})
+export class MainComponent {
+
+  constructor(private databaseservice: DatabaseService) {
+
+  }
+
+  medicinedata={
+    medicinename:" ",
+    days:[] as string[],
+    timephrase:[] as string[],
+    quantity : [] as number[],
+    timequantity:[] as string[]
+  }
+  medicinedataf={
+    medicinename:" ",
+    days:[] as string[],
+    timephrase:[] as string[],
+    quantity : [] as number[],
+    mquantity : 0,
+    aquantity:0,
+nquantity:0,
+    
+  }
+
+moncheck:boolean=false;
+tuecheck:boolean=false;
+wedcheck:boolean=false;
+thucheck:boolean=false;
+fricheck:boolean=false;
+satcheck:boolean=false;
+suncheck:boolean=false;
+morningcheck:boolean=false;
+afternooncheck:boolean=false;
+nightcheck:boolean=false;
+
+morningq:number=0;
+afternoonq:number=0;
+nightq:number=0;
+
+morningtimeh:number=8;
+morningtimem:number=0;
+morningtimet:string='AM';
+afternoontimeh:number=12;
+afternoontimem:number=0;
+afternoontimet:string='PM';
+
+nighttimeh:number=8;
+nighttimem:number=0;
+nighttimet:string='PM';
+
+
+// filter
+moncheckf:boolean=false;
+tuecheckf:boolean=false;
+wedcheckf:boolean=false;
+thucheckf:boolean=false;
+fricheckf:boolean=false;
+satcheckf:boolean=false;
+suncheckf:boolean=false;
+morningcheckf:boolean=false;
+afternooncheckf:boolean=false;
+nightcheckf:boolean=false;
+
+morningqf:number=0;
+afternoonqf:number=0;
+nightqf:number=0;
+  add_schedule(){
+    const medicinename:any= document.getElementById('medicinename') ;
+    this.medicinedata.medicinename=medicinename.value;
+    // console.log(this.moncheck);
+ if(this.moncheck==true){
+ this.medicinedata.days.push("mon");
+ }
+ if(this.tuecheck==true){
+  this.medicinedata.days.push("tue");
+ }
+ if(this.wedcheck==true){
+  this.medicinedata.days.push("wed");
+  
+  
+ }
+ if(this.thucheck==true){
+  this.medicinedata.days.push("thu");
+ }
+ if(this.fricheck==true){
+  this.medicinedata.days.push("fri");
+ }
+ if(this.satcheck==true){
+  this.medicinedata.days.push("sat");
+ }
+ if(this.suncheck==true){
+  this.medicinedata.days.push("sun");
+ }
+ if(this.morningcheck==true){
+  this.medicinedata.timephrase.push("morning");
+  
+  const morningq:any=document.getElementById('morning-quantity');
+ 
+  
+  this.medicinedata.quantity.push (Number( morningq.value) )
+  this.medicinedata.timequantity.push(this.morningtimeh.toString())
+  this.medicinedata.timequantity.push(this.morningtimem.toString())
+  this.medicinedata.timequantity.push(this.morningtimet)
+  
+ }
+ if(this.afternooncheck==true){  
+  this.medicinedata.timephrase.push("afternoon");
+  const afterenoonq:any=document.getElementById('afternoon-quantity');
+ 
+  this.medicinedata.quantity.push(Number( afterenoonq.value))
+  this.medicinedata.timequantity.push(this.afternoontimeh.toString())
+  this.medicinedata.timequantity.push(this.afternoontimem.toString())
+  this.medicinedata.timequantity.push(this.afternoontimet)
+ }
+ if(this.nightcheck==true){
+  this.medicinedata.timephrase.push("night");
+  const nightq:any=document.getElementById('night-quantity');
+ 
+  this.medicinedata.quantity.push(Number( nightq.value))
+  this.medicinedata.timequantity.push(this.nighttimeh.toString())
+  this.medicinedata.timequantity.push(this.nighttimem.toString())
+  this.medicinedata.timequantity.push(this.nighttimet)
+ }
+ console.log(this.medicinedata);
+ 
+       this.databaseservice.add_schedule_call(this.medicinedata).subscribe((res:any)=>{
+        console.log(res);
+       
+       });
+
+       
+    console.log(this.databaseservice.getdata)  
+    
+      
+  }
+
+
+  filter(){
+    const medicinename:any= document.getElementById('medicinenamef') ;
+    this.medicinedataf.medicinename=medicinename.value;
+
+    if(this.moncheckf==true){
+      this.medicinedataf.days.push("mon");
+      }
+      if(this.tuecheckf==true){
+       this.medicinedataf.days.push("tue");
+      }
+      if(this.wedcheckf==true){
+       this.medicinedataf.days.push("wed");
+       
+       
+      }
+      if(this.thucheckf==true){
+       this.medicinedataf.days.push("thu");
+      }
+      if(this.fricheckf==true){
+       this.medicinedataf.days.push("fri");
+      }
+      if(this.satcheckf==true){
+       this.medicinedataf.days.push("sat");
+      }
+      if(this.suncheckf==true){
+       this.medicinedataf.days.push("sun");
+      }
+      if(this.morningcheckf==true){
+        this.medicinedataf.timephrase.push("morning");
+        
+       
+       }
+       if(this.afternooncheckf==true){  
+        this.medicinedataf.timephrase.push("afternoon");
+       
+        
+       }
+       if(this.nightcheckf==true){
+        this.medicinedataf.timephrase.push("night");
+       
+       
+       }
+
+       const morningq:any=document.getElementById('morning-quantityf');
+       if(Number( morningq.value)>0){
+        this.medicinedata.quantity.push(Number( morningq.value))
+       this.medicinedataf.mquantity=Number( morningq.value) 
+       }
+
+      
+       const afterenoonq:any=document.getElementById('afternoon-quantityf');
+       if(Number( afterenoonq.value)>0){
+        this.medicinedata.quantity.push(Number( afterenoonq.value))
+       this.medicinedataf.aquantity=Number( afterenoonq.value)
+       }
+
+
+       const nightq:any=document.getElementById('night-quantityf');
+       if(Number( nightq.value)>0){
+        this.medicinedata.quantity.push(Number( nightq.value))
+       this.medicinedataf.nquantity=Number( nightq.value)
+       }
+
+       console.log(this.medicinedataf)
+
+       this.databaseservice.add_filter(this.medicinedataf).subscribe((res:any)=>{
+      this.databaseservice.getdata=res.getall;
+      this.databaseservice.raiseemit(res.getall);
+       });
+    
+  }
+}
+
+
+this is the register component
+in the register component this is the register.html
+
+user name <input type="text" required [(ngModel)]="username">
+password <input type="text" required  [(ngModel)]="userpassword">
+mobile number <input type="text" required  [(ngModel)]="mobilenumber">
+<button (click)="onregister()">register </button>done with register then
+ <button routerLink="/login" >go to login </button>
+ 
+ 
+ in the register component this is the register.ts
+
+import { Component } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-register',
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
+})
+export class RegisterComponent {
+constructor(private databaseservice:DatabaseService,private router:Router){
+
+}
+
+  username:string="";
+  userpassword:string="";
+  mobilenumber:string="";
+
+  
+  onregister(){
+  this.databaseservice.register_user({username:this.username,userpassword:this.userpassword,mobilenumber:this.mobilenumber});
+  this.router.navigateByUrl('/login');
+  }
+
+}
+
+this is the scroll component
+
+in the scroll component this is the scroll.html
+
+
+
+<ng-container *ngIf="getdataforloop?.length">
+<div *ngFor="let item of getdataforloop">
+<div class="div" >
+<div>
+    {{item.medicinename}}
+</div>
+<div>
+    {{item.days}}
+</div>
+<div>
+    {{item.timephrase}}
+</div>
+<div>
+    {{item.quantity}}
+</div>
+</div>
+
+
+</div>
+</ng-container>
+
+
+<ng-container *ngIf="!getdataforloop?.length">
+<h1>{{getdataforloop?.length}}</h1>
+<h1>nothing to show</h1>
+</ng-container>
+
+in the scroll component this is the scroll.html
+
+
+
+<ng-container *ngIf="getdataforloop?.length">
+<div *ngFor="let item of getdataforloop">
+<div class="div" >
+<div>
+    {{item.medicinename}}
+</div>
+<div>
+    {{item.days}}
+</div>
+<div>
+    {{item.timephrase}}
+</div>
+<div>
+    {{item.quantity}}
+</div>
+</div>
+
+
+</div>
+</ng-container>
+
+
+<ng-container *ngIf="!getdataforloop?.length">
+<h1>{{getdataforloop?.length}}</h1>
+<h1>nothing to show</h1>
+</ng-container>
+
+in the scroll component this is the scroll.ts
+
+import { Component, DoCheck, OnChanges, OnInit } from '@angular/core';
+import { DatabaseService } from '../database.service';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-scroll',
+  templateUrl: './scroll.component.html',
+  styleUrls: ['./scroll.component.css']
+})
+export class ScrollComponent implements OnInit,DoCheck {
+
+  constructor(private databaseservice: DatabaseService, private router: Router) {
+
+  }
+  ngDoCheck(): void {
+    this.databaseservice.dataemitter.subscribe(()=>{
+      this.getdataforloop=this.databaseservice.getdata;
+      console.log(this.getdataforloop);
+      
+    })
+  }
+  
+  getdataforloop:any[]=[];
+
+  ngOnInit(): void {
+    this.databaseservice.dataemitter.subscribe(()=>{
+      this.getdataforloop=this.databaseservice.getdata;
+      console.log(this.getdataforloop);
+      
+    })
+  }
+  
+}
+
+
+this is login.action.ts
+
+     export class LoginAction{
+        static readonly type='[Login] login';
+        constructor(public payload:{ username:string, userpassword:string}){}
+     }   
+    
+    this is login.state.ts
+    
 import { Injectable } from "@angular/core";
 import { Action, Selector, State, StateContext } from "@ngxs/store";
 import { LoginAction } from "../actions/login.action";
@@ -66,231 +801,6 @@ payload:{username:username,userpassword:userpassword}
 }      
 }
 
-
-database.service.ts
-
-import { HttpClient,HttpParams } from '@angular/common/http';
-import { EventEmitter, Injectable } from '@angular/core';
-@Injectable({
-  providedIn: 'root'
-})
-export class DatabaseService {
-
-apiurl:string="https://localhost:44353/api/CrudApplication";
-
-// isloggin:boolean=false;
-
-getdata:any[]=[];
-
-  constructor(private http:HttpClient) { }
-
-dataemitter=new EventEmitter<any>;
-raiseemit(data:any){
-  this.dataemitter.emit(data);
-}
-
-  register_user(user:any){
-    console.log(user);
     
-this.http.post(this.apiurl+"/InsertUser",user).subscribe((res)=>{
-  console.log(res);
-});}
+in this when i first time login then  data is printing but after logout and try to login again then no data to show message is printed
 
-login_user(name:string,password:string){
-  let params=new HttpParams();
- params=params.append('username',name);
- params=params.append('userpassword',password)
- return this.http.get(this.apiurl+"/loginuser",{params:params});
-}
-
-
-add_schedule_call(medicinedata:any){
-  
-  const newmedicinedata={...medicinedata,userid:Number(localStorage.getItem("userid"))||0 as number};
-
-  console.log(newmedicinedata);
-  
- return this.http.post(this.apiurl+"/InsertAll",newmedicinedata)
-}
-
-add_filter(medicinedataf:any){
- let params=new HttpParams();
- console.log(Number(localStorage.getItem("userid")));
- 
- 
- const newmedicinedataf={...medicinedataf,patient_id:Number(localStorage.getItem("userid"))||0 as number};
- console.log(newmedicinedataf);
-return this.http.post(this.apiurl+"/filter",newmedicinedataf)
-}
-  
-getall(userid:number){
-let params=new HttpParams();
-params=params.append('patient_id',Number(userid))
-// console.log(this.http.get(this.apiurl+"/getall",{params:params}));
-
-return this.http.get(this.apiurl+"/getall",{params:params})
-}
-
-
-}
-
-
-login.action.ts
-
-     export class LoginAction{
-        static readonly type='[Login] login';
-        constructor(public payload:{ username:string, userpassword:string}){}
-     }
-     
-login.component.ts
-
-     import { Component } from '@angular/core';
-import { DatabaseService } from '../database.service';
-import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { LoginAction } from '../store/actions/login.action';
-import { Observable } from 'rxjs';
-import { LoginState } from '../store/state/login.state';
-
-@Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
-})
-export class LoginComponent {
-
-  constructor(private databaseservice: DatabaseService, private router: Router, private store: Store) {
-
-  }
-  @Select(LoginState.loginlist) login$: Observable<boolean>;
-  @Select(LoginState.loaded) loaded$: Observable<boolean>;
-  @Select(LoginState.payload) payload$: Observable<{ username: string, userpassword: string }>;
-  @Select(LoginState.userid) userid$: Observable<number>;
-
-  username: string = "";
-  password: string = "";
-
-  onlogin() {
-    // console.log("clicked");
-
-    this.loaded$.subscribe(res => {
-      console.log(res);
-
-      if (!res) {
-
-        this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
-          // console.log(res.login.sucess);
-          if (res.login.sucess == true) {
-
-
-            this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
-              //  console.log(res1.getall);
-              this.databaseservice.getdata = res1.getall;
-              // console.log(this.databaseservice.getdata);
-              this.databaseservice.raiseemit(res1.getall);
-            })
-
-            localStorage.setItem('isloggin', 'true');
-
-
-          }
-
-          if (res.login.sucess) {
-            this.router.navigateByUrl('/main');
-            localStorage.setItem("userid", res.login.userid);
-
-          }
-          else {
-            this.router.navigateByUrl('/register');
-          }
-        });
-      } else {
-
-        this.payload$.subscribe(res => {
-          if (res.username == this.username && res.userpassword == this.password) {
-            this.loaded$.subscribe(res => {
-              if (res == true) {
-                this.userid$.subscribe(res => {
-                  this.databaseservice.getall(res).subscribe((res1: any) => {
-                    //  console.log(res1.getall);
-                    this.databaseservice.getdata = res1.getall;
-                    console.log(this.databaseservice.getdata);
-                    this.databaseservice.raiseemit(res1.getall);
-                    localStorage.setItem('isloggin', 'true');
-                    this.router.navigateByUrl('/main');
-
-                  })
-                  localStorage.setItem("userid", res.toString());
-                })
-              }
-            }
-            )
-          } else {
-            this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
-              console.log(res.login.sucess);
-              if (res.login.sucess == true) {
-
-
-                this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
-                  //  console.log(res1.getall);
-                  this.databaseservice.getdata = res1.getall;
-                  // console.log(this.databaseservice.getdata);
-                  this.databaseservice.raiseemit(res1.getall);
-                })
-
-                localStorage.setItem('isloggin', 'true');
-
-
-              }
-
-              if (res.login.sucess) {
-                this.router.navigateByUrl('/main');
-                localStorage.setItem("userid", res.login.userid);
-
-              }
-              else {
-                this.router.navigateByUrl('/register');
-              }
-            });
-          }
-        })
-
-
-      }
-
-    })
-
-
-
-    //     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
-    //       console.log(res);
-    //       if(res.isSuccess==true){
-
-
-    //       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
-    //       //  console.log(res1.getall);
-    //       this.databaseservice.getdata=res1.getall;
-    //       // console.log(this.databaseservice.getdata);
-    //       this.databaseservice.raiseemit(res1.getall);
-    //       })
-
-    // localStorage.setItem('isloggin','true');
-
-
-    //         }
-
-    //       if (res.isSuccess) {
-    //         this.router.navigateByUrl('/main');
-    //       localStorage.setItem("userid",res.userid);
-
-    //       }
-    //       else {
-    //         this.router.navigateByUrl('/register');
-    //       }
-    //     });
-
-
-
-  }
-}
-after executing this code it doesnt give error but in login component onlogin method both if and else condition working but i executed onlogin only once login button clicked 
