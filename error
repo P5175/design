@@ -1,220 +1,223 @@
-login component
+board-filter.componentl.ts
 
-import { Component } from '@angular/core';
-import { DatabaseService } from '../database.service';
-import { Router } from '@angular/router';
-import { Select, Store } from '@ngxs/store';
-import { LoginAction } from '../store/actions/login.action';
-import { Observable, first } from 'rxjs';
-import { LoginState } from '../store/state/login.state';
+import { Component, OnInit } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
+import { FilterQuery } from '@trungk18/project/state/filter/filter.query';
+import { FilterService } from '@trungk18/project/state/filter/filter.service';
+import { debounceTime, distinctUntilChanged } from 'rxjs/operators';
+import { ProjectQuery } from '@trungk18/project/state/project/project.query';
+import { JUser } from '@trungk18/interface/user';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'board-filter',
+  templateUrl: './board-filter.component.html',
+  styleUrls: ['./board-filter.component.scss']
 })
-export class LoginComponent {
+@UntilDestroy()
+export class BoardFilterComponent implements OnInit {
+  searchControl: FormControl = new FormControl('');
+  userIds: string[];
 
-  constructor(private databaseservice: DatabaseService, private router: Router, private store: Store) {
 
+  constructor(
+    public projectQuery: ProjectQuery,
+    public filterQuery: FilterQuery,
+    public filterService: FilterService
+  ) {
+    this.userIds = [];
   }
-  @Select(LoginState.loginlist) login$: Observable<boolean>;
-  @Select(LoginState.loaded) loaded$: Observable<boolean>;
-  @Select(LoginState.payload) payload$: Observable<{ username: string, userpassword: string }>;
-  @Select(LoginState.userid) userid$: Observable<number>;
 
-  username: string = "";
-  password: string = "";
+  ngOnInit(): void {
+    this.searchControl.valueChanges
+      .pipe(debounceTime(100), distinctUntilChanged(), untilDestroyed(this))
+      .subscribe((term) => {
+        this.filterService.updateSearchTerm(term);
+      });
 
-  onlogin() {
-    // console.log("clicked");
+    this.filterQuery.userIds$.pipe(untilDestroyed(this)).subscribe((userIds) => {
+      this.userIds = userIds;
+    });
+  }
 
-    this.loaded$.pipe(first()).subscribe(res => {
-      console.log("clicked");
+  isUserSelected(user: JUser) {
+    return this.userIds.includes(user.id);
+  }
 
-      if (!res) {
+  ignoreResolvedChanged() {
+    this.filterService.toggleIgnoreResolve();
+  }
 
-        this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
-          // console.log(res.login.sucess);
-          if (res.login.sucess == true) {
+  onlyMyIssueChanged() {
+    this.filterService.toggleOnlyMyIssue();
+  }
 
+  userChanged(user: JUser) {
+    this.filterService.toggleUserId(user.id);
+  }
 
-            this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
-               console.log("daTA FROM login component",res1);
-               this.databaseservice.raiseemit(res1.getall);
-              this.databaseservice.getdata = res1.getall;
-              console.log("daTA FROM login componentthis if ",this.databaseservice.getdata);
-              
-            })
-
-            localStorage.setItem('isloggin', 'true');
-            this.router.navigateByUrl('/main');
-            localStorage.setItem("userid", res.login.userid);
-
-          }
-
-          
-          else {
-            this.router.navigateByUrl('/register');
-          }
-        });
-      } else {
-
-        this.payload$.pipe(first()).subscribe(res => {
-          if (res.username == this.username && res.userpassword == this.password) {
-            this.loaded$.pipe(first()).subscribe(res => {
-              if (res == true) {
-                this.userid$.pipe(first()).subscribe(res => {
-                  this.databaseservice.getall(res).subscribe((res1: any) => {
-                    //  console.log(res1.getall);
-                    this.databaseservice.raiseemit(res1.getall);
-                    this.databaseservice.getdata = res1.getall;
-                    console.log(this.databaseservice.getdata);
-                    
-                    localStorage.setItem('isloggin', 'true');
-                    this.router.navigateByUrl('/main');
-
-                  })
-                  localStorage.setItem("userid", res.toString());
-                })
-              }
-            }
-            )
-          } else {
-            this.store.dispatch(new LoginAction({ username: this.username, userpassword: this.password })).subscribe((res: any) => {
-              console.log(res.login.sucess);
-              if (res.login.sucess == true) {
-
-
-                this.databaseservice.getall(res.login.userid).subscribe((res1: any) => {
-                  //  console.log(res1.getall);
-                  this.databaseservice.getdata = res1.getall;
-                  // console.log(this.databaseservice.getdata);
-                  this.databaseservice.raiseemit(res1.getall);
-                })
-
-                localStorage.setItem('isloggin', 'true');
-
-
-              }
-
-              
-              else {
-                this.router.navigateByUrl('/register');
-              }
-            });
-          }
-        })
-
-
-      }
-
-    })
-
-
-
-    //     this.databaseservice.login_user(this.username, this.password).subscribe((res: any) => {
-    //       console.log(res);
-    //       if(res.isSuccess==true){
-
-
-    //       this.databaseservice.getall(res.userid).subscribe((res1:any)=>{
-    //       //  console.log(res1.getall);
-    //       this.databaseservice.getdata=res1.getall;
-    //       // console.log(this.databaseservice.getdata);
-    //       this.databaseservice.raiseemit(res1.getall);
-    //       })
-
-    // localStorage.setItem('isloggin','true');
-
-
-    //         }
-
-    //       if (res.isSuccess) {
-    //         this.router.navigateByUrl('/main');
-    //       localStorage.setItem("userid",res.userid);
-
-    //       }
-    //       else {
-    //         this.router.navigateByUrl('/register');
-    //       }
-    //     });
-
-
-
+  resetAll() {
+    this.searchControl.setValue('');
+    this.filterService.resetAll();
   }
 }
-login.action
 
-     export class LoginAction{
-        static readonly type='[Login] login';
-        constructor(public payload:{ username:string, userpassword:string}){}
-     }   
-     
-     login state
-     import { Injectable } from "@angular/core";
-import { Action, Selector, State, StateContext } from "@ngxs/store";
-import { LoginAction } from "../actions/login.action";
-import { DatabaseService } from "src/app/database.service";
-import { tap } from "rxjs";
-import { state } from "@angular/animations";
+board-filter.html
 
-export class LoginStateModel{
-     sucess:boolean;
-     loaded:boolean;
-     userid:number;
-     payload:{ username:string, userpassword:string}
-}
+<div class="flex items-center mt-6">
+    <form class="w-40 mr-4">
+        <j-input aria-label="search"
+                 icon="search"                 
+                 [control]="searchControl">
+        </j-input>
+    </form>
+    <div class="flex flex-row mr-3">
+        <div *ngFor="let user of projectQuery.users$ | async"
+             class="lift-avatar"
+             nz-tooltip
+             [nzTooltipPlacement]="'bottom'"
+             [class.is-active]="isUserSelected(user)"
+             [nzTooltipTitle]="user.name">
+            <j-avatar class="flex"
+                      className="select-none shadow-outline-white"
+                      [avatarUrl]="user.avatarUrl"
+                      [size]="36"
+                      (click)="userChanged(user)">
+            </j-avatar>
+        </div>
+    </div>
+    <j-button class="ml-3"
+              className="btn-empty"
+              [isActive]="filterQuery.onlyMyIssue$ | async"
+              (click)="onlyMyIssueChanged()">
+        Only My Issues
+    </j-button>
+    <j-button class="ml-3"
+              [isActive]="filterQuery.ignoreResolve$ | async"
+              (click)="ignoreResolvedChanged()"
+              className="btn-empty">
+        Ignore Resolved
+    </j-button>
+    <div class="ml-3 flex items-center"
+         *ngIf="filterQuery.any$ | async">
+        <div class="mr-3 w-px bg-backgroundMedium self-stretch"></div>
+        <j-button [className]="'btn-secondary'"
+                  (click)="resetAll()">Clear all
+        </j-button>
+    </div>
+</div>
 
-@State<LoginStateModel>({
-    name:'login',
-    defaults:{
-       sucess:false,
-       loaded:false,
-       userid:0,
-       payload:{ username:'', userpassword:''}
-    }
+filter.service
+
+import { Injectable } from '@angular/core';
+import { FilterStore, createInitialFilterState } from './filter.store';
+
+@Injectable({
+  providedIn: 'root'
 })
+export class FilterService {
+  constructor(private store: FilterStore) {}
 
-@Injectable()
-export class LoginState{
-    constructor(private databaseservice:DatabaseService){
+  updateSearchTerm(searchTerm: string) {
+    this.store.update({
+      searchTerm
+    });
+  }
 
-    }
-       @Selector()
-       static loginlist(state:LoginStateModel){
-return state.sucess;
+  toggleUserId(userId: string) {
+    this.store.update((state) => {
+      const hasUser = state.userIds.includes(userId);
+      const userIds = hasUser
+        ? state.userIds.filter((x) => x !== userId)
+        : [...state.userIds, userId];
+      return {
+        ...state,
+        userIds
+      };
+    });
+  }
+
+  toggleOnlyMyIssue() {
+    this.store.update((state) => {
+      const onlyMyIssue = !state.onlyMyIssue;
+      return {
+        ...state,
+        onlyMyIssue
+      };
+    });
+  }
+
+  toggleIgnoreResolve() {
+    this.store.update((state) => {
+      const ignoreResolved = !state.ignoreResolved;
+      return {
+        ...state,
+        ignoreResolved
+      };
+    });
+  }
+
+  resetAll() {
+    this.store.update((state) => ({
+      ...state,
+      ...createInitialFilterState()
+    }));
+  }
 }
 
-@Selector()
-       static loaded(state:LoginStateModel){
-return state.loaded;}
 
-@Selector()
-static payload(state:LoginStateModel){
-    return state.payload;
+filter.store
+
+import { Injectable } from '@angular/core';
+import { Store, StoreConfig } from '@datorama/akita';
+
+export interface FilterState {
+  searchTerm: string;
+  userIds: string[];
+  onlyMyIssue: boolean;
+  ignoreResolved: boolean;
 }
-    
-@Selector()
-static userid(state:LoginStateModel){
-    return state.userid;
+
+export function createInitialFilterState(): FilterState {
+  return {
+    searchTerm: '',
+    userIds: [],
+    onlyMyIssue: false,
+    ignoreResolved: false
+  };
 }
-       @Action(LoginAction)
-       loginaction({getState,setState}:StateContext<LoginStateModel>,{payload}:LoginAction){
-        const {username,userpassword}=payload;
-return this.databaseservice.login_user(username,userpassword).pipe(tap((res:any)=>{
-const state=getState();
-setState({
-    ...state,
-sucess:res.isSuccess,
-loaded:true,
-userid:res.userid,
-payload:{username:username,userpassword:userpassword}
+
+@Injectable({
+  providedIn: 'root'
 })
-    
-}));
-   
-
-}      
+@StoreConfig({
+  name: 'filter'
+})
+export class FilterStore extends Store<FilterState> {
+  constructor() {
+    super(createInitialFilterState());
+  }
 }
 
+filter.query
+
+import { Injectable } from '@angular/core';
+import { Query } from '@datorama/akita';
+import { FilterStore, FilterState } from './filter.store';
+
+@Injectable({ providedIn: 'root' })
+export class FilterQuery extends Query<FilterState> {
+  any$ = this.select(
+    ({ searchTerm, userIds, onlyMyIssue, ignoreResolved }) =>
+      !!searchTerm || !!userIds?.length || onlyMyIssue || ignoreResolved
+  );
+  all$ = this.select();
+  userIds$ = this.select('userIds');
+  onlyMyIssue$ = this.select('onlyMyIssue');
+  ignoreResolve$ = this.select('ignoreResolved');
+
+  constructor(protected store: FilterStore) {
+    super(store);
+  }
+}
+explain this code with in deep
