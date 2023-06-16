@@ -1,5 +1,14 @@
-issueByStatusSorted$ = (status: IssueStatus): Observable<JIssue[]> => this.issues$.pipe(
-      map((issues) => issues
-          .filter((x) => x.status === status)
-          .sort((a, b) => a.listPosition - b.listPosition))
-    );
+export enum IssueStatus {
+  BACKLOG = 'Backlog',
+  SELECTED = 'Selected',
+  // eslint-disable-next-line @typescript-eslint/naming-convention
+  IN_PROGRESS = 'InProgress',
+  DONE = 'Done'
+}
+
+export const IssueStatusDisplay = {
+  [IssueStatus.BACKLOG]: 'Backlog',
+  [IssueStatus.SELECTED]: 'Selected for Development',
+  [IssueStatus.IN_PROGRESS]: 'In progress',
+  [IssueStatus.DONE]: 'Done'
+};
