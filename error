@@ -1,2 +1,12 @@
  this.f.userIds[0].patchValue(user.id);
  cant read properties of null undefined
+initForm() {
+    this.issueForm = this._fb.group({
+      type: [IssueType.TASK],
+      priority: [IssuePriority.MEDIUM],
+      title: ['', NoWhitespaceValidator()],
+      description: [''],
+      reporterId: [''],
+      userIds: [[]]
+    });
+  }
