@@ -1,2 +1,78 @@
-(16) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}]0: {createdAt: '2020-08-27T14:23:38.183Z', description: "<p>I shared some of my technical decisions behind …t=jpg&amp;name=large' alt='Image'></p><p><br></p>", id: '6527', priority: 'Medium', reporterId: 'd65047e5-f4cf-4caa-9a38-6073dcbab7d1', …}1: {type: 'Story', priority: 'Medium', title: 'Jira Clone Storybook - Update 10/2020', description: '<h3>What is Storybook</h3><p>Storybook helps you b…ilt with Angular 10, Akita and ng-zorro"></a></p>', reporterId: 'd65047e5-f4cf-4caa-9a38-6073dcbab7d1', …}2: {type: 'Story', priority: 'Highest', title: 'Angular Spotify 🎧', description: `<h3>Hey Angular people, what's up? 😆</h3><p>I wan…="Angular Spotify Visualizer"></a></p><p><br></p>`, reporterId: 'd65047e5-f4cf-4caa-9a38-6073dcbab7d1', …}3: {type: 'Story', priority: 'Highest', title: 'Merry Christmas 🎄🎄🎄', description: "<p><span style='background-color: transparent;'>20…This is Totoro, my most favorite character 😂</p>", reporterId: 'd65047e5-f4cf-4caa-9a38-6073dcbab7d1', …}4: {type: 'Story', priority: 'Highest', title: 'How to build Jira clone? Follow these tutorials from its author. Update part 8 - 11/2020 😍', description: "<h3>I have prepared a set of tutorial for some maj…_blank'>Build a placeholder loading</a></li></ol>", reporterId: 'd65047e5-f4cf-4caa-9a38-6073dcbab7d1', …}5: {id: '9013', title: 'Set up project structure ⛏️⛏️', description: '<h3>Create front end and backend folder</h3><ul><l…#session-feature</a></li><li>Tweet Icon</li></ul>', type: 'Task', status: 'Done', …}6: {id: '9210', title: 'TailwindCSS configuration 😭😭😭', description: '<h1>No official guide to configure TailwindCSS and…ure-tailwind-css-with-angular/</a></p><p><br></p>', type: 'Task', status: 'Done', …}7: {id: '9361', title: 'Try leaving a comment on this issue.', description: '<p>Adding comments to an issue is a useful way to …ong>key to save the comment.</li></ol><p><br></p>', type: 'Story', status: 'InProgress', …}8: {id: '9451', title: 'Preparing backend API with GraphQL - Update 08/2020', description: "<p>GraphQL authentication API is ready with the en…><img src='https://i.imgur.com/MpGReIF.gif'/></p>", type: 'Story', status: 'InProgress', …}9: {id: '9631', title: 'Each issue has a single reporter but can have multiple assignees.', description: "<h2>Try assigning this issue to <strong><u>Spider … rgb(51, 51, 51);'>🤣&nbsp;🤣&nbsp;🤣</span></h2>", type: 'Task', status: 'Selected', …}10: {id: '9546', title: 'Set up Akita state management', description: '<h2>I heard about Akita and would love to try this…eate the Observable Data Stores model.</p><p></p>', type: 'Story', status: 'Done', …}11: {id: '9548', title: 'Make the CDK Drag and Drop animation smoother', description: '<h2>The drag and drop board is not working as I ex…-grow;&nbsp;&nbsp;margin-bottom:&nbsp;5px;}</pre>', type: 'Bug', status: 'Done', …}12: {id: '9584', title: 'What is Angular Jira clone application?', description: "<p>There have been a handful of cool Jira-cloned a…e='color: rgb(3, 102, 214);'>Heroku</a></li></ul>", type: 'Task', status: 'Backlog', …}13: {id: '9554', title: 'Who is the author of Angular Jira clone?', description: "<h3>Hi! My name is Trung 👋</h3><p>I am a seasoned…nk'>https://twitter.com/tuantrungvo</a></li></ul>", type: 'Task', status: 'Backlog', …}14: {id: '9665', title: 'Angular router not working on Netlify on refresh', description: "<p>Old question, but for those who might stumble o…ql-syntax' spellcheck='false'>/*  /index.html 200", type: 'Bug', status: 'Done', …}15: {id: '9667', title: 'When creating an issue, the assignee list is not working properly on searching', description: "After searching for an assignee on the list and cl…ets/img/assignee-bug.gif' alt='Assignee issue' />", type: 'Bug', status: 'Selected', …}length: 16[[Prototype]]: Array(0) in this structure after getting this whole response how to acess listposition of all 16 issue
-console.log(this.projectQuery.issues$.subscribe(res=>console.log(res))); this res is all 16 array
+import { DragDropModule } from '@angular/cdk/drag-drop';
+import { TextFieldModule } from '@angular/cdk/text-field';
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ContentLoaderModule } from '@ngneat/content-loader';
+import { AutofocusDirective } from '@trungk18/core/directives/autofocus.directive';
+import { NzDrawerModule } from 'ng-zorro-antd/drawer';
+import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
+import { NzIconModule } from 'ng-zorro-antd/icon';
+import { NzModalModule } from 'ng-zorro-antd/modal';
+import { NzNotificationModule } from 'ng-zorro-antd/notification';
+import { NzPopoverModule } from 'ng-zorro-antd/popover';
+import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
+import { QuillModule } from 'ngx-quill';
+import { JiraControlModule } from '../jira-control/jira-control.module';
+import { AddIssueModalComponent } from './components/add-issue-modal/add-issue-modal.component';
+import { IssueAssigneesSelectComponent } from './components/add-issue-modal/issue-assignees-select/issue-assignees-select.component';
+import { IssuePrioritySelectComponent } from './components/add-issue-modal/issue-priority-select/issue-priority-select.component';
+import { IssueReporterSelectComponent } from './components/add-issue-modal/issue-reporter-select/issue-reporter-select.component';
+import { IssueTypeSelectComponent } from './components/add-issue-modal/issue-type-select/issue-type-select.component';
+import { BoardPageComponents } from './components/board';
+import { IssueUtilComponents } from './components/issues';
+import { NavigationComponents } from './components/navigation';
+import { ResizerComponent } from './components/navigation/resizer/resizer.component';
+import { IssueResultComponent } from './components/search/issue-result/issue-result.component';
+import { SearchDrawerComponent } from './components/search/search-drawer/search-drawer.component';
+import { UserComponent } from './components/user/user.component';
+import { NZ_JIRA_ICONS } from './config/icons';
+import { BoardComponent } from './pages/board/board.component';
+import { FullIssueDetailComponent } from './pages/full-issue-detail/full-issue-detail.component';
+import { SettingsComponent } from './pages/settings/settings.component';
+import { ProjectRoutingModule } from './project-routing.module';
+import { ProjectComponent } from './project.component';
+
+@NgModule({
+  declarations: [
+    AutofocusDirective,
+    ...NavigationComponents,
+    ...BoardPageComponents,
+    ...IssueUtilComponents,
+    ProjectComponent,
+    BoardComponent,
+    SettingsComponent,
+    FullIssueDetailComponent,
+    SearchDrawerComponent,
+    IssueResultComponent,
+    AddIssueModalComponent,
+    UserComponent,
+    IssueTypeSelectComponent,
+    IssuePrioritySelectComponent,
+    IssueReporterSelectComponent,
+    IssueAssigneesSelectComponent,
+    ResizerComponent
+  ],
+  imports: [
+    CommonModule,
+    ProjectRoutingModule,
+    NzIconModule.forChild(NZ_JIRA_ICONS),
+    NzToolTipModule,
+    NzModalModule,
+    NzDropDownModule,
+    NzSelectModule,
+    NzNotificationModule,
+    NzDrawerModule,
+    NzPopoverModule,
+    DragDropModule,
+    TextFieldModule,
+    FormsModule,
+    ReactiveFormsModule,
+    JiraControlModule,
+    ContentLoaderModule,
+    QuillModule
+  ]
+})
+export class ProjectModule {}
+ this is the module file why in this navigation component specified using spread operator
