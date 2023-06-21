@@ -1,159 +1,50 @@
-navigation.html
-<div class="navigation">
-    <div class="flex flex-row overflow-hidden h-full">
-        <app-navbar-left></app-navbar-left>
-        <app-sidebar [expanded]="expanded"></app-sidebar>
+index.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <link rel="stylesheet" href="index.css">
+</head>
+<body>
+  <header id="header" class="header">
+    <div id="left"><img src="/Assets/Logo.svg" alt=""></div>
+    <div id="mid"><a href="">Products</a>
+        <a href="">Challenges</a>
+        <a href="">Resources</a>
+        <a href="">Other Links</a></div>
+    <div id="right">
+        <button>sign in</button>
+        <button>Try for free</button>
     </div>
-    <app-resizer (click)="toggle()" [expanded]="expanded"></app-resizer>
-</div>
+  </header>
 
-navigation.ts
-import { Component, Input, Output, EventEmitter } from '@angular/core';
 
-@Component({
-  selector: 'app-navigation',
-  templateUrl: './navigation.component.html',
-  styleUrls: ['./navigation.component.scss']
-})
-export class NavigationComponent {
-  @Input() expanded: boolean;
-  @Output() manualToggle = new EventEmitter();
-  constructor() {}
+<script src="index.js"></script>
+</body>
+</html>
 
-  toggle() {
-    this.manualToggle.emit();
-  }
+index.css
+
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+#header{
+    display: flex;
+    justify-content: space-around;
 }
 
-
-sidebar.html
-
-<div [style.width.px]="sidebarWidth"
-     class="sidebar">
-    <div class="sidebar-content">
-        <div class="flex px-1 py-6">
-            <j-avatar avatarUrl="https://res.cloudinary.com/dvujyxh7e/image/upload/c_scale,w_256/v1593097745/angular-vietnam-transparent_iwfwxa.png"
-                      [name]="'Project'"
-                      [rounded]="false"
-                      [size]="45"
-                      title="Angular Vietnam">
-            </j-avatar>
-            <div class="pl-2">
-                <div class="font-medium text-textDark text-15">
-                    {{ project.name }}
-                </div>
-                <div class="text-textMedium text-13">
-                    {{ project.category }} Project
-                </div>
-            </div>
-        </div>
-
-        <div *ngFor="let link of sideBarLinks; let idx = index">
-            <a *ngIf="link.url"
-               [routerLink]="link.url"
-               routerLinkActive="active"
-               class="link allowed">
-
-                <svg-icon class="mr-4"
-                          [name]="link.icon"
-                          [size]="24">
-                </svg-icon>
-
-                <div class="pt-px text-15">{{ link.name }}</div>
-            </a>
-            <div *ngIf="!link.url"
-                 class="link not-allowed">
-
-                <svg-icon class="mr-4"
-                          [name]="link.icon"
-                          [size]="24">
-                </svg-icon>
-
-                <div class="pt-px text-15">{{ link.name }}</div>
-                <div class="not-implemented">
-                    Not implemented
-                </div>
-            </div>
-
-            <div *ngIf="idx === 1"
-                 class="divider"></div>
-        </div>
-    </div>
-</div>
-
-siderbar.ts
-import { Component, Input, OnInit } from '@angular/core';
-import { UntilDestroy, untilDestroyed } from '@ngneat/until-destroy';
-import { JProject } from '@trungk18/interface/project';
-import { SideBarLink } from '@trungk18/interface/ui-model/nav-link';
-import { SideBarLinks } from '@trungk18/project/config/sidebar';
-import { ProjectQuery } from '@trungk18/project/state/project/project.query';
-
-@Component({
-  selector: 'app-sidebar',
-  templateUrl: './sidebar.component.html',
-  styleUrls: ['./sidebar.component.scss']
-})
-@UntilDestroy()
-export class SidebarComponent implements OnInit {
-  @Input() expanded: boolean;
-
-  get sidebarWidth(): number {
-    return this.expanded ? 240 : 15;
-  }
-
-  project: JProject;
-  sideBarLinks: SideBarLink[];
-
-  constructor(private _projectQuery: ProjectQuery) {
-    this._projectQuery.all$.pipe(untilDestroyed(this)).subscribe((project) => {
-      this.project = project;
-    });
-  }
-
-  ngOnInit(): void {
-    this.sideBarLinks = SideBarLinks;
-  }
+#mid a {
+    text-decoration: none;
+    color: black;
+    
 }
-
-resizer.html
-<div class="sizer-wrap">
-    <div class="strip"></div>
-    <div class="sizer">
-        <div class="line">
-
-        </div>
-    </div>
-    <button class="btn">
-        <div class="overlay"></div>
-        <span class="cursor-pointer fill-current text-white flex-shrink-0 leading-none">
-            <svg-icon [name]="icon"
-                      [size]="24"
-                      class="icon text-textMedium">
-            </svg-icon>
-        </span>
-    </button>
-</div>
-
-resizer.ts
-import { Component, Input } from '@angular/core';
-
-@Component({
-  selector: 'app-resizer',
-  templateUrl: './resizer.component.html',
-  styleUrls: ['./resizer.component.scss']
-})
-export class ResizerComponent {
-  @Input() expanded: boolean;
-
-  get icon() {
-    console.log(this.expanded)
-    return this.expanded ? 'chevron-left' : 'chevron-right';
-  }
-  constructor() {}
+#mid{
+    display: flex;
+    align-items: center;
+    
+    
 }
-
-
-how the toggle button working explain me 
-with click on app-resizer toggle happen app-sidebar remove and on again click it display again
-
