@@ -1,13 +1,4 @@
-otp.html
-<input type="number" appOtp [disabled]="true" #1>
-<input type="number" appOtp [disabled]="true" #2>
-<input type="number" appOtp [disabled]="true" #3>
-<input type="number" appOtp [disabled]="true" #4>
-
-<button (click)="enter()">enter otp</button>
-
 otp.ts
-
 import { Component, ElementRef, ViewChild } from '@angular/core';
 
 @Component({
@@ -28,23 +19,29 @@ export class OtpComponent {
   fourth!: ElementRef;
  
   enter(){
-
+this.first.nativeElement.disabled=false;
+this.first.nativeElement.focus();
+  }
+onkeyup(){
+  // console.log("called");
+  console.log(this.first.nativeElement.value);
+  
+  if(this.first.nativeElement.value>0 && this.first.nativeElement.value<9){
+    this.second.nativeElement.disabled=false;
+    this.second.nativeElement.focus();
+    console.log("hekllo");
+    
   }
 }
-
-otp.directive
-import { Directive, ElementRef, HostListener } from '@angular/core';
-
-@Directive({
-  selector: '[appOtp]'
-})
-export class OtpDirective {
-
-  constructor(private el:ElementRef) { }
-
-  @HostListener('keydown',['$event'])
-  onkeydown(event:KeyboardEvent){
-   console.log(event)
-  }
+ 
 }
-how to change first disble false in enter method angualr
+otp.html
+
+<input type="number" appOtp [disabled]="true" #1 (keyup)="onkeyup()">
+<input type="number" appOtp [disabled]="true" #2 >
+<input type="number" appOtp [disabled]="true" #3 >
+<input type="number" appOtp [disabled]="true" #4 >
+
+<button (click)="enter()">enter otp</button>
+in this code why second element not disbled why
+
