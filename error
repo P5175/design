@@ -11,37 +11,80 @@ export class OtpComponent {
 
   @ViewChild('1')
   first!: ElementRef;
-  @ViewChild('1')
+  @ViewChild('2')
   second!: ElementRef;
-  @ViewChild('1')
+  @ViewChild('3')
   third!: ElementRef;
-  @ViewChild('1')
+  @ViewChild('4')
   fourth!: ElementRef;
  
   enter(){
 this.first.nativeElement.disabled=false;
 this.first.nativeElement.focus();
   }
-onkeyup(){
+onkeyup1(event:any){
   // console.log("called");
-  console.log(this.first.nativeElement.value);
   
   if(this.first.nativeElement.value>0 && this.first.nativeElement.value<9){
     this.second.nativeElement.disabled=false;
     this.second.nativeElement.focus();
-    console.log("hekllo");
-    
+    // console.log("hekllo");
   }
 }
- 
+ onkeyup2(event:any){
+  console.log(event)
+ if(this.second.nativeElement.value==''&& event.keyCode==8){
+  this.first.nativeElement.focus();
+  this.second.nativeElement.disabled=true;
+  console.log("1");
+  
+ }
+  else if(this.second.nativeElement.value>0 && this.second.nativeElement.value<9){
+    this.third.nativeElement.disabled=false;
+    this.third.nativeElement.focus();
+    console.log("2");
+  }else if(this.second.nativeElement.value!==''&&event.keyCode==8){
+    this.second.nativeElement.focus();
+  console.log("3");
+  
+  }
+ }
+ onkeyup3(event:any){
+  if(this.third.nativeElement.value=='' && event.keyCode==8){
+    this.second.nativeElement.focus();
+    this.third.nativeElement.disabled=true;
+   }
+    else if(this.third.nativeElement.value>0 && this.third.nativeElement.value<9){
+      this.fourth.nativeElement.disabled=false;
+      this.fourth.nativeElement.focus();
+      // console.log("hekllo");
+    }else if(this.third.nativeElement.value!==''&&event.keyCode==8){
+      this.third.nativeElement.focus();
+    
+    }
+ }
+ onkeyup4(event:any){
+  if(this.fourth.nativeElement.value=='' && event.keyCode==8){
+    this.third.nativeElement.focus();
+    this.fourth.nativeElement.disabled=true;
+   }
+    else if(this.fourth.nativeElement.value>0 && this.fourth.nativeElement.value<9){
+      alert("otp entered ")
+      // console.log("hekllo");
+    }else if(this.fourth.nativeElement.value!==''&&event.keyCode==8){
+      this.fourth.nativeElement.focus();
+   
+    }
+ }
 }
+
 otp.html
 
-<input type="number" appOtp [disabled]="true" #1 (keyup)="onkeyup()">
-<input type="number" appOtp [disabled]="true" #2 >
-<input type="number" appOtp [disabled]="true" #3 >
-<input type="number" appOtp [disabled]="true" #4 >
+<input type="number" appOtp [disabled]="true" #1 (keyup)="onkeyup1($event)">
+<input type="number" appOtp [disabled]="true" #2 (keyup)="onkeyup2($event)">
+<input type="number" appOtp [disabled]="true" #3 (keyup)="onkeyup3($event)">
+<input type="number" appOtp [disabled]="true" #4 (keyup)="onkeyup4($event)">
 
 <button (click)="enter()">enter otp</button>
-in this code why second element not disbled why
+in this code when we enter value in seconde input and go to third input and then backspace enter and when we come to second input and again enter backspace then second input is clear but we are not able to edit second input and go to directly first input 
 
