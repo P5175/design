@@ -1,169 +1,50 @@
-index.html
-<!DOCTYPE html>
-<html lang="en">
+otp.html
+<input type="number" appOtp [disabled]="true" #1>
+<input type="number" appOtp [disabled]="true" #2>
+<input type="number" appOtp [disabled]="true" #3>
+<input type="number" appOtp [disabled]="true" #4>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    <link rel="stylesheet" href="index.css">
-</head>
+<button (click)="enter()">enter otp</button>
 
-<body>
-    <header id="header" class="header">
-        <div id="left"><img src="/Assets/Logo.svg" alt=""></div>
-        <div id="mid">
-            <a href="#" onclick="modal()">Products</a>
-            <a href="#">Challenges</a>
-            <a href="#">Resources</a>
-            <a href="#">Other Links</a>
-           
-            <div class="popup" id="popup">
-                <div class="uparrow"></div>
-                <div id="modal">
-                    <div id="flex">
-                        <img src="Assets/Spense_Icon.svg" alt="">&nbsp;&nbsp;
-                        <h3>Spense</h3>
-                    </div>
-    
-                   <div id="flex" class="marginb">
-                    <div>
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                    </div>&nbsp;&nbsp;
-                    <div>Spense is a landing page for writers. Great for practicing absolute positioning and flex
-                        layouts.
-                    </div>
-                   </div>
-    
-                   <div id="flex">
-                    <img src="Assets/Fiber_Icon.svg" alt="">&nbsp;&nbsp;
-                    <h3>Fiber landing Page</h3>
-                   </div>
-    
-                    <div id="flex" class="marginb">
-                        <div>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>&nbsp;&nbsp;
-                        <div>An Online portfolio generator. Great to practice flex/grid layouts,and absolute positioning
-                        </div>
-                    </div>
-    
-                    <div id="flex">
-                        <img src="Assets/Gradie_Icon.svg" alt="">&nbsp;&nbsp;
-                        <h3>Gradie sign up page</h3>
-                    </div>
-                    <div id="flex" class="marginb">
-                        <div>
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        </div>&nbsp;&nbsp;
-                        <div>
-                            Gradie is a simple sign up page, great to practice centering layouts.
-                        </div>
-                    </div>
-                </div>
-    
-            </div>
-        </div>
-        <div id="right">
-            <a href="">sign in</a>
-            <button id="try">Try for free</button>
-        </div>
-    </header>
-    <div class="main">
-        
-    </div>
+otp.ts
+
+import { Component, ElementRef, ViewChild } from '@angular/core';
+
+@Component({
+  selector: 'app-otp',
+  templateUrl: './otp.component.html',
+  styleUrls: ['./otp.component.css']
+})
+export class OtpComponent {
 
 
-    <script src="index.js"></script>
-</body>
+  @ViewChild('1')
+  first!: ElementRef;
+  @ViewChild('1')
+  second!: ElementRef;
+  @ViewChild('1')
+  third!: ElementRef;
+  @ViewChild('1')
+  fourth!: ElementRef;
+ 
+  enter(){
 
-</html>
-
-index.css
-*{
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    
-}
-body{
-    background-color: rgb(230, 194, 129);
-}
-#header{
-    display: flex;
-    justify-content: space-around;
+  }
 }
 
-#mid a {
-    text-decoration: none;
-    color: black;
-    margin: 10px;
-}
+otp.directive
+import { Directive, ElementRef, HostListener } from '@angular/core';
 
-#right button{
-    margin: 10px;
-}
-#mid{
-    position: relative;
-    /* border:1px solid red; */
-}
-#right,#left,#mid{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-#right a {
-    text-decoration: none;
-    color: black;
-}
-#try{
-    color: white;
-    background-color: rgb(3, 77, 3);
-    border-radius: 3px;
-    border: none;
-    padding: 10px;
-}
-#flex{
-    display: flex;
+@Directive({
+  selector: '[appOtp]'
+})
+export class OtpDirective {
 
-}
-#popup{
-    width:350px;
-    background-color: white;
-    border-radius: 10px;
-   padding: 10px;
-   position: absolute;
-   top:60px;
-   right:100px;
-  display: none;
-}
-.marginb{
-    margin-bottom: 10px;
-}
-.uparrow{
-    width: 0;
-    height: 0;
-    border-left: 20px solid transparent;
-    border-right: 20px solid transparent;
-              
-    border-bottom: 20px solid white;
+  constructor(private el:ElementRef) { }
 
-    margin: 2rem;
-    position: absolute;
-    top:-51px;
-    left:80px
+  @HostListener('keydown',['$event'])
+  onkeydown(event:KeyboardEvent){
+   console.log(event)
+  }
 }
-
-index.js
-function modal(){
-document.getElementById('popup').style.display='block';
-}
-window.onclick=function(event){
-    console.log(event.target);
-    console.log(document.getElementsByTagName('html')[0])
-    if(event.target===document.getElementsByTagName('html') ){
-  
-        document.getElementById('popup').style.display='none';
-    }
-}
-in index.js if condition not satisfied despite the event.target and 
+how to change first disble false in enter method angualr
