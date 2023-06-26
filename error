@@ -1,90 +1,166 @@
-otp.ts
-import { Component, ElementRef, ViewChild } from '@angular/core';
+typing.html
+
+<!-- <input type="text" id="input"> -->
+<div id="paragraph" (keyup)="keyup($event)" tabindex="5" #paragraph>
+</div>
+<div id="refresh" class="refresh"><button style="font-size: 20px;" (click)="onclick()">refresh</button></div>
+
+typing.css
+
+#paragraph{
+    display: flex;
+    width:100%;
+   flex-wrap: wrap;
+   margin:30px;
+   outline: none;
+}
+:host /deep/ #paragraph div{
+    font-size: 50px;
+    margin-right: 10px;
+   
+}
+:host /deep/.sucess{
+    color: greenyellow ;
+}
+:host /deep/.error{
+    color: tomato ;
+}
+#refresh{
+    text-align: center;
+    
+}
+
+typing.ts
+
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { ParagraphService } from '../paragraph.service';
 
 @Component({
-  selector: 'app-otp',
-  templateUrl: './otp.component.html',
-  styleUrls: ['./otp.component.css']
+  selector: 'app-typing',
+  templateUrl: './typing.component.html',
+  styleUrls: ['./typing.component.css']
 })
-export class OtpComponent {
+export class TypingComponent implements AfterViewInit {
+  @ViewChild('paragraph') myDiv!: ElementRef ;
+  constructor(private paragraphService:ParagraphService){
 
-
-  @ViewChild('1')
-  first!: ElementRef;
-  @ViewChild('2')
-  second!: ElementRef;
-  @ViewChild('3')
-  third!: ElementRef;
-  @ViewChild('4')
-  fourth!: ElementRef;
- 
-  enter(){
-this.first.nativeElement.disabled=false;
-this.first.nativeElement.focus();
   }
-onkeyup1(event:any){
-  // console.log("called");
-  
-  if(this.first.nativeElement.value>0 && this.first.nativeElement.value<9){
-    this.second.nativeElement.disabled=false;
-    this.second.nativeElement.focus();
-    // console.log("hekllo");
-  }
-}
- onkeyup2(event:any){
-  console.log(event)
- if(this.second.nativeElement.value==''&& event.keyCode==8){
-  this.first.nativeElement.focus();
-  this.second.nativeElement.disabled=true;
-  console.log("1");
-  
- }
-  else if(this.second.nativeElement.value>0 && this.second.nativeElement.value<9){
-    this.third.nativeElement.disabled=false;
-    this.third.nativeElement.focus();
-    console.log("2");
-  }else if(this.second.nativeElement.value!==''&&event.keyCode==8){
-    this.second.nativeElement.focus();
-  console.log("3");
-  
-  }
- }
- onkeyup3(event:any){
-  if(this.third.nativeElement.value=='' && event.keyCode==8){
-    this.second.nativeElement.focus();
-    this.third.nativeElement.disabled=true;
-   }
-    else if(this.third.nativeElement.value>0 && this.third.nativeElement.value<9){
-      this.fourth.nativeElement.disabled=false;
-      this.fourth.nativeElement.focus();
-      // console.log("hekllo");
-    }else if(this.third.nativeElement.value!==''&&event.keyCode==8){
-      this.third.nativeElement.focus();
+   divs:number[]=[];
+   i:number=0;
+   j:number=0;
+   wordl:number=0;
+   paragraph: String = '';
+  ngAfterViewInit(): void {
+    this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
+    this.splitParagraph();
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const childCount: number = divElement.children.length;
+    for(let i=0;i<childCount;i++){
+this.divs[i]=divElement.children[i].children.length;
+    }
+    // console.log(this.divs);
     
+  }
+
+
+  splitParagraph() {
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const words: string[] = this.paragraph.split(' ');
+
+    for (let i = 0; i < words.length; i++) {
+      const wordDiv = document.createElement('div');
+      const word = words[i];
+
+      for (let j = 0; j < word.length; j++) {
+        const letterSpan = document.createElement('span');
+        letterSpan.textContent = word[j];
+        wordDiv.appendChild(letterSpan);
+      }
+
+      divElement.appendChild(wordDiv);
     }
- }
- onkeyup4(event:any){
-  if(this.fourth.nativeElement.value=='' && event.keyCode==8){
-    this.third.nativeElement.focus();
-    this.fourth.nativeElement.disabled=true;
-   }
-    else if(this.fourth.nativeElement.value>0 && this.fourth.nativeElement.value<9){
-      alert("otp entered ")
-      // console.log("hekllo");
-    }else if(this.fourth.nativeElement.value!==''&&event.keyCode==8){
-      this.fourth.nativeElement.focus();
+  }
+
+
+  onclick(){
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    divElement.textContent='';
+    this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
+    this.splitParagraph();
+     divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const childCount: number = divElement.children.length;
+    for(let i=0;i<childCount;i++){
+this.divs[i]=divElement.children[i].children.length;
+    }
+    
+    
+  }
+
+
+  keyup(e:KeyboardEvent){
+    // console.log(e.key);
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+  this.wordl=this.divs[this.i];
+  
    
-    }
- }
+   if(this.wordl!=this.j){
+    console.log("first if");
+    
+    // console.log(this.wordl);
+    // console.log(this.j);
+    // console.log(e.keyCode);
+    
+    if(e.key==divElement.children[this.i].children[this.j].textContent){
+      console.log("second if");
+      
+      // console.log(e.key);
+      // console.log(divElement.children[this.i].children[this.j].textContent);
+      divElement.children[this.i].children[this.j].classList.add('sucess');
+    }else if(e.keyCode==8){
+      console.log("second else if");
+      console.log(this.j);
+      
+      if(this.j!=0){
+this.j--;
+divElement.children[this.i].children[this.j].classList.remove('sucess');
+divElement.children[this.i].children[this.j].classList.remove('error');
+this.j--;}else{
+  this.j--;
 }
+    }
+    else{
+      console.log("else");
+      
+      // console.log(e.key);
+      // console.log(divElement.children[this.i].children[this.j].textContent);
+      divElement.children[this.i].children[this.j].classList.add('error');
+    }
+this.j++;}
+else if(e.keyCode==32){
+  // console.log(e.keyCode);
+  console.log("first 1 else if");
+this.i++;
+this.j=0;
+// console.log("spacebar");
 
-otp.html
-
-<input type="number" appOtp [disabled]="true" #1 (keyup)="onkeyup1($event)">
-<input type="number" appOtp [disabled]="true" #2 (keyup)="onkeyup2($event)">
-<input type="number" appOtp [disabled]="true" #3 (keyup)="onkeyup3($event)">
-<input type="number" appOtp [disabled]="true" #4 (keyup)="onkeyup4($event)">
-
-<button (click)="enter()">enter otp</button>
-in this code when we enter value in seconde input and go to third input and then backspace enter and when we come to second input and again enter backspace then second input is clear but we are not able to edit second input and go to directly first input 
-
+}else if(e.keyCode==8){
+  console.log("first 2 else if");
+  
+  this.j--;
+  divElement.children[this.i].children[this.j].classList.remove('sucess');
+  
+  
+}
+else{
+  console.log("first else");
+  
+  // console.log(e.keyCode);
+  
+  console.log("else");
+  
+}
+    // console.log(j);
+    
+  }
+}
+ now when i keyup i want focus with one vertical line like input tag what to do
