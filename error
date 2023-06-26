@@ -1,7 +1,10 @@
 typing.html
 
-<!-- <input type="text" id="input"> -->
+<div style="position: relative;">
 <div id="paragraph" (keyup)="keyup($event)" tabindex="5" #paragraph>
+   
+</div>
+<span id="cursor"></span>
 </div>
 <div id="refresh" class="refresh"><button style="font-size: 20px;" (click)="onclick()">refresh</button></div>
 
@@ -29,6 +32,27 @@ typing.css
     text-align: center;
     
 }
+#cursor{
+    position: absolute;
+    background-color: blue;
+    height: 38px;
+    width: 2px;
+    top:12px;
+    left:27px;
+    /* color: blue; */
+    animation: blink 0.7s infinite;
+}
+@keyframes blink{
+    0%{
+        opacity: 1;
+    }
+    50%{
+        opacity: 0;
+    }
+    100%{
+        opacity: 1;
+    }
+}
 
 typing.ts
 
@@ -50,6 +74,8 @@ export class TypingComponent implements AfterViewInit {
    j:number=0;
    wordl:number=0;
    paragraph: String = '';
+   wordindex:number=0;
+   letterindex:number=0;
   ngAfterViewInit(): void {
     this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
     this.splitParagraph();
@@ -99,6 +125,8 @@ this.divs[i]=divElement.children[i].children.length;
 
   keyup(e:KeyboardEvent){
     // console.log(e.key);
+    this.wordindex=this.i;
+    this.letterindex=this.j;
     const divElement: HTMLDivElement = this.myDiv.nativeElement;
   this.wordl=this.divs[this.i];
   
@@ -163,4 +191,4 @@ else{
     
   }
 }
- now when i keyup i want focus with one vertical line like input tag what to do
+in this cursor position is fixed now use onkeyup event get that element width based on that width move cursor left from that width
