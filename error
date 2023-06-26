@@ -65,27 +65,30 @@ import { ParagraphService } from '../paragraph.service';
   styleUrls: ['./typing.component.css']
 })
 export class TypingComponent implements AfterViewInit {
-  @ViewChild('paragraph') myDiv!: ElementRef ;
-  constructor(private paragraphService:ParagraphService){
+  @ViewChild('paragraph') myDiv!: ElementRef;
+  @ViewChild('cursorelement') cursorelement!: ElementRef;
+  constructor(private paragraphService: ParagraphService) {
 
   }
-   divs:number[]=[];
-   i:number=0;
-   j:number=0;
-   wordl:number=0;
-   paragraph: String = '';
-   wordindex:number=0;
-   letterindex:number=0;
+
+  divs: number[] = [];
+  i: number = 0;
+  j: number = 0;
+  wordl: number = 0;
+  paragraph: String = '';
+  count: number = 0;
+  shift:boolean=false;
+
   ngAfterViewInit(): void {
     this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
     this.splitParagraph();
     const divElement: HTMLDivElement = this.myDiv.nativeElement;
     const childCount: number = divElement.children.length;
-    for(let i=0;i<childCount;i++){
-this.divs[i]=divElement.children[i].children.length;
+    for (let i = 0; i < childCount; i++) {
+      this.divs[i] = divElement.children[i].children.length;
     }
     // console.log(this.divs);
-    
+    divElement.focus();
   }
 
 
@@ -108,87 +111,153 @@ this.divs[i]=divElement.children[i].children.length;
   }
 
 
-  onclick(){
+  onclick() {
     const divElement: HTMLDivElement = this.myDiv.nativeElement;
-    divElement.textContent='';
+    divElement.textContent = '';
     this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
     this.splitParagraph();
-     divElement: HTMLDivElement = this.myDiv.nativeElement;
+    divElement: HTMLDivElement = this.myDiv.nativeElement;
     const childCount: number = divElement.children.length;
-    for(let i=0;i<childCount;i++){
-this.divs[i]=divElement.children[i].children.length;
+    for (let i = 0; i < childCount; i++) {
+      this.divs[i] = divElement.children[i].children.length;
     }
-    
-    
+    const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+    cursorelement.removeAttribute('style');
+
   }
 
 
-  keyup(e:KeyboardEvent){
+  keyup(e: KeyboardEvent) {
     // console.log(e.key);
-    this.wordindex=this.i;
-    this.letterindex=this.j;
     const divElement: HTMLDivElement = this.myDiv.nativeElement;
-  this.wordl=this.divs[this.i];
-  
-   
-   if(this.wordl!=this.j){
-    console.log("first if");
-    
-    // console.log(this.wordl);
-    // console.log(this.j);
-    // console.log(e.keyCode);
-    
-    if(e.key==divElement.children[this.i].children[this.j].textContent){
-      console.log("second if");
-      
-      // console.log(e.key);
-      // console.log(divElement.children[this.i].children[this.j].textContent);
-      divElement.children[this.i].children[this.j].classList.add('sucess');
-    }else if(e.keyCode==8){
-      console.log("second else if");
-      console.log(this.j);
-      
-      if(this.j!=0){
-this.j--;
-divElement.children[this.i].children[this.j].classList.remove('sucess');
-divElement.children[this.i].children[this.j].classList.remove('error');
-this.j--;}else{
-  this.j--;
-}
-    }
-    else{
-      console.log("else");
-      
-      // console.log(e.key);
-      // console.log(divElement.children[this.i].children[this.j].textContent);
-      divElement.children[this.i].children[this.j].classList.add('error');
-    }
-this.j++;}
-else if(e.keyCode==32){
-  // console.log(e.keyCode);
-  console.log("first 1 else if");
-this.i++;
-this.j=0;
-// console.log("spacebar");
+    this.wordl = this.divs[this.i];
+    // if (this.j < this.wordl) {
+    //   const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+    //   console.log(letterelement);
 
-}else if(e.keyCode==8){
-  console.log("first 2 else if");
-  
-  this.j--;
-  divElement.children[this.i].children[this.j].classList.remove('sucess');
-  
-  
-}
-else{
-  console.log("first else");
-  
-  // console.log(e.keyCode);
-  
-  console.log("else");
-  
-}
+    //   const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+    //   cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+    // }
+
+    if (this.wordl != this.j) {
+      console.log("first if");
+
+      // console.log(this.wordl);
+      // console.log(this.j);
+      // console.log(e.keyCode);
+
+      if (e.key == divElement.children[this.i].children[this.j].textContent) {
+        console.log("second if");
+
+        // console.log(e.key);
+        // console.log(divElement.children[this.i].children[this.j].textContent);
+        divElement.children[this.i].children[this.j].classList.add('sucess');
+        const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+        // console.log(letterelement);
+
+        const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+        cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+      } else if (e.keyCode == 8) {
+        console.log("second else if");
+        console.log(this.j);
+
+        if (this.j != 0) {
+          this.j--;
+          divElement.children[this.i].children[this.j].classList.remove('sucess');
+          divElement.children[this.i].children[this.j].classList.remove('error');
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+          // console.log(letterelement);
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+          this.j--;
+        } else {
+          this.j--;
+        }
+      }
+      else {
+        console.log("else");
+
+        // console.log(e.key);
+        // console.log(divElement.children[this.i].children[this.j].textContent);
+        divElement.children[this.i].children[this.j].classList.add('error');
+        const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+        // console.log(letterelement);
+
+        const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+        cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+      }
+      this.j++;
+    }
+    else if (e.keyCode == 32) {
+      // console.log(e.keyCode);
+      console.log("first 1 else if");
+      this.i++;
+      this.count = 0;
+      this.j = 0;
+      // console.log("spacebar");
+      const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+      console.log(letterelement);
+
+      const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+      cursorelement.style.left = letterelement.offsetLeft + 'px';
+
+    } else if (e.keyCode == 8 && this.count == 0) {
+      console.log("first 2 else if");
+
+      const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+      console.log(letterelement);
+
+      const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+      cursorelement.style.left = letterelement.offsetLeft + 'px';
+
+      this.j--;
+
+      divElement.children[this.i].children[this.j].classList.remove('sucess');
+
+
+    } else if (e.keyCode == 8 && this.count != 0) {
+
+      var parent = divElement.children[this.i];
+      if (parent != null) {
+        var last = parent.lastChild;
+        if (last != null) {
+          console.log(this.i);
+          console.log(this.j);
+          console.log(this.count);
+
+
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+          console.log(letterelement);
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+          parent.removeChild(last);
+          this.count--;
+
+        }
+      }
+
+    }
+    else {
+      console.log("first else");
+
+      // console.log(e.keyCode);
+
+      divElement.children[this.i].innerHTML += '<span class="error">' + e.key + '</span>';
+      // this.j++;
+
+      console.log(e.key);
+
+      this.count++;
+      const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+      console.log(letterelement);
+
+      const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+      cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+    }
     // console.log(j);
-    
+
   }
 }
-in this cursor position is fixed now use onkeyup event get that element width based on that width move cursor left from that width
+this work good but in this i cant enter capital character right because when i use shift key it use it as one key event and cursor move ahead
