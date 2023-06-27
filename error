@@ -1,49 +1,55 @@
 header.html
 
-<input type="radio" id="time" name="type" value="time">
+<input type="radio" id="time" name="type" value="time" checked="checked" [(ngModel)]="selectedtype">
 <label for="time">time</label>
-<input type="radio" id="word" name="type" value="word">
+<input type="radio" id="word" name="type" value="word" [(ngModel)]="selectedtype">
 <label for="word">word</label>
-<div class="v1"></div>
+<span class="v1"></span>
 
-<input type="radio" name="timevalue" id="time15" value="15">
-<label for="15">15</label>
-<input type="radio" name="timevalue" id="time30" value="30">
-<label for="30">30</label>
-<input type="radio" name="timevalue" id="time60" value="60">
-<label for="60">60</label>
-<input type="radio" name="timevalue" id="time120" value="120">
-<label for="120">120</label>
-<input type="radio" name="timevalue" id="timecustom" value="time0">
-<label for="time0">0</label>
+<input type="radio" name="timevalue" id="time15" value=15 checked="checked" *ngIf="selectedtype=='time'">
+<label for="time15" *ngIf="selectedtype=='time'">15</label>
+<input type="radio" name="timevalue" id="time30" value=30 *ngIf="selectedtype=='time'">
+<label for="time30" *ngIf="selectedtype=='time'">30</label>
+<input type="radio" name="timevalue" id="time60" value=60 *ngIf="selectedtype=='time'">
+<label for="time60" *ngIf="selectedtype=='time'">60</label>
+<input type="radio" name="timevalue" id="time120" value=120 *ngIf="selectedtype=='time'">
+<label for="time120" *ngIf="selectedtype=='time'">120</label>
+<input type="radio" name="timevalue" id="timecustom" value=0 *ngIf="selectedtype=='time'">
+<label for="timecustom" *ngIf="selectedtype=='time'">custom</label>
 
-<input type="radio" name="wordvalue" id="word10" value="10">
-<label for="10">10</label>
-<input type="radio" name="wordvalue" id="word25" value="25">
-<label for="25">25</label>
-<input type="radio" name="wordvalue" id="word50" value="50">
-<label for="50">50</label>
-<input type="radio" name="wordvalue" id="word100" value="100">
-<label for="100">100</label>
-<input type="radio" name="wordvalue" id="wordcustotimevalue" value="word0">
-<label for="word0">0</label>
+<input type="radio" name="wordvalue" id="word10" value=10 checked="checked" *ngIf="selectedtype=='word'">
+<label for="word10" *ngIf="selectedtype=='word'">10</label>
+<input type="radio" name="wordvalue" id="word25" value=25 *ngIf="selectedtype=='word'">
+<label for="word25" *ngIf="selectedtype=='word'">25</label>
+<input type="radio" name="wordvalue" id="word50" value=50 *ngIf="selectedtype=='word'">
+<label for="word50" *ngIf="selectedtype=='word'">50</label>
+<input type="radio" name="wordvalue" id="word100" value=100 *ngIf="selectedtype=='word'">
+<label for="word100" *ngIf="selectedtype=='word'">100</label>
+<input type="radio" name="wordvalue" id="wordcustom" value=0 *ngIf="selectedtype=='word'">
+<label for="wordcustom" *ngIf="selectedtype=='word'">custom</label>
 
 
-header.css
+header.ts
 
-input[type="radio"]{
-    visibility: hidden;
-    height: 0;
-    width: 0;
+
+import { AfterViewInit, Component } from '@angular/core';
+import { ParagraphService } from 'app/paragraph.service';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent implements AfterViewInit {
+constructor(private paragraphservice:ParagraphService){
+
+}
+selectedtype:string="time";
+  ngAfterViewInit(): void {
+  
   }
 
-  .vl {
-    border-left: 6px solid green;
-    height: 500px;
-    position: absolute;
-    left: 50%;
-    margin-left: -3px;
-    top: 0;
-  }
+  
 
-why v1 not applying to div tad
+}
+
