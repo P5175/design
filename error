@@ -1,21 +1,51 @@
-<!-- <input type="text" id="input"> -->
-<div id="timer" #timerdiv >{{ timer }}</div>
-
-<div style="position: relative;">
-<appEvent id="paragraph" (keydown)="keydown($event)"  tabindex="5" #paragraph (onkeyup)="shiftup($event)" (onkeydown)="shiftdown($event)" ng-mousemove="onmousemove()">
-   
-</appEvent>
-<span id="cursor" #cursorelement></span>
-</div>
-<div id="refresh" class="refresh"><button style="font-size: 20px;" (click)="onclick()" #refresh>refresh</button></div>
+this is the app.html
 
 
-<div id="result_main" #result_main>
-    <span id="wpm" class="result">wpm</span>
-    <div id="wpma" class="resulta">{{(correctword*100/const_timer)|number:'1.0-0'}}</div>
-    <span id="accuracy"  class="result">accuracy</span>
-    <div id="accuracya"  class="resulta" *ngIf="correctword!=0 || incorrectword!=0">{{(correctword*100/(correctword+incorrectword))|number:'1.0-0'}}<span>%</span></div>
-    <div   id="accuracya"  class="resulta"  *ngIf="correctword==0 && incorrectword==0">0<span>%</span></div>
+<app-header id="header" #header></app-header>
+<app-typing id="typing" #typing></app-typing>
+<app-modal id="modal" #modal></app-modal>
 
-    <button (click)="onclick2()">try again</button>
-</div>
+
+
+this is the app.ts
+
+import { Component,OnChanges,OnDestroy,OnInit,DoCheck,AfterContentChecked,AfterContentInit,AfterViewChecked,AfterViewInit, ViewChild, ElementRef } from '@angular/core';
+import { ParagraphService } from './paragraph.service';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  title = 'practice'
+  @ViewChild('header') header!: ElementRef;
+@ViewChild('modal') modal!: ElementRef;
+@ViewChild('typing') typing!: ElementRef;
+
+  constructor(private paragraphservice:ParagraphService){
+
+  }
+  ngOnInit(): void {
+    this.paragraphservice.modalchange.subscribe(res=>{
+    
+      
+      if(res==true){
+        console.log("modl open");
+        const header: HTMLDivElement = this.header.nativeElement;
+       
+        
+        const modal: HTMLDivElement = this.modal.nativeElement;
+        const typing: HTMLDivElement = this.typing.nativeElement;
+        header.style.opacity='0';
+        typing.style.opacity='0';
+        modal.style.opacity='1';
+      }
+    })
+  }
+ 
+  
+}
+
+
+this is angular file main app file but in this header modal and typing showing undefined in ts
