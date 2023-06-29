@@ -1,128 +1,484 @@
-header.html
+typing.ts 
 
-<div *ngIf="!headervisible" #ref>
-<input type="radio" id="time" name="type" value="time" checked="checked" [(ngModel)]="selectedtype">
-<label for="time">time</label>
-<input type="radio" id="word" name="type" value="word" [(ngModel)]="selectedtype">
-<label for="word">word</label>
-<span class="v1"></span>
-
-<input type="radio" name="timevalue" id="time15" value=15 checked="checked" *ngIf="selectedtype=='time'" (change)="change($event)" >
-<label for="time15" *ngIf="selectedtype=='time'">15</label>
-<input type="radio" name="timevalue" id="time30" value=30 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
-<label for="time30" *ngIf="selectedtype=='time'">30</label>
-<input type="radio" name="timevalue" id="time60" value=60 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
-<label for="time60" *ngIf="selectedtype=='time'">60</label>
-<input type="radio" name="timevalue" id="time120" value=120 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
-<label for="time120" *ngIf="selectedtype=='time'">120</label>
-<input type="radio" name="timevalue" id="timecustom" value=0 *ngIf="selectedtype=='time'"  (change)="change($event)" (click)="click($event)" [(ngModel)]="timer">
-<label for="timecustom" *ngIf="selectedtype=='time'">custom</label>
-<!-- <button type="button" style="margin-left: 5px;" *ngIf="selectedtype=='time'" (click)="change($event)">
-    Custom
-</button> -->
-
-<input type="radio" name="wordvalue" id="word10" value=10 checked="checked" *ngIf="selectedtype=='word'">
-<label for="word10" *ngIf="selectedtype=='word'">10</label>
-<input type="radio" name="wordvalue" id="word25" value=25 *ngIf="selectedtype=='word'">
-<label for="word25" *ngIf="selectedtype=='word'">25</label>
-<input type="radio" name="wordvalue" id="word50" value=50 *ngIf="selectedtype=='word'">
-<label for="word50" *ngIf="selectedtype=='word'">50</label>
-<input type="radio" name="wordvalue" id="word100" value=100 *ngIf="selectedtype=='word'">
-<label for="word100" *ngIf="selectedtype=='word'">100</label>
-<input type="radio" name="wordvalue" id="wordcustom" value=0 *ngIf="selectedtype=='word'">
-<label for="wordcustom" *ngIf="selectedtype=='word'">custom</label>
-</div>
-<!-- <div id="modal" #modal>
- <input type="number">
- <button>ok</button>
-</div> -->
-
-
-
-header.ts
-
-
-import { AfterViewInit, Component, ElementRef, OnChanges, OnInit, ViewChild } from '@angular/core';
-import { ParagraphService } from 'app/paragraph.service';
+import { AfterViewInit, Component, DoCheck, ElementRef, EventEmitter, HostListener, OnChanges, OnInit, Output, ViewChild } from '@angular/core';
+import { ParagraphService } from '../paragraph.service';
 
 @Component({
-  selector: 'app-header',
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  selector: 'app-typing',
+  templateUrl: './typing.component.html',
+  styleUrls: ['./typing.component.css']
 })
-export class HeaderComponent implements OnInit {
-  constructor(private paragraphservice: ParagraphService) {
-
-  }
-  
-  openmodal: boolean = false;
-  ngOnInit(): void {
-
+export class TypingComponent implements AfterViewInit, OnInit {
+  @ViewChild('paragraph') myDiv!: ElementRef;
+  @ViewChild('cursorelement') cursorelement!: ElementRef;
+  @ViewChild('refresh') refresh!: ElementRef;
+  @ViewChild('timerdiv') timerdiv!: ElementRef;
+  @ViewChild('result_main') result!: ElementRef;
 
 
-    this.paragraphservice.headerchange.subscribe(res => this.headervisible = res);
 
-    //  console.log(this.headervisible);
+  divs: number[] = [];
+  i: number = 0;
+  j: number = 0;
+  wordl: number = 0;
+  max_i: number = 0;
 
-  }
-  selectedtype: string = "time";
-  
-  timer: number = 15;
+  paragraph: String = '';
+  count: number = 0;
+  shift: boolean = false;
+  const_timer: number = 15;
+  timer: number = this.const_timer; // Time in seconds
+  max_timer: number = this.const_timer;
+  wordcount: number = 10;
+  timerId: any;
+  timerstart: boolean = true;
+  correctword: number = 0;
+  incorrectword: number = 0;
+  type: string = "time";
 
+  speed: number = 0;
+  accuracy: number = 0;
   headervisible: boolean = false;
 
-  change(event: any) {
-    // console.log(event.target.value);
 
-    if (event.target.value != 0) {
-      this.timer = event.target.value;
-      console.log(this.timer);
+  constructor(private paragraphService: ParagraphService) {
 
-      this.paragraphservice.valuechanged(event.target.value)
+  }
+
+  ngOnInit(): void {
+    this.paragraphService.typechange.subscribe(res => {
+      console.log("type updated");
+      this.type = res;
+     
+
+    })
+
+
+    this.paragraphService.valuechange.subscribe(res => {
+      console.log(res);
+
+      if (this.type == 'time') {
+        if (this.j != 0 || this.i != 0) {
+          this.onclick();
+        }
+
+
+        this.max_timer = res;
+        this.const_timer = res;
+        this.timer = res;
+        console.log(res);
+      } else {
+        this.wordcount = res;
+      
+      }
+    })
+
+
+    // console.log('dada');
+
+  }
+
+
+  startTimer() {
+    this.timer = this.const_timer;
+
+    this.i = 0;
+    this.j = 0;
+    this.count = 0;
+    this.correctword = 0;
+    this.incorrectword = 0;
+    if (this.timer == 0) {
+      this.timerId = setInterval(() => {
+
+
+        this.timer++;
+
+        console.log(this.i);
+
+        if (this.i === this.max_i) {
+          console.log(this.max_timer);
+
+          this.const_timer = this.timer;
+          // this.const_timer=this.timer;
+          this.stopTimer();
+          const divElement: HTMLDivElement = this.myDiv.nativeElement;
+          const timerdiv: HTMLDivElement = this.timerdiv.nativeElement;
+          const refresh: HTMLDivElement = this.refresh.nativeElement;
+          const cursorelement: HTMLDivElement = this.cursorelement.nativeElement;
+          divElement.blur();
+          divElement.style.visibility = 'hidden';
+          timerdiv.style.visibility = 'hidden';
+          refresh.style.visibility = 'hidden';
+          cursorelement.style.visibility = 'hidden'
+          const result: HTMLDivElement = this.result.nativeElement;
+          result.style.visibility = 'visible';
+
+        }
+      }, 1000);
+    }
+    if (this.timer > 0) {
+      this.timerId = setInterval(() => {
+
+
+        this.timer--;
+
+
+        if (this.timer === 0 || this.max_i == (this.incorrectword + this.correctword)) {
+
+          this.const_timer -= this.timer;
+          console.log(this.const_timer);
+
+          this.stopTimer();
+          const divElement: HTMLDivElement = this.myDiv.nativeElement;
+          const timerdiv: HTMLDivElement = this.timerdiv.nativeElement;
+          const refresh: HTMLDivElement = this.refresh.nativeElement;
+          const cursorelement: HTMLDivElement = this.cursorelement.nativeElement;
+          divElement.blur();
+          divElement.style.visibility = 'hidden';
+          timerdiv.style.visibility = 'hidden';
+          refresh.style.visibility = 'hidden';
+          cursorelement.style.visibility = 'hidden'
+          const result: HTMLDivElement = this.result.nativeElement;
+          result.style.visibility = 'visible';
+
+        }
+      }, 1000);
+    }
+  }
+
+  stopTimer() {
+    clearInterval(this.timerId);
+    // Handle timer completion or other actions
+    this.timer = this.max_timer;
+    console.log(this.timer);
+
+  }
+
+
+  ngAfterViewInit(): void {
+    
+  //  console.log(this.type);
+  this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
+  console.log("called1");
+  
+  this.splitParagraph();
+  const divElement: HTMLDivElement = this.myDiv.nativeElement;
+  const childCount: number = divElement.children.length;
+  for (let i = 0; i < childCount; i++) {
+    this.divs[i] = divElement.children[i].children.length;
+  }
+
+  divElement.focus();
+ 
+
+    
+
+  }
+
+
+  splitParagraph() {
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const words: string[] = this.paragraph.split(' ');
+    console.log(words);
+    
+if(this.type=='time'){
+  
+  this.max_i = words.length;
+    for (let i = 0; i < words.length; i++) {
+      const wordDiv = document.createElement('div');
+      const word = words[i];
+
+      for (let j = 0; j < word.length; j++) {
+        const letterSpan = document.createElement('span');
+        letterSpan.textContent = word[j];
+        wordDiv.appendChild(letterSpan);
+      }
+
+      divElement.appendChild(wordDiv);
+    }}
+    
+  }
+
+
+  onclick() {
+    this.headervisible = false;
+    this.paragraphService.headerchanged(this.headervisible);
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    divElement.textContent = '';
+    this.paragraph = this.paragraphService.data[Math.floor(Math.random() * this.paragraphService.data.length)];
+
+    this.splitParagraph();
+
+
+    divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const childCount: number = divElement.children.length;
+    for (let i = 0; i < childCount; i++) {
+      this.divs[i] = divElement.children[i].children.length;
+    }
+    const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+    cursorelement.removeAttribute('style');
+    // divElement.focus();
+    // cursorelement.style.left = '27px';
+    // cursorelement.style.top = '12px';
+
+    divElement.focus();
+
+    if (!this.timerstart) {
+      this.stopTimer();
+      this.timerstart = true;
+      this.timer = this.max_timer;
+      this.const_timer = this.max_timer
+
+    }
+
+  }
+
+  onclick2() {
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    const timerdiv: HTMLDivElement = this.timerdiv.nativeElement;
+    const refresh: HTMLDivElement = this.refresh.nativeElement;
+    const cursorelement: HTMLDivElement = this.cursorelement.nativeElement;
+
+    divElement.style.visibility = 'visible';
+    timerdiv.style.visibility = 'visible';
+    refresh.style.visibility = 'visible';
+    cursorelement.style.visibility = 'visible'
+    const result: HTMLDivElement = this.result.nativeElement;
+    result.style.visibility = 'hidden';
+
+    this.onclick();
+  }
+
+  shiftdown(event: any) {
+    this.shift = event;
+  }
+  shiftup(event: any) {
+    this.shift = event;
+  }
+
+  
+  keydown(e: KeyboardEvent) {
+    this.headervisible = true;
+    this.paragraphService.headerchanged(this.headervisible);
+    if (this.timerstart) {
+
+      this.startTimer();
+      this.timerstart = false;
+    }
+
+    if (e.keyCode == 16) {
+      return
+    }
+    const divElement: HTMLDivElement = this.myDiv.nativeElement;
+    this.wordl = this.divs[this.i];
+
+
+    if (this.wordl != this.j) {
+
+
+
+
+
+      //  const enteredletter=this.shift?e.key.toUpperCase():e.key;
+      if (e.key == divElement.children[this.i].children[this.j].textContent) {
+
+
+
+        divElement.children[this.i].children[this.j].classList.add('sucess');
+        const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+
+
+        const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+        cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+      } else if (e.keyCode == 8) {
+
+        if (this.j != 0) {
+          this.j--;
+          divElement.children[this.i].children[this.j].classList.remove('sucess');
+          divElement.children[this.i].children[this.j].classList.remove('error');
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+          this.j--;
+        } else {
+          this.j--;
+        }
+      }
+      else {
+
+        divElement.children[this.i].children[this.j].classList.add('error');
+        const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+
+
+        const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+        cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+      }
+      this.j++;
+    }
+    else if (e.keyCode == 32) {
+
+      this.i++;
+      this.count = 0;
+      this.j = 0;
+
+      if (divElement.children[this.i - 1].querySelectorAll(".error").length == 0) {
+        this.correctword++;
+
+
+      } else {
+        this.incorrectword++;
+
+
+      }
+
+      if (this.i < this.max_i) {
+        const first: HTMLElement = divElement.children[this.i - 1] as HTMLElement;
+        const second: HTMLElement = divElement.children[this.i] as HTMLElement;
+
+        if (first.offsetTop == second.offsetTop) {
+
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+        }
+        else {
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+          cursorelement.style.top = letterelement.offsetTop + 10 + 'px';
+        }
+      }
+
+    } else if (e.keyCode == 8 && this.count == 0) {
+
+
+      const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+      const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+      cursorelement.style.left = letterelement.offsetLeft + 'px';
+
+      this.j--;
+
+      divElement.children[this.i].children[this.j].classList.remove('sucess');
+      divElement.children[this.i].children[this.j].classList.remove('error');
+
+    } else if (e.keyCode == 8 && this.count != 0) {
+
+      var parent = divElement.children[this.i];
+      if (parent != null) {
+        var last = parent.lastChild;
+        if (last != null) {
+
+
+
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + 'px';
+          parent.removeChild(last);
+          this.count--;
+          // new
+          if (this.i != 0) {
+
+
+
+            const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+            const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+            cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+            cursorelement.style.top = letterelement.offsetTop + 10 + 'px';
+
+          }
+
+        }
+      }
+
     }
     else {
-      // const header: HTMLDivElement = this.header.nativeElement;
-      // const modal: HTMLDivElement = this.modal.nativeElement;
-      // modal.style.opacity="1";
-      // header.style.opacity="0";
-      this.openmodal = true;
-      this.paragraphservice.modalchanged(this.openmodal);
+
+
+
+
+      divElement.children[this.i].innerHTML += '<span class="error">' + e.key + '</span>';
+
+
+
+
+      this.count++;
+      const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+
+      const first: HTMLElement = divElement.children[this.i - 1] as HTMLElement;
+      const second: HTMLElement = divElement.children[this.i] as HTMLElement;
+
+      if (this.i != 0) {
+        if (first.offsetTop == second.offsetTop) {
+
+
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+        }
+        else {
+
+
+          const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+          const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+          cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+          cursorelement.style.top = letterelement.offsetTop + 10 + 'px';
+        }
+      }
+      else {
+        const letterelement: HTMLElement = divElement.children[this.i].children[this.j + this.count - 1] as HTMLElement;
+
+
+        const cursorelement: HTMLElement = this.cursorelement.nativeElement;
+        cursorelement.style.left = letterelement.offsetLeft + letterelement.offsetWidth + 'px';
+      }
     }
 
   }
-
-  click(event:any){
-    if(event.target.value==0){
-      this.openmodal = true;
-      this.paragraphservice.modalchanged(this.openmodal);
-    }
-  }
-
 }
 
+typing.html 
 
-header.css
-
-input[type="radio"]{
-    visibility: hidden;
-    height: 0;
-    width: 0;
-  }
-
-  .v1 {
-    border-right: 1px solid black;
-    height: 10px;
-    margin-left: 10px;
-  }
-
-  input[type="radio"]:checked + label {
-    font-weight: bold;
-    color:rgb(158, 103, 20)
-}
+<!-- <input type="text" id="input"> -->
+<div id="timer" #timerdiv *ngIf="type=='time'">{{ timer }}</div>
+<div id="timer" #timerdiv *ngIf="type=='word'">{{i}}/{{ wordcount }}</div>
+<div style="position: relative;">
+<!-- <appEvent id="paragraph" (keydown)="keydown($event)"  tabindex="5" #paragraph (onkeyup)="shiftup($event)" (onkeydown)="shiftdown($event)" (onmousemove)="onmousemove($event)"> -->
+    <appEvent id="paragraph" (keydown)="keydown($event)"  tabindex="5" #paragraph (onkeyup)="shiftup($event)" (onkeydown)="shiftdown($event)" >
+    </appEvent>
+<!-- </appEvent> -->
+<span id="cursor" #cursorelement></span>
+</div>
+<div id="refresh" class="refresh"><button style="font-size: 20px;" (click)="onclick()" #refresh>refresh</button></div>
 
 
+<div id="result_main" #result_main>
+    <span id="wpm" class="result">wpm</span>
+    <div id="wpma" class="resulta" *ngIf="const_timer!=0">{{((correctword*60)/const_timer)|number:'1.0-0'}}</div>
+    <!-- <div id="wpma" class="resulta" *ngIf="const_timer==0">{{(correctword*100/max_timer)|number:'1.0-0'}}</div> -->
+    <span id="accuracy"  class="result">accuracy</span>
+    <div id="accuracya"  class="resulta" *ngIf="correctword!=0 || incorrectword!=0">{{(correctword*100/(correctword+incorrectword))|number:'1.0-0'}}<span>%</span></div>
+    <div   id="accuracya"  class="resulta"  *ngIf="correctword==0 && incorrectword==0">0<span>%</span></div>
 
-in this header.html if <input type="radio" name="timevalue" id="time15" value=15 checked="checked" *ngIf="selectedtype=='time'" (change)="change($event)" > i put this then in start 15 button color changed  but if i added [(ngModel)]="timer" in this tag then in start 15 is not color and this colr based on input[type="radio"]:checked + label {
-    font-weight: bold;
-    color:rgb(158, 103, 20)
-} whici is specifeied in css file above 
+    <button (click)="onclick2()">try again</button>
+</div>
+
+in this code when i click on word radio button then i want paragraph from service from fix number which i specified in header call service and take any paragraph and select its  fix number which is specified in header
+
+in ts. file wordcount is variable paragraph must contain word equal to wordcount
