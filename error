@@ -1,1 +1,128 @@
-visibility visible component reinitialize and change to default value angular
+header.html
+
+<div *ngIf="!headervisible" #ref>
+<input type="radio" id="time" name="type" value="time" checked="checked" [(ngModel)]="selectedtype">
+<label for="time">time</label>
+<input type="radio" id="word" name="type" value="word" [(ngModel)]="selectedtype">
+<label for="word">word</label>
+<span class="v1"></span>
+
+<input type="radio" name="timevalue" id="time15" value=15 checked="checked" *ngIf="selectedtype=='time'" (change)="change($event)" >
+<label for="time15" *ngIf="selectedtype=='time'">15</label>
+<input type="radio" name="timevalue" id="time30" value=30 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
+<label for="time30" *ngIf="selectedtype=='time'">30</label>
+<input type="radio" name="timevalue" id="time60" value=60 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
+<label for="time60" *ngIf="selectedtype=='time'">60</label>
+<input type="radio" name="timevalue" id="time120" value=120 *ngIf="selectedtype=='time'"  (change)="change($event)" [(ngModel)]="timer">
+<label for="time120" *ngIf="selectedtype=='time'">120</label>
+<input type="radio" name="timevalue" id="timecustom" value=0 *ngIf="selectedtype=='time'"  (change)="change($event)" (click)="click($event)" [(ngModel)]="timer">
+<label for="timecustom" *ngIf="selectedtype=='time'">custom</label>
+<!-- <button type="button" style="margin-left: 5px;" *ngIf="selectedtype=='time'" (click)="change($event)">
+    Custom
+</button> -->
+
+<input type="radio" name="wordvalue" id="word10" value=10 checked="checked" *ngIf="selectedtype=='word'">
+<label for="word10" *ngIf="selectedtype=='word'">10</label>
+<input type="radio" name="wordvalue" id="word25" value=25 *ngIf="selectedtype=='word'">
+<label for="word25" *ngIf="selectedtype=='word'">25</label>
+<input type="radio" name="wordvalue" id="word50" value=50 *ngIf="selectedtype=='word'">
+<label for="word50" *ngIf="selectedtype=='word'">50</label>
+<input type="radio" name="wordvalue" id="word100" value=100 *ngIf="selectedtype=='word'">
+<label for="word100" *ngIf="selectedtype=='word'">100</label>
+<input type="radio" name="wordvalue" id="wordcustom" value=0 *ngIf="selectedtype=='word'">
+<label for="wordcustom" *ngIf="selectedtype=='word'">custom</label>
+</div>
+<!-- <div id="modal" #modal>
+ <input type="number">
+ <button>ok</button>
+</div> -->
+
+
+
+header.ts
+
+
+import { AfterViewInit, Component, ElementRef, OnChanges, OnInit, ViewChild } from '@angular/core';
+import { ParagraphService } from 'app/paragraph.service';
+
+@Component({
+  selector: 'app-header',
+  templateUrl: './header.component.html',
+  styleUrls: ['./header.component.css']
+})
+export class HeaderComponent implements OnInit {
+  constructor(private paragraphservice: ParagraphService) {
+
+  }
+  
+  openmodal: boolean = false;
+  ngOnInit(): void {
+
+
+
+    this.paragraphservice.headerchange.subscribe(res => this.headervisible = res);
+
+    //  console.log(this.headervisible);
+
+  }
+  selectedtype: string = "time";
+  
+  timer: number = 15;
+
+  headervisible: boolean = false;
+
+  change(event: any) {
+    // console.log(event.target.value);
+
+    if (event.target.value != 0) {
+      this.timer = event.target.value;
+      console.log(this.timer);
+
+      this.paragraphservice.valuechanged(event.target.value)
+    }
+    else {
+      // const header: HTMLDivElement = this.header.nativeElement;
+      // const modal: HTMLDivElement = this.modal.nativeElement;
+      // modal.style.opacity="1";
+      // header.style.opacity="0";
+      this.openmodal = true;
+      this.paragraphservice.modalchanged(this.openmodal);
+    }
+
+  }
+
+  click(event:any){
+    if(event.target.value==0){
+      this.openmodal = true;
+      this.paragraphservice.modalchanged(this.openmodal);
+    }
+  }
+
+}
+
+
+header.css
+
+input[type="radio"]{
+    visibility: hidden;
+    height: 0;
+    width: 0;
+  }
+
+  .v1 {
+    border-right: 1px solid black;
+    height: 10px;
+    margin-left: 10px;
+  }
+
+  input[type="radio"]:checked + label {
+    font-weight: bold;
+    color:rgb(158, 103, 20)
+}
+
+
+
+in this header.html if <input type="radio" name="timevalue" id="time15" value=15 checked="checked" *ngIf="selectedtype=='time'" (change)="change($event)" > i put this then in start 15 button color changed  but if i added [(ngModel)]="timer" in this tag then in start 15 is not color and this colr based on input[type="radio"]:checked + label {
+    font-weight: bold;
+    color:rgb(158, 103, 20)
+} whici is specifeied in css file above 
