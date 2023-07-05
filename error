@@ -1,8 +1,5 @@
-.centered {
-    position: absolute;
-    left: 50%;
-    transform: translate(-50%);
-}  what this code do
-
-
-create a horizontal line in html css with the size of content above 
+.boxes.big {
+  width: 600px;
+  height: 600px;
+}
+what is this in css
