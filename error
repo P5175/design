@@ -5,25 +5,16 @@ import {
   HttpHandler,
   HttpRequest,
 } from "@angular/common/http";
-import { Observable } from "rxjs";
-import { JwtService } from "../services/jwt.service";
+import { Observable, throwError } from "rxjs";
+import { catchError } from "rxjs/operators";
 
 @Injectable({ providedIn: "root" })
-export class TokenInterceptor implements HttpInterceptor {
-  constructor(private readonly jwtService: JwtService) {}
-
+export class ErrorInterceptor implements HttpInterceptor {
   intercept(
     req: HttpRequest<any>,
     next: HttpHandler
   ): Observable<HttpEvent<any>> {
-    const token = this.jwtService.getToken();
-
-    const request = req.clone({
-      setHeaders: {
-        ...(token ? { Authorization: `Token ${token}` } : {}),
-      },
-    });
-    return next.handle(request);
+    return next.handle(req).pipe(catchError((err) => throwError(err.error)));
   }
 }
-explain this interceptor of angular
+explain this interceptor and also why pipe opertor used here 
