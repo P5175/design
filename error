@@ -1,8 +1,13 @@
-Making requests to the backend API
-For convenience, we have a live API server running at https://conduit.productionready.io/api for the application to make requests against. You can view the API spec here which contains all routes & responses for the server.
+import { Pipe, PipeTransform } from "@angular/core";
 
-The source code for the backend server (available for Node, Rails and Django) can be found in the main RealWorld repo.
-
-If you want to change the API URL to a local server, simply edit src/environments/environment.ts and change api_url to the local server's URL (i.e. localhost:3000/api). Please note you will probably need to use a proxy in order to avoid Cross-Origin Resource (CORS) issues. (more info: Proxying to a backend server )
-
-in code documentatoin this is mentionaed here now i want know api structure and database structure of that api this api is working on my pc but i am not able to see his structure  despite it is public api
+@Pipe({
+  name: "markdown",
+  standalone: true,
+})
+export class MarkdownPipe implements PipeTransform {
+  async transform(content: string): Promise<string> {
+    const { marked } = await import("marked");
+    return marked(content, { sanitize: true });
+  }
+}
+ explain this code and why it is used
