@@ -1,76 +1,25 @@
-register.ts
-import { AfterViewInit, Component, ElementRef, ViewChild } from '@angular/core';
-import { User } from 'src/model/user.model';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { DataService } from 'src/services/data.service';
 
 @Component({
-  selector: 'app-register',
-  templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
+  selector: 'app-login',
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.css']
 })
-export class RegisterComponent implements AfterViewInit{
-constructor(private dataservice:DataService){
-
-}
-  ngAfterViewInit(): void {
+export class LoginComponent {
+  constructor(private dataservice:DataService){}
+ @ViewChild('username') username!:ElementRef;
   
-  }
-
-@ViewChild('username') username!:ElementRef;
-@ViewChild('email') email!:ElementRef;
-@ViewChild('password') password!:ElementRef;
-user!:User;
-
-  register(){
+  @ViewChild('password') password!:ElementRef;
   
-    this.user.name=this.username.nativeElement.value;
-    this.user.password=this.password.nativeElement.value;
-    this.user.email=this.email.nativeElement.value;
-    console.log(this.user);
+  
+    login(){
     
-    this.dataservice.registerUser(this.user);
-  }
+      
+     
+      
+      
+      this.dataservice.loginUser(name:this.username.nativeElement.value;password:this.username.nativeElement.value);
+    }
 }
-
-
-data.service
-import { Injectable } from '@angular/core';
-import { User } from 'src/model/user.model';
-import { BehaviorSubject } from "rxjs";
-@Injectable({
-  providedIn: 'root'
-})
-export class DataService {
-
-  constructor() { }
-
-  private users:User[]=[];
-  private generateUserIds:number=1;
-  private isLogged=new BehaviorSubject<boolean>(false);
-  islogged$=this.isLogged.asObservable();
-
-  registerUser(user:User){
-    user.userId=this.generateUserIds;
-    this.users.push(user);
-    this.generateUserIds++;
-    console.log(this.users);
-    
-  }
-
-  loginUser(name:string,password:string):boolean{
-  const user=this.users.find((u)=>u.name===name && u.password===password);
-  return !!user;
-  }
-
-}
-
-
-user.model
-export interface User{
-    userId:number;
-    name:string;
-    email:string;
-    password:string;
-    followingIds:number[];
-    favoriteCardIds:number[];
-} 
+this is login component it also give error
