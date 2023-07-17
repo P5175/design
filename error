@@ -1,84 +1,27 @@
-/******************************************************************************
+import { Injectable } from '@angular/core';
+import { User } from 'src/model/user.model';
+import { BehaviorSubject } from "rxjs";
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
 
-                              Online C++ Compiler.
-               Code, Compile, Run and Debug C++ program online.
-Write your code in this editor and press "Run" button to compile and execute it.
+  constructor() { }
 
-*******************************************************************************/
-   
-  
-#include <iostream>
-  
-using namespace std;
+  private users:User[]=[];
+  private generateUserIds:number=1;
+  private isLogged=new BehaviorSubject();
+  islogged$=this.isLogged.asObservable();
 
- 
-int
-main () 
-{
-  
-int n;
-  
-cin >> n;
-  
-int k, m = n;
-  
-int flag = 1;
-  
-for (int i = (n * 2) - 1; i > 0; i--)
-    
-    {
-      
-k = n;
-      
-for (int j = (n * 2) - 1; j > 0; j--)
-	
-	{
-	  
-cout << k; 
-	  
-if (k > m && j > n - m)
-	    
-	    {
-	      
-k--;
-	    
-}
-	  
-if (j <= (n - m + 1))
-	    
-	    {
-	      
-k++;
-	    
-}
-	
-}
-      
-cout << endl;
-      
-if (m > 1 && flag)
-	
-	{
-	  
-m--;
-	
-}
-      
-      else
-	
-	{
-	  
-flag = 0;
-	  
-m++;
-	
-}
-    
-}
-  
-return 0;
+  registerUser(user:User){
+    user.userId=this.generateUserIds;
+    this.users.push(user);
+    this.generateUserIds++;
+  }
+
+  loginUser(name:string,password:string):boolean{
+  const user=this.users.find((u)=>u.name===name && u.password===password);
+  return !!user;
+  }
 
 }
-
-
-explain logic of this code
