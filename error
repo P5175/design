@@ -1,25 +1,45 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { DataService } from 'src/services/data.service';
+this is the editor.html
+
+
+<div>
+    <form [formgroup]="articleForm" (ngsubmit)="onSubmit()" >
+        <p>
+            <label for="title">title</label>
+            <input type="text" id="title" name="title" formControlName="title">
+        </p>
+        <div *ngIf="!title?.valid && (title?.dirty ||title?.touched)">
+            <div [hidden]="!title.errors.required">title is required</div>
+        </div>
+
+        <p>
+            <label for="des">description</label>
+            <input type="text" id="des" name="des" formControlName="description">
+        </p>
+        <div *ngIf="!description.valid && (description.dirty ||description.touched)">
+            <div [hidden]="!description.errors.required">description is required</div>
+        </div>
+
+        
+    </form>
+</div>
+
+
+this is the editor component 
+import { Component } from '@angular/core';
+import { FormBuilder, Validators } from '@angular/forms';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
-  styleUrls: ['./login.component.css']
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css']
 })
-export class LoginComponent {
-  constructor(private dataservice:DataService){}
- @ViewChild('username') username!:ElementRef;
-  
-  @ViewChild('password') password!:ElementRef;
-  
-  
-    login(){
-    
-      
-     
-      
-      
-      this.dataservice.loginUser(name:this.username.nativeElement.value;password:this.username.nativeElement.value);
-    }
+export class EditorComponent {
+  articleForm;
+  constructor(private formbuilder:FormBuilder){
+  this.articleForm=this.formbuilder.group({
+title:["",[Validators.required]],
+description:["",[Validators.required]]
+  })};
+
 }
-this is login component it also give error
+now why it is giving error
