@@ -29,20 +29,24 @@ export class EditorComponent {
 
 
 
-  get title() {
-    return this.articleForm.get('title');
-  }
-  get description() {
-    return this.articleForm.get('description');
-  }
-get tags():FormArray{
-  return this.articleForm.get('tags') as FormArray;
-}
+//   get title() {
+//     return this.articleForm.get('title');
+//   }
+//   get description() {
+//     return this.articleForm.get('description');
+//   }
+// get tags():FormArray{
+//   return this.articleForm.get('tags') as FormArray;
+// }
 
   onSubmit() {
    this.card.cardId=this.cardId;
    this.card.authorId=Number(localStorage.getItem('userid'));
-   this.title=
+   this.card.title=this.articleForm.value.title ?? "";
+   this.card.description=this.articleForm.value.description ?? "";
+   this.card.date=new Date().toISOString();
+   this.card.tags=this.articleForm.value.tags ?? "";
+   this.cardId++;
   }
 }
-this is the ts file now how to assign title value into card title property
+Type 'string' is not assignable to type 'string[]'.
