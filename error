@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { Card } from 'src/model/card.model';
-
+ 
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
@@ -23,7 +23,7 @@ export class EditorComponent {
     this.articleForm = this.formbuilder.group({
       title: ["", [Validators.required]],
       description: ["", [Validators.required]],
-      tags: this.formbuilder.array([])
+      tags:["",Validators.required] 
     })
   };
 
@@ -45,8 +45,13 @@ export class EditorComponent {
    this.card.title=this.articleForm.value.title ?? "";
    this.card.description=this.articleForm.value.description ?? "";
    this.card.date=new Date().toISOString();
-   this.card.tags=this.articleForm.value.tags ?? "";
+   this.card.tags=Array.isArray(this.articleForm.value.tags)?this.articleForm.value.tags as string[]:[];
    this.cardId++;
   }
+
+  enter(event:any){
+   if(event.key==="enter"){
+    this.card.tags.push(this.articleForm.value.tags)
+   }
+  }
 }
-Type 'string' is not assignable to type 'string[]'.
