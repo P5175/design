@@ -1,7 +1,9 @@
+editor.ts 
+
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { Card } from 'src/model/card.model';
- 
+
 @Component({
   selector: 'app-editor',
   templateUrl: './editor.component.html',
@@ -9,8 +11,8 @@ import { Card } from 'src/model/card.model';
 })
 export class EditorComponent {
   articleForm;
-  cardId=1;
-  card:Card={
+  cardId = 1;
+  card: Card = {
     cardId: 0,
     authorId: 0,
     title: '',
@@ -23,37 +25,77 @@ export class EditorComponent {
     this.articleForm = this.formbuilder.group({
       title: ["", [Validators.required]],
       description: ["", [Validators.required]],
-      tags:["",Validators.required] 
+      tags: ["", Validators.required]
     })
   };
 
 
 
-//   get title() {
-//     return this.articleForm.get('title');
-//   }
-//   get description() {
-//     return this.articleForm.get('description');
-//   }
-// get tags():FormArray{
-//   return this.articleForm.get('tags') as FormArray;
-// }
+  //   get title() {
+  //     return this.articleForm.get('title');
+  //   }
+  //   get description() {
+  //     return this.articleForm.get('description');
+  //   }
+  // get tags():FormArray{
+  //   return this.articleForm.get('tags') as FormArray;
+  // }
 
   onSubmit() {
-   this.card.cardId=this.cardId;
-   this.card.authorId=Number(localStorage.getItem('userid'));
-   this.card.title=this.articleForm.value.title ?? "";
-   this.card.description=this.articleForm.value.description ?? "";
-   this.card.date=new Date().toISOString();
-   this.card.tags=Array.isArray(this.articleForm.value.tags)?this.articleForm.value.tags as string[]:[];
-   this.cardId++;
+    this.card.cardId = this.cardId;
+    this.card.authorId = Number(localStorage.getItem('userid'));
+    this.card.title = this.articleForm.value.title ?? "";
+    this.card.description = this.articleForm.value.description ?? "";
+    this.card.date = new Date().toISOString();
+    
+    this.cardId++;
   }
 
-  enter(event:any){
-   if(event.key==="enter"){
-    this.card.tags.push(this.articleForm.value.tags)
-   }
+  enter(event: any) {
+    if (event.key === "enter") {
+      const tagvalue = this.articleForm.value.tags;
+      if (tagvalue != undefined) {
+        this.card.tags.push(tagvalue);
+      }
+    }
+
+
   }
+
+
 }
-Argument of type 'string | null | undefined' is not assignable to parameter of type 'string'.
-  Type 'undefined' is not assignable to type 'string'.
+
+
+editor.html
+
+<div>
+    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" >
+        <p>
+            <label for="title">title</label>
+            <input type="text" id="title" name="title" formControlName="title">
+        </p>
+        <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)">
+            <div >title is required</div>
+        </div>
+
+        <p>
+            <label for="des">description</label>
+            <input type="text" id="des" name="des" formControlName="description">
+        </p>
+        <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)">
+            <div >description is required</div>
+        </div>
+<div formArrayName="tags">
+        <p>
+            <label for="tags">tags</label>
+            <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)">
+        </p>
+    </div>
+        <p>
+            <button type="submit" [disabled]="!articleForm.valid">submit</button>
+        </p>
+    </form>
+</div>
+
+
+in this error coming Cannot find control with path: 'tags -> tags' and also card.tags is also remain empty
