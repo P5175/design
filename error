@@ -1,1 +1,48 @@
-Property 'title' does not exist on type 'FormGroup<{ title: FormControl<string | null>; description: FormControl<string | null>; }>'
+import { Component } from '@angular/core';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { Card } from 'src/model/card.model';
+
+@Component({
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css']
+})
+export class EditorComponent {
+  articleForm;
+  cardId=1;
+  card:Card={
+    cardId: 0,
+    authorId: 0,
+    title: '',
+    description: '',
+    tags: [],
+    date: '',
+    likes: 0
+  }
+  constructor(private formbuilder: FormBuilder) {
+    this.articleForm = this.formbuilder.group({
+      title: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      tags: this.formbuilder.array([])
+    })
+  };
+
+
+
+  get title() {
+    return this.articleForm.get('title');
+  }
+  get description() {
+    return this.articleForm.get('description');
+  }
+get tags():FormArray{
+  return this.articleForm.get('tags') as FormArray;
+}
+
+  onSubmit() {
+   this.card.cardId=this.cardId;
+   this.card.authorId=Number(localStorage.getItem('userid'));
+   this.title=
+  }
+}
+this is the ts file now how to assign title value into card title property
