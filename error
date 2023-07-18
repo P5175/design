@@ -1,7 +1,7 @@
 editor.ts 
-
 import { Component } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { first } from 'rxjs';
 import { Card } from 'src/model/card.model';
 
 @Component({
@@ -11,6 +11,7 @@ import { Card } from 'src/model/card.model';
 })
 export class EditorComponent {
   articleForm;
+   smalltag="";
   cardId = 1;
   card: Card = {
     cardId: 0,
@@ -53,18 +54,17 @@ export class EditorComponent {
 
   enter(event: any) {
     if (event.key === "enter") {
-      const tagvalue = this.articleForm.value.tags;
-      if (tagvalue != undefined) {
-        this.card.tags.push(tagvalue);
-      }
+      
+        this.card.tags.push(this.smalltag);
+     
     }
+console.log(this.card.tags);
 
 
   }
 
 
 }
-
 
 editor.html
 
@@ -85,17 +85,16 @@ editor.html
         <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)">
             <div >description is required</div>
         </div>
-<div formArrayName="tags">
+
         <p>
             <label for="tags">tags</label>
-            <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)">
+            <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)" [(ngModel)]="smalltag">
         </p>
-    </div>
+    
         <p>
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
         </p>
     </form>
 </div>
 
-
-in this error coming Cannot find control with path: 'tags -> tags' and also card.tags is also remain empty
+why console.log(this.card.tags); give empty array all the time
