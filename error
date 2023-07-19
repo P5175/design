@@ -1,12 +1,13 @@
 editor.html
 
+
 <div id="pform" class="pform">
-    <!-- <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
+    <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
         <div >title is required</div>
     </div>
     <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)" id="error">
         <div >description is required</div>
-    </div> -->
+    </div>
     <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
         <p id="ptitle" class="ptitle">
             <label for="title">title</label>
@@ -24,64 +25,90 @@ editor.html
             <label for="tags">tags</label>
             <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)" [(ngModel)]="smalltag">
         </p>
-    
+        <div *ngIf="card.tags.length>0" #tagContainer></div>
         <p id="button" class="button">
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
         </p>
+      
+              
+        
     </form>
 </div>
 
 
-editor.css
 
-#pform{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    height: 100vh;
+
+editor.ts
+import { Component, ElementRef, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { first } from 'rxjs';
+import { Card } from 'src/model/card.model';
+
+@Component({
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css']
+})
+export class EditorComponent {
+  @ViewChild('tagContainer') tagContainer!:ElementRef;
+  articleForm;
+  smalltag = "";
+  cardId = 1;
+  card: Card = {
+    cardId: 0,
+    authorId: 0,
+    title: '',
+    description: '',
+    tags: [],
+    date: '',
+    likes: 0
+  }
+  constructor(private formbuilder: FormBuilder) {
+    this.articleForm = this.formbuilder.group({
+      title: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      tags: [""]
+    })
+  };
+
+addtag(){
+  for(let i=0;i<this.card.tags.length;i++){
+const tag=document.createElement('span').innerText=this.card.tags[i];
+this.tagContainer.nativeElement.appendChild(tag);
+  }
 }
 
-#form{
-    display: flex;
-    flex-direction: column;
-    width: 40%;
-   
-    
-}
-
-#form p{
-    display: flex;
-
-
- 
-}
-#form p label{
-    width: 20%;
-   margin-right: 5px;
-    text-align: right;
-}
-#form p input{
-  width: 100%;
   
-}
-#button{
-  
-    display: flex;
-  justify-content: flex-end;
-}
+  onSubmit() {
+    this.card.cardId = this.cardId;
+    this.card.authorId = Number(localStorage.getItem('userid'));
+    this.card.title = this.articleForm.value.title ?? "";
+    this.card.description = this.articleForm.value.description ?? "";
+    this.card.date = new Date().toISOString();
 
+    this.cardId++;
+  }
 
-@media only screen and (max-width: 936px) {
-    #form p{
-        display: flex;
-    flex-direction: column;
-      
-     
+  enter(event: any) {
+    // console.log(event);
+
+    if (event.key === "Enter" && this.smalltag.trim() != "") {
+
+      this.card.tags.push(this.smalltag.trim());
+      this.articleForm.get('tags')?.reset();
+    this.addtag();
+
     }
-   
+    if (event.key === "Enter" && this.smalltag?.trim() == "") {
+      this.articleForm.get('tags')?.reset();
+    }
+    console.log(this.card.tags);
+
+
   }
 
 
-in this when we decrease height or weight to check responsiveness then on each change some time input uper line not seen sometime below and sometime side sometime it comback and other not seen 
+}
+in this when i press enter key addtag method work work of this method is to add span tag on each enter 
+
+
