@@ -1,29 +1,31 @@
 editor.html
 
 <div id="pform" class="pform">
+    <!-- <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
+        <div >title is required</div>
+    </div>
+    <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)" id="error">
+        <div >description is required</div>
+    </div> -->
     <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
         <p id="ptitle" class="ptitle">
             <label for="title">title</label>
             <input type="text" id="title" name="title" formControlName="title">
         </p>
-        <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)">
-            <div >title is required</div>
-        </div>
+        
 
         <p id="pdescription" class="pdescription">
             <label for="des">description</label>
             <input type="text" id="description" name="description" formControlName="description">
         </p>
-        <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)">
-            <div >description is required</div>
-        </div>
+        
 
         <p id="ptags" class="ptags">
             <label for="tags">tags</label>
             <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)" [(ngModel)]="smalltag">
         </p>
     
-        <p>
+        <p id="button" class="button">
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
         </p>
     </form>
@@ -32,9 +34,9 @@ editor.html
 
 editor.css
 
-
 #pform{
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -45,21 +47,41 @@ editor.css
     display: flex;
     flex-direction: column;
     width: 40%;
+   
+    
 }
 
 #form p{
     display: flex;
-   
+
+
+ 
 }
 #form p label{
     width: 20%;
-    overflow: hidden;
+   margin-right: 5px;
     text-align: right;
-    margin-right: 5px;
 }
 #form p input{
-    width:100%
+  width: 100%;
+  
+}
+#button{
+  
+    display: flex;
+  justify-content: flex-end;
 }
 
 
-this is the html and css file in this when width decrease then label hiddern and i kept it hidden becuase if i remove overflow hidder then the with size decrease the input label not remain in same line 
+@media only screen and (max-width: 936px) {
+    #form p{
+        display: flex;
+    flex-direction: column;
+      
+     
+    }
+   
+  }
+
+
+in this when we decrease height or weight to check responsiveness then on each change some time input uper line not seen sometime below and sometime side sometime it comback and other not seen 
