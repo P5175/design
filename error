@@ -1,6 +1,5 @@
 editor.html
 
-
 <div id="pform" class="pform">
     <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
         <div >title is required</div>
@@ -8,7 +7,7 @@ editor.html
     <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)" id="error">
         <div >description is required</div>
     </div>
-    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
+    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form" >
         <p id="ptitle" class="ptitle">
             <label for="title">title</label>
             <input type="text" id="title" name="title" formControlName="title">
@@ -25,7 +24,7 @@ editor.html
             <label for="tags">tags</label>
             <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)" [(ngModel)]="smalltag">
         </p>
-        <div *ngIf="card.tags.length>0" #tagContainer></div>
+        <p  #tagContainer  id="dtags" class="dtags" ></p>
         <p id="button" class="button">
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
         </p>
@@ -36,9 +35,9 @@ editor.html
 </div>
 
 
-
-
 editor.ts
+
+
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
 import { first } from 'rxjs';
@@ -49,8 +48,8 @@ import { Card } from 'src/model/card.model';
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.css']
 })
-export class EditorComponent {
-  @ViewChild('tagContainer') tagContainer!:ElementRef;
+export class EditorComponent  {
+  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
   articleForm;
   smalltag = "";
   cardId = 1;
@@ -72,8 +71,12 @@ export class EditorComponent {
   };
 
 addtag(temp:string){
+//  console.log(this.tagContainer.nativeElement);
+//  console.log(temp);
  
 const tag=document.createElement('span');
+tag.style.marginRight="5px";
+
 tag.innerText=temp;
 this.tagContainer.nativeElement.appendChild(tag);
   }
@@ -92,12 +95,13 @@ this.tagContainer.nativeElement.appendChild(tag);
 
   enter(event: any) {
     // console.log(event);
-
+// event.preventdefault();
     if (event.key === "Enter" && this.smalltag.trim() != "") {
 
       this.card.tags.push(this.smalltag.trim());
+      this.addtag(this.smalltag?.trim());
       this.articleForm.get('tags')?.reset();
-    this.addtag(this.smalltag.trim());
+    
 
     }
     if (event.key === "Enter" && this.smalltag?.trim() == "") {
@@ -113,7 +117,69 @@ this.tagContainer.nativeElement.appendChild(tag);
 
 
 
+editor.css
 
-in this when i press enter key addtag method work ,work  of this method is to add span tag on each enter  key to div tag which we obtained using viewchild but it not working
+#pform{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+}
 
+#form{
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+   
+    
+}
+
+#form p{
+    display: flex;
+
+
+ 
+}
+#form p label{
+    width: 30%;
+   margin-right: 5px;
+    text-align: right;
+}
+#form p input{
+  width: 100%;
+  border:1px solid black;
+  border-radius: 2px;
+}
+#button{
+  
+    display: flex;
+  justify-content: flex-end;
+}
+#dtags{
+    display: flex;
+    flex-direction: row;
+   
+}
+
+
+
+@media only screen and (max-width: 936px) {
+    #form p{
+        display: flex;
+    flex-direction: column;
+      
+     
+    }
+    #form p label{
+        text-align: justify;
+    }
+   
+  }   
+
+
+
+
+in this i want  when we add dynamic data in tagcontainer it must be exact under to the ptags paragraph input tag
 
