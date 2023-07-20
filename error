@@ -2,122 +2,44 @@ editor.html
 
 <div id="pform" class="pform">
     <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
-        <div >title is required</div>
+        <div>title is required</div>
     </div>
-    <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)" id="error">
-        <div >description is required</div>
+    <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)"
+        id="error">
+        <div>description is required</div>
     </div>
-    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form" >
+    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
         <p id="ptitle" class="ptitle">
             <label for="title">title</label>
             <input type="text" id="title" name="title" formControlName="title">
         </p>
-        
+
 
         <p id="pdescription" class="pdescription">
             <label for="des">description</label>
             <input type="text" id="description" name="description" formControlName="description">
         </p>
-        
 
-        <p id="ptags" class="ptags">
-            <label for="tags">tags</label>
-            <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)" [(ngModel)]="smalltag">
-        </p>
-        <p  #tagContainer  id="dtags" class="dtags" ></p>
+        <div id="divtag" class="divtag">
+            <p id="ptags" class="ptags">
+                <label for="tags">tags</label>
+                <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
+                    [(ngModel)]="smalltag">
+            </p>
+            <p #tagContainer id="dtags" class="dtags"></p>
+        </div>
         <p id="button" class="button">
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
         </p>
-      
-              
-        
+
+
+
     </form>
 </div>
 
 
-editor.ts
-
-
-import { Component, ElementRef, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
-import { first } from 'rxjs';
-import { Card } from 'src/model/card.model';
-
-@Component({
-  selector: 'app-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css']
-})
-export class EditorComponent  {
-  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
-  articleForm;
-  smalltag = "";
-  cardId = 1;
-  card: Card = {
-    cardId: 0,
-    authorId: 0,
-    title: '',
-    description: '',
-    tags: [],
-    date: '',
-    likes: 0
-  }
-  constructor(private formbuilder: FormBuilder) {
-    this.articleForm = this.formbuilder.group({
-      title: ["", [Validators.required]],
-      description: ["", [Validators.required]],
-      tags: [""]
-    })
-  };
-
-addtag(temp:string){
-//  console.log(this.tagContainer.nativeElement);
-//  console.log(temp);
- 
-const tag=document.createElement('span');
-tag.style.marginRight="5px";
-
-tag.innerText=temp;
-this.tagContainer.nativeElement.appendChild(tag);
-  }
-
-
-  
-  onSubmit() {
-    this.card.cardId = this.cardId;
-    this.card.authorId = Number(localStorage.getItem('userid'));
-    this.card.title = this.articleForm.value.title ?? "";
-    this.card.description = this.articleForm.value.description ?? "";
-    this.card.date = new Date().toISOString();
-
-    this.cardId++;
-  }
-
-  enter(event: any) {
-    // console.log(event);
-// event.preventdefault();
-    if (event.key === "Enter" && this.smalltag.trim() != "") {
-
-      this.card.tags.push(this.smalltag.trim());
-      this.addtag(this.smalltag?.trim());
-      this.articleForm.get('tags')?.reset();
-    
-
-    }
-    if (event.key === "Enter" && this.smalltag?.trim() == "") {
-      this.articleForm.get('tags')?.reset();
-    }
-    console.log(this.card.tags);
-
-
-  }
-
-
-}
-
-
-
 editor.css
+
 
 #pform{
     display: flex;
@@ -157,12 +79,28 @@ editor.css
     display: flex;
   justify-content: flex-end;
 }
-#dtags{
-    display: flex;
-    flex-direction: row;
-   
+
+#divtag{
+display: flex;
+flex-direction: column;
+
+margin-bottom: 10px;
 }
 
+#divtag span{
+   
+    
+    margin-right: 5px;
+    padding: 3px 8px;
+    border-radius: 2px;
+    background-color: rgb(194, 230, 230);
+}
+
+#divtag p:last-child{
+    display:flex;
+    flex-direction: wrap;
+
+}
 
 
 @media only screen and (max-width: 936px) {
@@ -181,5 +119,90 @@ editor.css
 
 
 
-in this i want  when we add dynamic data in tagcontainer it must be exact under to the ptags paragraph input tag
+editor.ts
+
+import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { first } from 'rxjs';
+import { Card } from 'src/model/card.model';
+
+@Component({
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css'],
+  encapsulation:ViewEncapsulation.None
+})
+export class EditorComponent  {
+  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
+  articleForm;
+  smalltag = "";
+  cardId = 1;
+  card: Card = {
+    cardId: 0,
+    authorId: 0,
+    title: '',
+    description: '',
+    tags: [],
+    date: '',
+    likes: 0
+  }
+  constructor(private formbuilder: FormBuilder) {
+    this.articleForm = this.formbuilder.group({
+      title: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      tags: [""]
+    })
+  };
+
+addtag(temp:string){
+//  console.log(this.tagContainer.nativeElement);
+//  console.log(temp);
+ 
+const tag=document.createElement('span');
+
+
+tag.innerText=temp;
+this.tagContainer.nativeElement.appendChild(tag);
+  }
+
+
+  
+  onSubmit() {
+    this.card.cardId = this.cardId;
+    this.card.authorId = Number(localStorage.getItem('userid'));
+    this.card.title = this.articleForm.value.title ?? "";
+    this.card.description = this.articleForm.value.description ?? "";
+    this.card.date = new Date().toISOString();
+
+    this.cardId++;
+  }
+
+  enter(event: any) {
+    // console.log(event);
+// event.preventdefault();
+    if (event.key === "Enter" && this.smalltag.trim() != "") {
+
+      this.card.tags.push(this.smalltag.trim());
+      this.addtag(this.smalltag?.trim());
+      this.articleForm.get('tags')?.reset();
+    
+
+    }
+    if (event.key === "Enter" && this.smalltag?.trim() == "") {
+      this.articleForm.get('tags')?.reset();
+    }
+    console.log(this.card.tags);
+
+
+  }
+
+
+}
+here why #divtag p:last-child{
+    display:flex;
+    flex-direction: wrap;
+
+} this is not working 
+
+
 
