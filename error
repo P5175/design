@@ -1,145 +1,6 @@
-editor.html
-
-
-<div id="pform" class="pform">
-
-    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
-        <div id="ptitle" class="ptitle" >
-            <label for="title">title</label>
-            <input type="text" id="title" name="title" formControlName="title" />
-        </div>
-
-
-        <div id="pdescription" class="pdescription" >
-            <label for="des">description</label>
-            <input type="text" id="description" name="description" formControlName="description">
-        </div>
-
-        <div id="divtag" class="divtag" >
-           
-            <label for="tags" >tags</label>
-            <div style="display: flex;flex-direction: column;width: 100%;">
-                <div>
-                    <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
-                        [(ngModel)]="smalltag">
-                </div>
-                <div #tagContainer id="dtags" class="dtags"
-                    [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                    style="display:flex;flex-wrap: wrap;">
-                </div>
-               
-            </div>
-
-        </div>
-
-        <div id="button" class="button">
-            <button type="submit" [disabled]="!articleForm.valid" style="font-size:larger;">submit</button>
-        </div>
-
-
-
-    </form>
-</div>
-
-
-
-
-editor.css
-
-
-#pform {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 100vh;
-}
-
-#form {
-    display: flex;
-    flex-direction: column;
-    width: 40%;
-
-
-}
-
-#ptitle,#pdescription,#divtag  {
-   
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin: 3px;
-   /* align-items: center; */
-}
-
-/* .ptags div {
-    width: 100%;
-} */
-
-#form div label {
-    font-size: larger;
-    /* flex-grow: 1; */
-    width: 30%;
-    margin-right: 5px;
-    text-align: right;
-}
-
-#form div input {
-    height: 30px;
-    width: 100%;
-    border: 1px solid black;
-    border-radius: 2px;
-    font-size: 20px;
-}
-
-#button {
-    width: 100%;
-    display: flex;
-    justify-content: flex-end;
-}
-
-#divtag {
-    display: flex;
-    flex-direction: row;
-
-    margin-bottom: 10px;
-}
-
-#divtag span {
-
-    display: flex;
-
-    background-color: rgb(161, 161, 161);
-    margin: 5px;
-    padding: 3px 8px;
-    border-radius: 3px;
-
-}
-
-
-
-
-@media only screen and (max-width: 998px) {
-    #form div {
-        display: flex;
-        flex-direction: column;
-
-
-    }
-
-    #form div label {
-        text-align: justify;
-    }
- #button button{
-    width: 100%;
- }
-}
-
-
-
-
 editor.ts 
+
+
 
 import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
@@ -150,10 +11,10 @@ import { Card } from 'src/model/card.model';
   selector: 'app-editor',
   templateUrl: './editor.component.html',
   styleUrls: ['./editor.component.css'],
-  encapsulation:ViewEncapsulation.None
+  encapsulation: ViewEncapsulation.None
 })
-export class EditorComponent  {
-  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
+export class EditorComponent {
+  @ViewChild('tagContainer', { static: true }) tagContainer!: ElementRef<HTMLDivElement>;
   articleForm;
   smalltag = "";
   cardId = 1;
@@ -174,19 +35,19 @@ export class EditorComponent  {
     })
   };
 
-addtag(temp:string){
-//  console.log(this.tagContainer.nativeElement);
-//  console.log(temp);
- 
-const tag=document.createElement('span');
+  addtag(temp: string) {
+    //  console.log(this.tagContainer.nativeElement);
+    //  console.log(temp);
+
+    const tag = document.createElement('span');
 
 
-tag.innerText=temp;
-this.tagContainer.nativeElement.appendChild(tag);
+    tag.innerText = temp;
+    this.tagContainer.nativeElement.appendChild(tag);
   }
 
 
-  
+
   onSubmit() {
     this.card.cardId = this.cardId;
     this.card.authorId = Number(localStorage.getItem('userid'));
@@ -199,13 +60,18 @@ this.tagContainer.nativeElement.appendChild(tag);
 
   enter(event: any) {
     // console.log(event);
-// event.preventdefault();
+    // event.preventdefault();
     if (event.key === "Enter" && this.smalltag.trim() != "") {
+      if (this.card.tags.includes(this.smalltag.trim())) {
+        this.articleForm.get('tags')?.reset();
+      } else {
 
-      this.card.tags.push(this.smalltag.trim());
-      this.addtag(this.smalltag?.trim());
-      this.articleForm.get('tags')?.reset();
-    
+        this.card.tags.push(this.smalltag.trim());
+
+        this.addtag(this.smalltag?.trim());
+        this.articleForm.get('tags')?.reset();
+      }
+
 
     }
     if (event.key === "Enter" && this.smalltag?.trim() == "") {
@@ -219,7 +85,4 @@ this.tagContainer.nativeElement.appendChild(tag);
 
 }
 
-
-
-in this title description and submit are in accurately of same width but tag div is of different width
-
+this is the ts file and i want  add ondbclick method in each span tag and ondbclick some method must run and 
