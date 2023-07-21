@@ -85,4 +85,4 @@ export class EditorComponent {
 
 }
 
-this is the ts file and i want  add ondbclick method in each span tag and ondbclick some method must run and 
+this is the ts file and i want  add ondbclick method in each span tag and ondbclick some method must run and it method remove that span tag from array
