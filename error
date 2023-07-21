@@ -85,4 +85,143 @@ export class EditorComponent {
 
 }
 
-this is the ts file and i want  add ondbclick method in each span tag and ondbclick some method must run and it method remove that span tag from array
+editor.html
+
+
+
+
+<div id="pform" class="pform">
+    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
+        <div id="ptitle" class="ptitle center">
+            <label for="title">title</label>
+            <input type="text" id="title" name="title" formControlName="title" />
+        </div>
+
+        <div id="pdescription" class="pdescription center">
+            <label for="des">description</label>
+            <input type="text" id="description" name="description" formControlName="description" />
+        </div>
+
+        <div id="divtag" class="divtag ">
+            <div id="ptags" class="ptags center">
+                <label for="tags" >tags</label>
+                <div style="display: flex; flex-direction: column">
+                    <div>
+                        <input type="text" d id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
+                            [(ngModel)]="smalltag" />
+                    </div>
+                    <div #tagContainer id="dtags" class="dtags"
+                        [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
+                        style="display: flex; flex-wrap: wrap"></div>
+                </div>
+            </div>
+        </div>
+        <div id="button" class="button">
+            <button type="submit" [disabled]="!articleForm.valid">submit</button>
+        </div>
+    </form>
+</div>
+
+
+
+editor.css
+
+
+
+#pform{
+     display: flex;
+     flex-direction: column;
+     align-items: center;
+     justify-content: center;
+     width: 100%;
+     min-height: 100vh;}
+    
+    #form{
+     display: flex;
+     flex-direction: column;
+     width: 40%;
+    
+     
+    }
+    
+    #form div{
+     display: flex;
+    
+    
+    
+    }
+    #ptitle,#pdescription,#divtag,#button  {
+   
+       
+        margin: 3px;
+      
+    }
+    .ptags div{
+     width: 100%;
+    }
+    #form div label{
+        font-size: larger;
+     width: 30%;
+    margin-right: 5px;
+     text-align: right;
+    }
+    #form div input{
+        font-size: 20px;
+        height: 30px;
+     width: 100%;
+     border:1px solid black;
+     border-radius: 2px;
+    }
+    #button{
+    
+    display: flex;
+    justify-content: flex-end;
+    }
+    
+    #divtag{
+    display: flex;
+    flex-direction: column;
+    
+    margin-bottom: 10px;
+    }
+    
+    #divtag span{
+    
+     display:flex;
+     background-color: rgb(179, 174, 174);
+     margin: 5px;
+     padding: 3px 8px;
+     border-radius: 4px;
+    
+    }
+    button{
+        font-size: larger;
+        height: 30px;
+        
+    }
+    
+    
+    
+    @media only screen and (max-width: 995px) {
+     #form div{
+      display: flex;
+     flex-direction: column;
+     
+     
+     }
+     #form div label{
+      text-align: justify;
+     }
+     #button{
+        width: 100%;
+     }
+    
+}
+
+.center{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+in this when we insert tag and multiple tag are added then tag label come under because tags input and tags are in one div and label are in another div and both are in flex so when tag are added tag label positon change how to stop it
