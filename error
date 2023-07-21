@@ -1,40 +1,4 @@
-first html
-
-<div id="pform" class="pform">
-    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
-        <div id="ptitle" class="ptitle">
-            <label for="title">title</label>
-            <input type="text" id="title" name="title" formControlName="title" />
-        </div>
-
-        <div id="pdescription" class="pdescription">
-            <label for="des">description</label>
-            <input type="text" id="description" name="description" formControlName="description" />
-        </div>
-
-        <div id="divtag" class="divtag">
-            <div id="ptags" class="ptags">
-                <label for="tags">tags</label>
-                <div style="display: flex; flex-direction: column">
-                    <div>
-                        <input type="text"  id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
-                            [(ngModel)]="smalltag" />
-                    </div>
-                    <div #tagContainer id="dtags" class="dtags"
-                        [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                        style="display: flex; flex-wrap: wrap"></div>
-                </div>
-            </div>
-        </div>
-        <div id="button" class="button">
-            <button type="submit" [disabled]="!articleForm.valid">submit</button>
-        </div>
-    </form>
-</div>
-
-
-
-second html
+editor.html
 
 
 <div id="pform" class="pform">
@@ -53,14 +17,14 @@ second html
 
         <div id="divtag" class="divtag">
             <div id="ptags" class="ptags">
-                <label for="tags" >tags</label>
+                <label for="tags" width="30%-6px;">tags</label>
                 <div style="display: flex;flex-direction: column;" > 
                     <div >
                         <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
                         [(ngModel)]="smalltag">
                     </div>
                     <div #tagContainer id="dtags" class="dtags" [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                         style="display:flex;flex: flex-wrap;">
+                         style="display:flex;flex-wrap: wrap;">
                     </div>
                 </div>
             </div>
@@ -68,7 +32,7 @@ second html
         </div>
 
         <div id="button" class="button">
-            <button type="submit" [disabled]="!articleForm.valid">submit</button>
+            <button type="submit" [disabled]="!articleForm.valid"  style="font-size:larger;">submit</button>
         </div>
 
 
@@ -79,4 +43,181 @@ second html
 
 
 
-both html are same then why both work different 
+
+editor.ts
+
+
+import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { first } from 'rxjs';
+import { Card } from 'src/model/card.model';
+
+@Component({
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css'],
+  encapsulation:ViewEncapsulation.None
+})
+export class EditorComponent  {
+  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
+  articleForm;
+  smalltag = "";
+  cardId = 1;
+  card: Card = {
+    cardId: 0,
+    authorId: 0,
+    title: '',
+    description: '',
+    tags: [],
+    date: '',
+    likes: 0
+  }
+  constructor(private formbuilder: FormBuilder) {
+    this.articleForm = this.formbuilder.group({
+      title: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      tags: [""]
+    })
+  };
+
+addtag(temp:string){
+//  console.log(this.tagContainer.nativeElement);
+//  console.log(temp);
+ 
+const tag=document.createElement('span');
+
+
+tag.innerText=temp;
+this.tagContainer.nativeElement.appendChild(tag);
+  }
+
+
+  
+  onSubmit() {
+    this.card.cardId = this.cardId;
+    this.card.authorId = Number(localStorage.getItem('userid'));
+    this.card.title = this.articleForm.value.title ?? "";
+    this.card.description = this.articleForm.value.description ?? "";
+    this.card.date = new Date().toISOString();
+
+    this.cardId++;
+  }
+
+  enter(event: any) {
+    // console.log(event);
+// event.preventdefault();
+    if (event.key === "Enter" && this.smalltag.trim() != "") {
+
+      this.card.tags.push(this.smalltag.trim());
+      this.addtag(this.smalltag?.trim());
+      this.articleForm.get('tags')?.reset();
+    
+
+    }
+    if (event.key === "Enter" && this.smalltag?.trim() == "") {
+      this.articleForm.get('tags')?.reset();
+    }
+    console.log(this.card.tags);
+
+
+  }
+
+
+}
+
+
+
+
+
+editor.css
+
+
+
+
+#pform {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+
+
+}
+
+#form div {
+    display: flex;
+    margin: 3px;
+
+}
+
+.ptags div {
+    width: 100%;
+}
+
+#form div label {
+    font-size: larger;
+    width: 30%;
+    margin-right: 5px;
+    text-align: right;
+}
+
+#form div input {
+    height: 30px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 2px;
+}
+
+#button {
+    
+    display: flex;
+    justify-content: flex-end;
+}
+
+#divtag {
+    display: flex;
+    flex-direction: column;
+
+    margin-bottom: 10px;
+}
+
+#divtag span {
+
+    display: flex;
+
+    background-color: rgb(161, 161, 161);
+    margin: 5px;
+    padding: 3px 8px;
+    border-radius: 3px;
+
+}
+
+
+
+
+@media only screen and (max-width: 857px) {
+    #form div {
+        display: flex;
+        flex-direction: column;
+
+
+    }
+
+    #form div label {
+        text-align: justify;
+    }
+
+}
+
+
+
+
+in this due to more div tag label and input is not same as title and description in term with width
+
