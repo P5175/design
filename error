@@ -2,37 +2,38 @@ editor.html
 
 
 <div id="pform" class="pform">
-    
+
     <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
-        <div id="ptitle" class="ptitle">
+        <div id="ptitle" class="ptitle" >
             <label for="title">title</label>
-            <input type="text" id="title" name="title" formControlName="title"/>
+            <input type="text" id="title" name="title" formControlName="title" />
         </div>
 
 
-        <div id="pdescription" class="pdescription">
+        <div id="pdescription" class="pdescription" >
             <label for="des">description</label>
             <input type="text" id="description" name="description" formControlName="description">
         </div>
 
-        <div id="divtag" class="divtag">
-            <div id="ptags" class="ptags">
-                <label for="tags" width="30%-6px;">tags</label>
-                <div style="display: flex;flex-direction: column;" > 
-                    <div >
-                        <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
+        <div id="divtag" class="divtag" >
+           
+            <label for="tags" >tags</label>
+            <div style="display: flex;flex-direction: column;width: 100%;">
+                <div>
+                    <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
                         [(ngModel)]="smalltag">
-                    </div>
-                    <div #tagContainer id="dtags" class="dtags" [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                         style="display:flex;flex-wrap: wrap;">
-                    </div>
                 </div>
+                <div #tagContainer id="dtags" class="dtags"
+                    [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
+                    style="display:flex;flex-wrap: wrap;">
+                </div>
+               
             </div>
 
         </div>
 
         <div id="button" class="button">
-            <button type="submit" [disabled]="!articleForm.valid"  style="font-size:larger;">submit</button>
+            <button type="submit" [disabled]="!articleForm.valid" style="font-size:larger;">submit</button>
         </div>
 
 
@@ -43,9 +44,102 @@ editor.html
 
 
 
+editor.css
 
-editor.ts
 
+#pform {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 100vh;
+}
+
+#form {
+    display: flex;
+    flex-direction: column;
+    width: 40%;
+
+
+}
+
+#ptitle,#pdescription,#divtag  {
+   
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 3px;
+   /* align-items: center; */
+}
+
+/* .ptags div {
+    width: 100%;
+} */
+
+#form div label {
+    font-size: larger;
+    /* flex-grow: 1; */
+    width: 30%;
+    margin-right: 5px;
+    text-align: right;
+}
+
+#form div input {
+    height: 30px;
+    width: 100%;
+    border: 1px solid black;
+    border-radius: 2px;
+    font-size: 20px;
+}
+
+#button {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end;
+}
+
+#divtag {
+    display: flex;
+    flex-direction: row;
+
+    margin-bottom: 10px;
+}
+
+#divtag span {
+
+    display: flex;
+
+    background-color: rgb(161, 161, 161);
+    margin: 5px;
+    padding: 3px 8px;
+    border-radius: 3px;
+
+}
+
+
+
+
+@media only screen and (max-width: 998px) {
+    #form div {
+        display: flex;
+        flex-direction: column;
+
+
+    }
+
+    #form div label {
+        text-align: justify;
+    }
+ #button button{
+    width: 100%;
+ }
+}
+
+
+
+
+editor.ts 
 
 import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
 import { FormArray, FormBuilder, Validators } from '@angular/forms';
@@ -127,97 +221,5 @@ this.tagContainer.nativeElement.appendChild(tag);
 
 
 
-
-
-editor.css
-
-
-
-
-#pform {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 100vh;
-}
-
-#form {
-    display: flex;
-    flex-direction: column;
-    width: 40%;
-
-
-}
-
-#form div {
-    display: flex;
-    margin: 3px;
-
-}
-
-.ptags div {
-    width: 100%;
-}
-
-#form div label {
-    font-size: larger;
-    width: 30%;
-    margin-right: 5px;
-    text-align: right;
-}
-
-#form div input {
-    height: 30px;
-    width: 100%;
-    border: 1px solid black;
-    border-radius: 2px;
-}
-
-#button {
-    
-    display: flex;
-    justify-content: flex-end;
-}
-
-#divtag {
-    display: flex;
-    flex-direction: column;
-
-    margin-bottom: 10px;
-}
-
-#divtag span {
-
-    display: flex;
-
-    background-color: rgb(161, 161, 161);
-    margin: 5px;
-    padding: 3px 8px;
-    border-radius: 3px;
-
-}
-
-
-
-
-@media only screen and (max-width: 857px) {
-    #form div {
-        display: flex;
-        flex-direction: column;
-
-
-    }
-
-    #form div label {
-        text-align: justify;
-    }
-
-}
-
-
-
-
-in this due to more div tag label and input is not same as title and description in term with width
+in this title description and submit are in accurately of same width but tag div is of different width
 
