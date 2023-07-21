@@ -1,36 +1,75 @@
-editor.html
+first html
 
 <div id="pform" class="pform">
-    <div *ngIf="! articleForm.controls.title?.valid && ( articleForm.controls.title?.touched)" id="error">
-        <div>title is required</div>
-    </div>
-    <div *ngIf="! articleForm.controls.description.valid && ( articleForm.controls.description.dirty || articleForm.controls.description.touched)"
-        id="error">
-        <div>description is required</div>
-    </div>
     <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
-        <p id="ptitle" class="ptitle">
+        <div id="ptitle" class="ptitle">
             <label for="title">title</label>
-            <input type="text" id="title" name="title" formControlName="title">
-        </p>
+            <input type="text" id="title" name="title" formControlName="title" />
+        </div>
 
-
-        <p id="pdescription" class="pdescription">
+        <div id="pdescription" class="pdescription">
             <label for="des">description</label>
-            <input type="text" id="description" name="description" formControlName="description">
-        </p>
+            <input type="text" id="description" name="description" formControlName="description" />
+        </div>
 
         <div id="divtag" class="divtag">
-            <p id="ptags" class="ptags">
+            <div id="ptags" class="ptags">
                 <label for="tags">tags</label>
-                <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
-                    [(ngModel)]="smalltag">
-            </p>
-            <p #tagContainer id="dtags" class="dtags"></p>
+                <div style="display: flex; flex-direction: column">
+                    <div>
+                        <input type="text"  id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
+                            [(ngModel)]="smalltag" />
+                    </div>
+                    <div #tagContainer id="dtags" class="dtags"
+                        [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
+                        style="display: flex; flex-wrap: wrap"></div>
+                </div>
+            </div>
         </div>
-        <p id="button" class="button">
+        <div id="button" class="button">
             <button type="submit" [disabled]="!articleForm.valid">submit</button>
-        </p>
+        </div>
+    </form>
+</div>
+
+
+
+second html
+
+
+<div id="pform" class="pform">
+    
+    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
+        <div id="ptitle" class="ptitle">
+            <label for="title">title</label>
+            <input type="text" id="title" name="title" formControlName="title"/>
+        </div>
+
+
+        <div id="pdescription" class="pdescription">
+            <label for="des">description</label>
+            <input type="text" id="description" name="description" formControlName="description">
+        </div>
+
+        <div id="divtag" class="divtag">
+            <div id="ptags" class="ptags">
+                <label for="tags" >tags</label>
+                <div style="display: flex;flex-direction: column;" > 
+                    <div >
+                        <input type="text" id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
+                        [(ngModel)]="smalltag">
+                    </div>
+                    <div #tagContainer id="dtags" class="dtags" [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
+                         style="display:flex;flex: flex-wrap;">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <div id="button" class="button">
+            <button type="submit" [disabled]="!articleForm.valid">submit</button>
+        </div>
 
 
 
@@ -38,171 +77,6 @@ editor.html
 </div>
 
 
-editor.css
 
 
-#pform{
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    min-height: 100vh;
-}
-
-#form{
-    display: flex;
-    flex-direction: column;
-    width: 40%;
-   
-    
-}
-
-#form p{
-    display: flex;
-
-
- 
-}
-#form p label{
-    width: 30%;
-   margin-right: 5px;
-    text-align: right;
-}
-#form p input{
-  width: 100%;
-  border:1px solid black;
-  border-radius: 2px;
-}
-#button{
-  
-    display: flex;
-  justify-content: flex-end;
-}
-
-#divtag{
-display: flex;
-flex-direction: column;
-
-margin-bottom: 10px;
-}
-
-#divtag span{
-   
-    
-    margin-right: 5px;
-    padding: 3px 8px;
-    border-radius: 2px;
-    background-color: rgb(194, 230, 230);
-}
-
-#divtag p:last-child{
-    display:flex;
-    flex-direction: wrap;
-
-}
-
-
-@media only screen and (max-width: 936px) {
-    #form p{
-        display: flex;
-    flex-direction: column;
-      
-     
-    }
-    #form p label{
-        text-align: justify;
-    }
-   
-  }   
-
-
-
-
-editor.ts
-
-import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
-import { first } from 'rxjs';
-import { Card } from 'src/model/card.model';
-
-@Component({
-  selector: 'app-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css'],
-  encapsulation:ViewEncapsulation.None
-})
-export class EditorComponent  {
-  @ViewChild('tagContainer',{static:true}) tagContainer!:ElementRef<HTMLDivElement>;
-  articleForm;
-  smalltag = "";
-  cardId = 1;
-  card: Card = {
-    cardId: 0,
-    authorId: 0,
-    title: '',
-    description: '',
-    tags: [],
-    date: '',
-    likes: 0
-  }
-  constructor(private formbuilder: FormBuilder) {
-    this.articleForm = this.formbuilder.group({
-      title: ["", [Validators.required]],
-      description: ["", [Validators.required]],
-      tags: [""]
-    })
-  };
-
-addtag(temp:string){
-//  console.log(this.tagContainer.nativeElement);
-//  console.log(temp);
- 
-const tag=document.createElement('span');
-
-
-tag.innerText=temp;
-this.tagContainer.nativeElement.appendChild(tag);
-  }
-
-
-  
-  onSubmit() {
-    this.card.cardId = this.cardId;
-    this.card.authorId = Number(localStorage.getItem('userid'));
-    this.card.title = this.articleForm.value.title ?? "";
-    this.card.description = this.articleForm.value.description ?? "";
-    this.card.date = new Date().toISOString();
-
-    this.cardId++;
-  }
-
-  enter(event: any) {
-    // console.log(event);
-// event.preventdefault();
-    if (event.key === "Enter" && this.smalltag.trim() != "") {
-
-      this.card.tags.push(this.smalltag.trim());
-      this.addtag(this.smalltag?.trim());
-      this.articleForm.get('tags')?.reset();
-    
-
-    }
-    if (event.key === "Enter" && this.smalltag?.trim() == "") {
-      this.articleForm.get('tags')?.reset();
-    }
-    console.log(this.card.tags);
-
-
-  }
-
-
-}
-here why #divtag p:last-child{
-    display:flex;
-    flex-direction: wrap;
-
-} this is not working 
-
-
-
+both html are same then why both work different 
