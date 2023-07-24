@@ -1,227 +1,31 @@
-editor.ts 
+<hr>
+<div id="home">
+    <div>
+        <button id="yourfeed" >your feed</button>
+        <button id="globalfeed" >global feed</button>
 
-
-
-import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
-import { FormArray, FormBuilder, Validators } from '@angular/forms';
-import { first } from 'rxjs';
-import { Card } from 'src/model/card.model';
-
-@Component({
-  selector: 'app-editor',
-  templateUrl: './editor.component.html',
-  styleUrls: ['./editor.component.css'],
-  encapsulation: ViewEncapsulation.None
-})
-export class EditorComponent {
-  @ViewChild('tagContainer', { static: true }) tagContainer!: ElementRef<HTMLDivElement>;
-  articleForm;
-  smalltag = "";
-  cardId = 1;
-  card: Card = {
-    cardId: 0,
-    authorId: 0,
-    title: '',
-    description: '',
-    tags: [],
-    date: '',
-    likes: 0
-  }
-  constructor(private formbuilder: FormBuilder) {
-    this.articleForm = this.formbuilder.group({
-      title: ["", [Validators.required]],
-      description: ["", [Validators.required]],
-      tags: [""]
-    })
-  };
-
-  addtag(temp: string) {
-    //  console.log(this.tagContainer.nativeElement);
-    //  console.log(temp);
-
-    const tag = document.createElement('span');
-
-
-    tag.innerText = temp;
-    this.tagContainer.nativeElement.appendChild(tag);
-  }
-
-
-
-  onSubmit() {
-    this.card.cardId = this.cardId;
-    this.card.authorId = Number(localStorage.getItem('userid'));
-    this.card.title = this.articleForm.value.title ?? "";
-    this.card.description = this.articleForm.value.description ?? "";
-    this.card.date = new Date().toISOString();
-
-    this.cardId++;
-  }
-
-  enter(event: any) {
-    // console.log(event);
-    // event.preventdefault();
-    if (event.key === "Enter" && this.smalltag.trim() != "") {
-      if (this.card.tags.includes(this.smalltag.trim())) {
-        this.articleForm.get('tags')?.reset();
-      } else {
-
-        this.card.tags.push(this.smalltag.trim());
-
-        this.addtag(this.smalltag?.trim());
-        this.articleForm.get('tags')?.reset();
-      }
-
-
-    }
-    if (event.key === "Enter" && this.smalltag?.trim() == "") {
-      this.articleForm.get('tags')?.reset();
-    }
-    console.log(this.card.tags);
-
-
-  }
-
-
-}
-
-editor.html
-
-
-
-
-<div id="pform" class="pform">
-    <form [formGroup]="articleForm" (ngsubmit)="onSubmit()" id="form" class="form">
-        <div id="ptitle" class="ptitle center">
-            <label for="title">title</label>
-            <input type="text" id="title" name="title" formControlName="title" />
-        </div>
-
-        <div id="pdescription" class="pdescription center">
-            <label for="des">description</label>
-            <input type="text" id="description" name="description" formControlName="description" />
-        </div>
-
-        <div id="divtag" class="divtag ">
-            <div id="ptags" class="ptags center">
-                <label for="tags" >tags</label>
-                <div style="display: flex; flex-direction: column">
-                    <div>
-                        <input type="text" d id="tags" name="tags" formControlName="tags" (keydown)="enter($event)"
-                            [(ngModel)]="smalltag" />
-                    </div>
-                    <div #tagContainer id="dtags" class="dtags"
-                        [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                        style="display: flex; flex-wrap: wrap"></div>
+        <div id="cards" class="cards" *ngFor="let card of cardarray">
+            <div id="user">
+                <div>{{card.authorName}}</div>
+                <div>{{card.likes}}</div>
+            </div>
+            <div id="title">
+                {{card.title}}
+            </div>
+            <div id="description">
+                {{card.description}}
+            </div>
+            <div id="tag">
+                <div>read more....</div>
+                <div id="tagflex">
+                    <div *ngFor="let tag of card.tags"><span>{{tag}}</span></div>
                 </div>
             </div>
         </div>
-        <div id="button" class="button">
-            <button type="submit" [disabled]="!articleForm.valid">submit</button>
-        </div>
-    </form>
+
+    </div>
+    <div>
+
+    </div>
 </div>
-
-
-
-editor.css
-
-
-
-#pform{
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
-     width: 100%;
-     min-height: 100vh;}
-    
-    #form{
-     display: flex;
-     flex-direction: column;
-     width: 40%;
-    
-     
-    }
-    
-    #form div{
-     display: flex;
-    
-    
-    
-    }
-    #ptitle,#pdescription,#divtag,#button  {
-   
-       
-        margin: 3px;
-      
-    }
-    .ptags div{
-     width: 100%;
-    }
-    #form div label{
-        font-size: larger;
-     width: 30%;
-    margin-right: 5px;
-     text-align: right;
-    }
-    #form div input{
-        font-size: 20px;
-        height: 30px;
-     width: 100%;
-     border:1px solid black;
-     border-radius: 2px;
-    }
-    #button{
-    
-    display: flex;
-    justify-content: flex-end;
-    }
-    
-    #divtag{
-    display: flex;
-    flex-direction: column;
-    
-    margin-bottom: 10px;
-    }
-    
-    #divtag span{
-    
-     display:flex;
-     background-color: rgb(179, 174, 174);
-     margin: 5px;
-     padding: 3px 8px;
-     border-radius: 4px;
-    
-    }
-    button{
-        font-size: larger;
-        height: 30px;
-        
-    }
-    
-    
-    
-    @media only screen and (max-width: 995px) {
-     #form div{
-      display: flex;
-     flex-direction: column;
-     
-     
-     }
-     #form div label{
-      text-align: justify;
-     }
-     #button{
-        width: 100%;
-     }
-    
-}
-
-.center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-in this when we insert tag and multiple tag are added then tag label come under because tags input and tags are in one div and label are in another div and both are in flex so when tag are added tag label positon change how to stop it
+this is the html file now there is one active class which is by default put with globalfeed button but when i click yourfeed then class put with yourfeed and remove from globalfeed same again
