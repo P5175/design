@@ -1,4 +1,21 @@
-home.html
+this is card.ts
+
+export interface Card{
+    cardId:number;
+    authorId:number;
+    authorName:string;
+    title:string;
+    description:string;
+    tags:string[];
+    date:string;
+    likes:number;
+}
+
+
+now my all card are saved in array in service 
+
+
+this is the home.html
 
 <hr>
 <div id="body">
@@ -9,7 +26,7 @@ home.html
             <button id="globalfeed" (click)="toggle('globalfeed')" [class.active]="activebutton=='globalfeed'"
                 [class.inactive]="activebutton=='yourfeed'">global feed</button>
 
-            <div id="cards" class="cards" *ngFor="let card of cardarray">
+            <div id="cards" class="cards" *ngFor="let card of cardarray" [routerLink]="['/article',card.cardId]">
                 <div id="user">
                     <div>{{card.authorName}}||{{card.date|date:'dd/MM/yyyy'}}</div>
                     <div>{{card.likes}}</div>
@@ -34,62 +51,12 @@ home.html
         </div>
     </div>
     <div id="popular-tag">
-     <span>a</span><span>a</span><span>a</span><span>a</span><span>a</span>
+        <div>popular tag</div>
+     <div><span>a</span><span>a</span><span>a</span><span>a</span><span>a</span></div>
     </div>
 </div>
 
 
-
-home.ts
-
-
-
-button{
-    margin:5px;
-}
-#cards{
-    border-bottom: 1px solid black;
-}
-
-#user,#tag{
-    display: flex;
-    justify-content: space-between;
-}
-
-#tagflex{
-    display: flex;
-}
-#tagflex span{
-margin: 4px;
-}
-.active{
-  
-    background-color: greenyellow;
-    border-right: none;
-    border-left: none;
-    border-top: none;
-    
-}
-
-.inactive{
-    border-right: none;
-    border-left: none;
-    border-top: none;
-    border-bottom: none;
-    background-color: white;
-}
-#body{
-    width: 80%;
-    margin: auto;
-    display: flex;
-  
-}
-#home{
-    width:70%
-}
-#populartag{
-    width: 30%;
-}
-
-
-in this when we apply flex to body  home and populartag not taking full width of body
+now in this file  <div><span>a</span><span>a</span><span>a</span><span>a</span><span>a</span></div> this line is static but i want dyanamic here based on 
+below logic 
+if there are two tag one tag used in four card and another used in one card then sum of likes of four card and sum of likes of one card  out of both which has high like got high stand and based on that i want top 5 tag and this tag must updated on any card add or tag add 
