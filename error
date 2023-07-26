@@ -61,47 +61,53 @@ export class TodoComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.dataservice.todo$.subscribe(val=>this.todo=val);
+    this.dataservice.todo$.subscribe(val => this.todo = val);
     // console.log(this.todo);
-    
+
   }
 
-  @ViewChild('tasks') tasks!:ElementRef;
+  @ViewChild('tasks') tasks!: ElementRef;
   text!: string;
-  todo:string[]=[];
+  todo: string[] = [];
 
   addtask() {
-    
-    
+
+
     this.dataservice.addtask(this.text);
-    this.text="";
+    this.text = "";
   }
 
-   delete(i:number){
+  delete(i: number) {
     this.dataservice.delete(i);
-   }
+  }
 
-   edit(i:number){
-const taskelement=this.tasks.nativeElement.children[i].children[0];
-taskelement.nextSibling.children[0].style.display='none';
+  edit(i: number) {
+    const taskelement = this.tasks.nativeElement.children[i].children[0];
+    taskelement.nextSibling.children[0].style.display = 'none';
+    console.log(taskelement);
 
-taskelement.setAttribute('contenteditable','true');
-taskelement.focus();
-    
-   }
+    taskelement.setAttribute('contenteditable', 'true');
+    taskelement.focus();
 
-save(i:number,event:any){
- console.log("save");
- 
-  if(event.keyCode==13){
-    event.preventDefault();
-    const edittask=event.target.innerText.trim();
-    console.log(edittask);
-    
-  this.dataservice.edit(i,edittask);
-  const taskelement=this.tasks.nativeElement.children[i];
-taskelement.setAttribute('contenteditable','false');}
-}
+  }
+
+  save(i: number, event: any) {
+    console.log("save");
+
+    if (event.keyCode == 13) {
+      event.preventDefault();
+      
+      const edittask = event.target.innerText.trim();
+      if(edittask!=""){
+      console.log(edittask);
+
+      this.dataservice.edit(i, edittask);
+      const taskelement = this.tasks.nativeElement.children[i].children[0];
+      taskelement.setAttribute('contenteditable', 'false');
+      taskelement.nextSibling.children[0].style.display = 'inline';
+      console.log(this.tasks.nativeElement.children[i].children[0]);}
+    }
+  }
 }
 
 
@@ -141,5 +147,4 @@ edit(i:number,text:string){
 
 
 
-in this when click on edit and dont change anything and press enter then it not work edit not happend
-
+when edit and add new text then again edit then cursor come on starting instead of last 
