@@ -1,50 +1,4 @@
-todo.html
-
-<div id="body">
-
-    <div id="main">
-
-        <div id="first">
-
-            <h3>Task List</h3>
-
-            <div>
-                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
-            </div>
-
-            <button (click)="addtask()">Add task</button>
-
-        </div>
-
-
-        <div id="second">
-            <h3>Tasks</h3>
-            <div id="tasks" #tasks>
-                <div *ngFor="let task of todo; let i=index">
-                    <div  (keydown)="save(i,$event)">
-                        {{task}} 
-                    </div>
-                    <div>
-                        <button (click)="edit(i)">
-                            edit
-                        </button>
-                        <button (click)="delete(i)">
-                            delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-</div>
-
-
-
-
 todo.ts
-
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DataService } from '../data.service';
@@ -74,6 +28,7 @@ export class TodoComponent implements OnInit {
 
 
     this.dataservice.addtask(this.text);
+    
     this.text = "";
   }
 
@@ -97,8 +52,11 @@ export class TodoComponent implements OnInit {
     if (event.keyCode == 13) {
       event.preventDefault();
       
-      const edittask = event.target.innerText.trim();
-      if(edittask!=""){
+      const edittask = event.target.textContent.trim();
+      if(edittask==""){
+        this.delete(i);
+      }
+      else if(edittask!=""){
       console.log(edittask);
 
       this.dataservice.edit(i, edittask);
@@ -112,8 +70,50 @@ export class TodoComponent implements OnInit {
 
 
 
-data.service
+todo.html
 
+<div id="body">
+
+    <div id="main">
+
+        <div id="first">
+
+            <h3>Task List</h3>
+
+            <div>
+                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
+            </div>
+
+            <button (click)="addtask()">Add task</button>
+
+        </div>
+
+
+        <div id="second">
+            <h3>Tasks</h3>
+            <div id="tasks" #tasks>
+                <div *ngFor="let task of todo; let i=index">
+                    <div  >
+                        <input type="text" (keydown)="save(i,$event)" placeholder="" [(ngModel)]="text">
+                    </div>
+                    <div>
+                        <button (click)="edit(i)">
+                            edit
+                        </button>
+                        <button (click)="delete(i)">
+                            delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+data.service.ts
 
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
@@ -146,5 +146,6 @@ edit(i:number,text:string){
 }
 
 
+in this when add task method called then input box must come with value of task added
 
-when edit and add new text then again edit then cursor come on starting instead of last 
+
