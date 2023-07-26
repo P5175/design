@@ -1,4 +1,50 @@
-this is the todo.ts
+todo.html
+
+<div id="body">
+
+    <div id="main">
+
+        <div id="first">
+
+            <h3>Task List</h3>
+
+            <div>
+                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
+            </div>
+
+            <button (click)="addtask()">Add task</button>
+
+        </div>
+
+
+        <div id="second">
+            <h3>Tasks</h3>
+            <div id="tasks" #tasks>
+                <div *ngFor="let task of todo; let i=index">
+                    <div  (keydown)="save(i,$event)">
+                        {{task}} 
+                    </div>
+                    <div>
+                        <button (click)="edit(i)">
+                            edit
+                        </button>
+                        <button (click)="delete(i)">
+                            delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+
+
+
+todo.ts
+
 
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { DataService } from '../data.service';
@@ -36,17 +82,23 @@ export class TodoComponent implements OnInit {
    }
 
    edit(i:number){
-const taskelement=this.tasks.nativeElement.children[i];
+const taskelement=this.tasks.nativeElement.children[i].children[0];
+taskelement.nextSibling.children[0].style.display='none';
+
 taskelement.setAttribute('contenteditable','true');
 taskelement.focus();
     
    }
-   
+
 save(i:number,event:any){
+ console.log("save");
  
-  if(event.keycode==13){
+  if(event.keyCode==13){
     event.preventDefault();
-  this.dataservice.edit(i,this.text);
+    const edittask=event.target.innerText.trim();
+    console.log(edittask);
+    
+  this.dataservice.edit(i,edittask);
   const taskelement=this.tasks.nativeElement.children[i];
 taskelement.setAttribute('contenteditable','false');}
 }
@@ -54,48 +106,40 @@ taskelement.setAttribute('contenteditable','false');}
 
 
 
-this is the todo.html
+data.service
 
 
-<div id="body">
+import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 
-    <div id="main">
+@Injectable({
+  providedIn: 'root'
+})
+export class DataService {
 
-        <div id="first">
+  constructor() { }
 
-            <h3>Task List</h3>
+  todo:string[]=[];
 
-            <div>
-                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
-            </div>
+todo$=new BehaviorSubject(this.todo);
 
-            <button (click)="addtask()">Add task</button>
+addtask(text:string){
+  this.todo.push(text);
+  console.log(this.todo);
+  
+}
+delete(i:number){
+  this.todo.splice(i,1);
+}
 
-        </div>
-
-
-        <div id="second">
-            <h3>Tasks</h3>
-            <div id="tasks" #tasks>
-                <div *ngFor="let task of todo; let i=index">
-                    <div contenteditable="true" (keydown)="save(i,$event)">
-                        {{task}} 
-                    </div>
-                    <div>
-                        <button (click)="edit(i)">
-                            edit
-                        </button>
-                        <button (click)="delete(i)">
-                            delete
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-</div>
+edit(i:number,text:string){
+  this.todo[i]=text;
+  console.log(this.todo);
+  
+}
+}
 
 
-this not work on enter new line is coming
+
+in this when click on edit and dont change anything and press enter then it not work edit not happend
+
