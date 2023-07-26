@@ -1,6 +1,88 @@
-insert into cd.facilities
-    (facid, name, membercost, guestcost, initialoutlay, monthlymaintenance)
-    select (select max(facid) from cd.facilities)+1, 'Spa', 20, 30, 100000, 800; 
+this is the todo.ts
+
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { DataService } from '../data.service';
+
+@Component({
+  selector: 'app-todo',
+  templateUrl: './todo.component.html',
+  styleUrls: ['./todo.component.css']
+})
+export class TodoComponent implements OnInit {
+
+  constructor(private dataservice: DataService) {
+
+  }
+
+  ngOnInit(): void {
+    this.dataservice.todo$.subscribe(val=>this.todo=val);
+    // console.log(this.todo);
+    
+  }
+
+  @ViewChild('tasks') tasks!:ElementRef;
+  text!: string;
+  todo:string[]=[];
+
+  addtask() {
+    
+    
+    this.dataservice.addtask(this.text);
+    this.text="";
+  }
+
+   delete(i:number){
+    this.dataservice.delete(i);
+   }
+
+   edit(i:number){
+this.tasks.nativeElement.children[i];
+    this.dataservice.edit(i,this.text);
+   }
+
+}
 
 
-why this working without values
+this is the todo.html
+
+<div id="body">
+
+    <div id="main">
+
+        <div id="first">
+
+            <h3>Task List</h3>
+
+            <div>
+                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
+            </div>
+
+            <button (click)="addtask()">Add task</button>
+
+        </div>
+
+
+        <div id="second">
+            <h3>Tasks</h3>
+            <div id="tasks" #tasks>
+                <div *ngFor="let task of todo; let i=index">
+                    <div contenteditable="true">
+                        {{task}} 
+                    </div>
+                    <div>
+                        <button (click)="edit(i)">
+                            edit
+                        </button>
+                        <button (click)="delete(i)">
+                            delete
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</div>
+
+now i want this.tasks.nativeelement.children[i] to hover when edit method called and in html task must be editable 
