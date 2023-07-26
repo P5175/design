@@ -36,14 +36,26 @@ export class TodoComponent implements OnInit {
    }
 
    edit(i:number){
-this.tasks.nativeElement.children[i];
-    this.dataservice.edit(i,this.text);
+const taskelement=this.tasks.nativeElement.children[i];
+taskelement.setAttribute('contenteditable','true');
+taskelement.focus();
+    
    }
-
+   
+save(i:number,event:any){
+ 
+  if(event.keycode==13){
+    event.preventDefault();
+  this.dataservice.edit(i,this.text);
+  const taskelement=this.tasks.nativeElement.children[i];
+taskelement.setAttribute('contenteditable','false');}
+}
 }
 
 
+
 this is the todo.html
+
 
 <div id="body">
 
@@ -66,7 +78,7 @@ this is the todo.html
             <h3>Tasks</h3>
             <div id="tasks" #tasks>
                 <div *ngFor="let task of todo; let i=index">
-                    <div contenteditable="true">
+                    <div contenteditable="true" (keydown)="save(i,$event)">
                         {{task}} 
                     </div>
                     <div>
@@ -85,4 +97,5 @@ this is the todo.html
     </div>
 </div>
 
-now i want this.tasks.nativeelement.children[i] to hover when edit method called and in html task must be editable 
+
+this not work on enter new line is coming
