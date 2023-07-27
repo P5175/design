@@ -1,151 +1,61 @@
-todo.ts
-
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { DataService } from '../data.service';
-
-@Component({
-  selector: 'app-todo',
-  templateUrl: './todo.component.html',
-  styleUrls: ['./todo.component.css']
-})
-export class TodoComponent implements OnInit {
-
-  constructor(private dataservice: DataService) {
-
-  }
-
-  ngOnInit(): void {
-    this.dataservice.todo$.subscribe(val => this.todo = val);
-    // console.log(this.todo);
-
-  }
-
-  @ViewChild('tasks') tasks!: ElementRef;
-  text!: string;
-  todo: string[] = [];
-
-  addtask() {
-
-
-    this.dataservice.addtask(this.text);
-    
-    this.text = "";
-  }
-
-  delete(i: number) {
-    this.dataservice.delete(i);
-  }
-
-  edit(i: number) {
-    const taskelement = this.tasks.nativeElement.children[i].children[0];
-    taskelement.nextSibling.children[0].style.display = 'none';
-    console.log(taskelement);
-
-    taskelement.setAttribute('contenteditable', 'true');
-    taskelement.focus();
-
-  }
-
-  save(i: number, event: any) {
-    console.log("save");
-
-    if (event.keyCode == 13) {
-      event.preventDefault();
-      
-      const edittask = event.target.textContent.trim();
-      if(edittask==""){
-        this.delete(i);
-      }
-      else if(edittask!=""){
-      console.log(edittask);
-
-      this.dataservice.edit(i, edittask);
-      const taskelement = this.tasks.nativeElement.children[i].children[0];
-      taskelement.setAttribute('contenteditable', 'false');
-      taskelement.nextSibling.children[0].style.display = 'inline';
-      console.log(this.tasks.nativeElement.children[i].children[0]);}
-    }
-  }
-}
-
-
-
-todo.html
+form.html 
 
 <div id="body">
-
-    <div id="main">
-
-        <div id="first">
-
-            <h3>Task List</h3>
-
-            <div>
-                <input type="text" placeholder="what do you have planned?" [(ngModel)]="text">
+    <div id="center">
+        <div id="form">
+            <div id="form-title">
+                <span><i class="fa-solid fa-arrow-left"></i></span>
+                <span>Log in With Quantum</span>
             </div>
-
-            <button (click)="addtask()">Add task</button>
-
-        </div>
-
-
-        <div id="second">
-            <h3>Tasks</h3>
-            <div id="tasks" #tasks>
-                <div *ngFor="let task of todo; let i=index">
-                    <div  >
-                        <input type="text" (keydown)="save(i,$event)" placeholder="" [(ngModel)]="text">
-                    </div>
-                    <div>
-                        <button (click)="edit(i)">
-                            edit
-                        </button>
-                        <button (click)="delete(i)">
-                            delete
-                        </button>
-                    </div>
-                </div>
+            <div id="row1">
+                <label class="container">
+                   <div class="radio-btn">
+                    <input type="radio" checked="checked" name="radio">
+                    <span class="checkmark"></span>
+                   </div>
+                    <span class="radio-text">District</span>
+                </label>
+                <label class="container">
+                    <div class="radio-btn">
+                        <input type="radio" checked="checked" name="radio">
+                        <span class="checkmark"></span>
+                       </div>
+                       <span class="radio-text">Independent school</span>
+                </label>
             </div>
-
+            <div id="row2"></div>
+            <div id="row3"></div>
+            <div id="row4"></div>
+            <div id="row5"></div>
+            <div id="row6"></div>
+            <div id="row7"></div>
         </div>
-
     </div>
 </div>
 
 
-data.service.ts
+form.css
 
-import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+*{
+    box-sizing: border-box;
+    
+ 
 
-@Injectable({
-  providedIn: 'root'
-})
-export class DataService {
-
-  constructor() { }
-
-  todo:string[]=[];
-
-todo$=new BehaviorSubject(this.todo);
-
-addtask(text:string){
-  this.todo.push(text);
-  console.log(this.todo);
+}
+#body{
+    background-color: rgb(221, 218, 218);
+    height: 100vh;
+}
+#center{
+    width: 50%;
+    margin: auto;
+   
+}
+#form{
+    
   
-}
-delete(i:number){
-  this.todo.splice(i,1);
-}
-
-edit(i:number,text:string){
-  this.todo[i]=text;
-  console.log(this.todo);
-  
-}
+    background-color: white;
 }
 
 
-in this when add task method called then input box must come with value of task added
-
-
+why i am not able to  give margin-top to the #form 
