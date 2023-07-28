@@ -1,3 +1,48 @@
+home.html
+
+<hr>
+<div id="body">
+    <div id="home">
+        <div>
+            <button id="yourfeed" (click)="toggle('yourfeed')" [class.active]="activebutton=='yourfeed'"
+                [class.inactive]="activebutton=='globalfeed'">your feed</button>
+            <button id="globalfeed" (click)="toggle('globalfeed')" [class.active]="activebutton=='globalfeed'"
+                [class.inactive]="activebutton=='yourfeed'">global feed</button>
+
+            <div id="cards" class="cards" *ngFor="let card of cardarray" >
+                <div id="user">
+                    <div>{{card.authorName}}||{{card.date|date:'dd/MM/yyyy'}}</div>
+                    <div class="like-div"><button #like_button class="like-button" (click)="toggleLike(card.cardId)"><span>likes</span><span>{{card.likes}}</span></button></div>
+                </div>
+                <div id="title">
+                    {{card.title}}
+                </div>
+                <div id="description">
+                    {{card.description}}
+                </div>
+                <div id="tag">
+                    <div [routerLink]="['/article',card.cardId]" style="cursor: pointer;">read more....</div>
+                    <div id="tagflex">
+                        <div *ngFor="let tag of card.tags"><span>{{tag}}</span></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div>
+
+        </div>
+    </div>
+    <div id="popular-tag">
+        <div>popular tag</div>
+     <div #popular_tag></div>
+    </div>
+</div>
+
+
+
+home.ts
+
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Card } from 'src/model/card.model';
 import { User } from 'src/model/user.model';
@@ -15,11 +60,15 @@ export class HomeComponent implements OnInit, AfterViewInit {
   populartag: string[] = [];
 
   @ViewChild('popular_tag') popular_tag!: ElementRef<HTMLDivElement>;
-  @ViewChild('like-button') like_button!: ElementRef<HTMLDivElement>;
+  @ViewChild('like_button') like_button!: ElementRef<HTMLDivElement>;
   constructor(private dataservice: DataService) {
   }
   ngAfterViewInit(): void {
     this.calculatepopulartag();
+   console.log(this.like_button);
+   console.log(this.popular_tag);
+   
+    
   }
   ngOnInit(): void {
     this.dataservice.cardarray$.subscribe(val => this.cardarray = val);
@@ -42,13 +91,18 @@ export class HomeComponent implements OnInit, AfterViewInit {
         card.likes--;
        let i =user?.followingIds.indexOf(id);
         user.followingIds.splice(i,1);
+        
         if(this.like_button){
+         
+          
 this.like_button.nativeElement.classList.toggle("like-active");}
       } else {
 
         card.likes++;
         user?.followingIds.push(id);
+      
         if(this.like_button){
+          
           this.like_button.nativeElement.classList.toggle("like-active");}
       }
     }
@@ -83,4 +137,4 @@ this.like_button.nativeElement.classList.toggle("like-active");}
 
 
 }
-why like_button toggle not work
+ in this in ngafterviewinit when i do console.log then this popular_tag is printed but this.like_button is not printed
