@@ -1,5 +1,6 @@
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Card } from 'src/model/card.model';
+import { User } from 'src/model/user.model';
 import { DataService } from 'src/services/data.service';
 
 @Component({
@@ -9,6 +10,7 @@ import { DataService } from 'src/services/data.service';
 })
 export class HomeComponent implements OnInit,AfterViewInit{
   cardarray:Card[]=[];
+  users:User[]=[];
   activebutton='globalfeed';
   populartag:string[]=[];
   
@@ -21,7 +23,7 @@ constructor(private dataservice:DataService){
   }
   ngOnInit(): void {
     this.dataservice.cardarray$.subscribe(val=>this.cardarray=val);
-    
+    this.dataservice.users$.subscribe(val=>this.users=val);
   }
 
   toggle(button:string){
@@ -29,6 +31,17 @@ this.activebutton=button;
 // console.log(this.activebutton);
 
   }
+
+toggleLike(id:number){
+  const user = this.users.find((u) => u.userId.toString() == localStorage.getItem('userid'));
+  if(user?.followingIds.includes(id)){
+    const card= this.cardarray.find((c)=>c.cardId== id);
+    card?.likes--;
+  }else{
+    const card= this.cardarray.find((c)=>c.cardId== id);
+    card?.likes++;
+  }
+}
 
   calculatepopulartag(){
     const tagmap=new Map<string,{count:number,totallikes:number}>();
@@ -59,6 +72,4 @@ this.activebutton=button;
 
 
 }
-
-
-Cannot read properties of undefined (reading 'nativeElement')
+The operand of an increment or decrement operator may not be an optional property access. error in card.likes++
