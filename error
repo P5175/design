@@ -8,68 +8,74 @@ import { DataService } from 'src/services/data.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit,AfterViewInit{
-  cardarray:Card[]=[];
-  users:User[]=[];
-  activebutton='globalfeed';
-  populartag:string[]=[];
-  
+export class HomeComponent implements OnInit, AfterViewInit {
+  cardarray: Card[] = [];
+  users: User[] = [];
+  activebutton = 'globalfeed';
+  populartag: string[] = [];
+
   @ViewChild('popular_tag') popular_tag!: ElementRef<HTMLDivElement>;
- 
-constructor(private dataservice:DataService){
-}
+  @ViewChild('like-button') like_button!: ElementRef<HTMLDivElement>;
+  constructor(private dataservice: DataService) {
+  }
   ngAfterViewInit(): void {
-   this.calculatepopulartag();
+    this.calculatepopulartag();
   }
   ngOnInit(): void {
-    this.dataservice.cardarray$.subscribe(val=>this.cardarray=val);
-    this.dataservice.users$.subscribe(val=>this.users=val);
+    this.dataservice.cardarray$.subscribe(val => this.cardarray = val);
+    this.dataservice.users$.subscribe(val => this.users = val);
   }
 
-  toggle(button:string){
-this.activebutton=button;
-// console.log(this.activebutton);
+  toggle(button: string) {
+    this.activebutton = button;
+    // console.log(this.activebutton);
 
   }
 
-toggleLike(id:number){
-  const user = this.users.find((u) => u.userId.toString() == localStorage.getItem('userid'));
-  if(user?.followingIds.includes(id)){
-    const card= this.cardarray.find((c)=>c.cardId== id);
-    card?.likes--;
-  }else{
-    const card= this.cardarray.find((c)=>c.cardId== id);
-    card?.likes++;
-  }
-}
+  toggleLike(id: number) {
+    const user = this.users.find((u) => u.userId.toString() == localStorage.getItem('userid'));
+    const card = this.cardarray.find((c) => c.cardId == id);
+    if (card) {
+      if (user?.followingIds.includes(id)) {
 
-  calculatepopulartag(){
-    const tagmap=new Map<string,{count:number,totallikes:number}>();
-    for(const card of this.cardarray){
-      for(const tag of card.tags){
-        if(tagmap.has(tag)){
-          const tagdata=tagmap.get(tag);
-        if(tagdata){
-          tagdata.count++;
-          tagdata.totallikes+=card.likes;
-        }
-        }else{
-          tagmap.set(tag,{count:1,totallikes:card.likes})
+
+        card.likes--;
+this.like_button.nativeElement.classList.toggle("like-active");
+      } else {
+
+        card.likes++;
+        user?.followingIds.push(id);
+      }
+    }
+  }
+
+  calculatepopulartag() {
+    const tagmap = new Map<string, { count: number, totallikes: number }>();
+    for (const card of this.cardarray) {
+      for (const tag of card.tags) {
+        if (tagmap.has(tag)) {
+          const tagdata = tagmap.get(tag);
+          if (tagdata) {
+            tagdata.count++;
+            tagdata.totallikes += card.likes;
+          }
+        } else {
+          tagmap.set(tag, { count: 1, totallikes: card.likes })
         }
       }
     }
 
-    this.populartag=Array.from(tagmap.entries()).sort((a,b)=>b[1].count-a[1].count).map(([val])=>val).slice(0,5);
+    this.populartag = Array.from(tagmap.entries()).sort((a, b) => b[1].count - a[1].count).map(([val]) => val).slice(0, 5);
     console.log(this.populartag);
-    for(let i=0;i<this.populartag.length;i++){
+    for (let i = 0; i < this.populartag.length; i++) {
       const tag = document.createElement('span');
-      
-      
-          tag.innerText = this.populartag[i];
-          this.popular_tag.nativeElement!.appendChild(tag);
+
+
+      tag.innerText = this.populartag[i];
+      this.popular_tag.nativeElement!.appendChild(tag);
     }
   }
 
 
 }
-The operand of an increment or decrement operator may not be an optional property access. error in card.likes++
+Cannot read properties of undefined (reading 'nativeElement')
