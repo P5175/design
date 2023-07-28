@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Card } from 'src/model/card.model';
 import { DataService } from 'src/services/data.service';
 
@@ -7,7 +7,7 @@ import { DataService } from 'src/services/data.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit{
+export class HomeComponent implements OnInit,AfterViewInit{
   cardarray:Card[]=[];
   activebutton='globalfeed';
   populartag:string[]=[];
@@ -16,9 +16,12 @@ export class HomeComponent implements OnInit{
  
 constructor(private dataservice:DataService){
 }
+  ngAfterViewInit(): void {
+   this.calculatepopulartag();
+  }
   ngOnInit(): void {
     this.dataservice.cardarray$.subscribe(val=>this.cardarray=val);
-    this.calculatepopulartag();
+    
   }
 
   toggle(button:string){
@@ -49,8 +52,8 @@ this.activebutton=button;
       const tag = document.createElement('span');
       
       
-          tag.innerText = this.popular_tag[i];
-          this.popular_tag.nativeElement.appendChild(tag);
+          tag.innerText = this.populartag[i];
+          this.popular_tag.nativeElement!.appendChild(tag);
     }
   }
 
@@ -58,6 +61,4 @@ this.activebutton=button;
 }
 
 
- Element implicitly has an 'any' type because expression of type 'number' can't be used to index type 'ElementRef<HTMLDivElement>'.
-  No index signature with a parameter of type 'number' was found on type 'ElementRef<HTMLDivElement>'.
-
+Cannot read properties of undefined (reading 'nativeElement')
