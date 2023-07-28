@@ -40,11 +40,16 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
 
         card.likes--;
-this.like_button.nativeElement.classList.toggle("like-active");
+       let i =user?.followingIds.indexOf(id);
+        user.followingIds.splice(i,1);
+        if(this.like_button){
+this.like_button.nativeElement.classList.toggle("like-active");}
       } else {
 
         card.likes++;
         user?.followingIds.push(id);
+        if(this.like_button){
+          this.like_button.nativeElement.classList.toggle("like-active");}
       }
     }
   }
@@ -78,4 +83,4 @@ this.like_button.nativeElement.classList.toggle("like-active");
 
 
 }
-Cannot read properties of undefined (reading 'nativeElement')
+why like_button toggle not work
