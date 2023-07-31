@@ -1,8 +1,7 @@
-app.ts 
-
-
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormControl } from '@angular/forms';
+import { Subscription } from 'rxjs';
+import { PaginationComponent } from './pagination/pagination.component';
 
 export interface PaginatedResponse<T> {
   items: T[];
@@ -15,8 +14,13 @@ export interface PaginatedResponse<T> {
   styleUrls: ['./app.component.css']
 })
 export class AppComponent implements OnInit  {
+  @ViewChild('PaginationComponent') PaginationComponent!:PaginationComponent;
+ 
+  private pagesub!:Subscription;
+  private pagesizesub!:Subscription;
+  
   ngOnInit(): void {
-    
+    this.pagesub=this.PaginationComponent.page$.subscribe(page=>this.page=page);
   }
 
   page:number=1;
@@ -40,128 +44,4 @@ export class AppComponent implements OnInit  {
   }
 }
 
-
-app.html
-
-<div class="items-wrapper">
-    <app-card *ngFor="let item of visibleItems.items" [item]="item"></app-card>
-  </div>
-  
-  <div class="pagination-wrapper">
-    <app-pagination [page]="page" [pageSize]="pageSize" [total]="visibleItems.total"></app-pagination>
-  
-    
-  </div>
-
-
-
-pagination.ts
-
-import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subject } from 'rxjs';
-
-
-@Component({
-  selector: 'app-pagination',
-  templateUrl: './pagination.component.html',
-  styleUrls: ['./pagination.component.css']
-})
-export class PaginationComponent implements OnInit
-  
-{
-  @Input() total = 100;
-  @Input() page = 1;
-  @Input() pageSize = 10;
-
-  public total$=new Subject();
-  public page$=new Subject();
-  public pageSize$=new Subject();
-
-  public totalPages!: number;
-  public visiblePages!: number[];
-  public visibleRangeLength:number=5;
-  pageSizes: number[] = [5, 10, 25, 50];
-
-  ngOnInit(): void {
-    this.updateTotalPages();
-    this.updateVisiblePages();
-  }
-
-  public selectPage(page: number): void {
-   this.page=page;
-   this.page$.next(this.page);
-    this.updateVisiblePages();
-    
-  }
-
-  public selectPageSize(pageSize: string): void {
-   this.pageSize=+pageSize;
-   this.pageSize$.next(this.pageSize);
-    this.updateTotalPages();
-    this.updateVisiblePages();
-    
-  }
-
-  private updateVisiblePages(): void {
-    const length = Math.min(this.totalPages, this.visibleRangeLength);
-
-
-    const startIndex = Math.max(
-      Math.min(
-        this.page - Math.ceil(length / 2),
-        this.totalPages - length
-      ),
-      0
-    );
-
-    this.visiblePages = Array.from(
-      new Array(length).keys(),
-      (item) => item + startIndex + 1
-    );
-  }
-
-  private updateTotalPages(): void {
-    this.totalPages = Math.ceil(this.total / this.pageSize);
-  }
-}
-
-
-pagination.html
-
-
-<div class="pagination">
-    <button [disabled]="page === 1" (click)="selectPage(1)"><<</button>
-    <button [disabled]="page === 1" (click)="selectPage(page - 1)">
-      <
-    </button>
-    <button
-      *ngFor="let page of visiblePages"
-      
-      (click)="selectPage(page)"
-    >
-      {{ page }}
-    </button>
-    <button
-      [disabled]="page === totalPages"
-      (click)="selectPage(page + 1)"
-    >
-      >
-    </button>
-    <button
-      [disabled]="page === totalPages"
-      (click)="selectPage(totalPages)"
-    >
-      >>
-    </button>
-  </div>
-  
-  <select [ngModel]="pageSize" (ngModelChange)="selectPageSize($event)">
-    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-  </select>
-
-
-how to subscribe to subject of pagination.ts in app.ts 
-
-
-
+Type 'unknown' is not assignable to type 'number'
