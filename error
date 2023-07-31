@@ -35,9 +35,13 @@ export class AppComponent implements OnInit  {
   private pagesub!:Subscription;
   private pagesizesub!:Subscription;
   
-  ngOnInit(): void {
+  constructor(private paginationcomponent:PaginationComponent){
     
-    this.pagesub=this.PaginationComponent.page$.subscribe(val=>this.page=val);
+  }
+  ngOnInit(): void {
+    this.paginationcomponent.page$.subscribe(data=>{
+      this.page=data;
+    });
   }
 
   page:number=1;
@@ -62,13 +66,43 @@ export class AppComponent implements OnInit  {
 }
 
 
+pagination.html
 
-pagination.ts
+<div class="pagination">
+    <button [disabled]="page === 1" (click)="selectPage(1)"><<</button>
+    <button [disabled]="page === 1" (click)="selectPage(page - 1)">
+      <
+    </button>
+    <button
+      *ngFor="let page of visiblePages"
+      
+      (click)="selectPage(page)"
+    >
+      {{ page }}
+    </button>
+    <button
+      [disabled]="page === totalPages"
+      (click)="selectPage(page + 1)"
+    >
+      >
+    </button>
+    <button
+      [disabled]="page === totalPages"
+      (click)="selectPage(totalPages)"
+    >
+      >>
+    </button>
+  </div>
+  
+  <select [ngModel]="pageSize" (ngModelChange)="selectPageSize($event)">
+    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
+  </select>
 
+pagination.ts 
 
 import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { Subject } from 'rxjs';
+import { BehaviorSubject, Subject } from 'rxjs';
 
 
 @Component({
@@ -83,9 +117,9 @@ export class PaginationComponent implements OnInit
   @Input() page = 1;
   @Input() pageSize = 10;
 
-  public total$=new Subject();
-  public page$=new Subject();
-  public pageSize$=new Subject();
+  public total$=new BehaviorSubject(100);
+  public page$=new BehaviorSubject(1);
+  public pageSize$=new BehaviorSubject(10);
 
   public totalPages!: number;
   public visiblePages!: number[];
@@ -135,38 +169,18 @@ export class PaginationComponent implements OnInit
   }
 }
 
-pagination.html
-
-<div class="pagination">
-    <button [disabled]="page === 1" (click)="selectPage(1)"><<</button>
-    <button [disabled]="page === 1" (click)="selectPage(page - 1)">
-      <
-    </button>
-    <button
-      *ngFor="let page of visiblePages"
-      
-      (click)="selectPage(page)"
-    >
-      {{ page }}
-    </button>
-    <button
-      [disabled]="page === totalPages"
-      (click)="selectPage(page + 1)"
-    >
-      >
-    </button>
-    <button
-      [disabled]="page === totalPages"
-      (click)="selectPage(totalPages)"
-    >
-      >>
-    </button>
-  </div>
-  
-  <select [ngModel]="pageSize" (ngModelChange)="selectPageSize($event)">
-    <option *ngFor="let size of pageSizes" [value]="size">{{ size }}</option>
-  </select>
 
 
-TypeError: Cannot read properties of undefined (reading 'page$')
-Type 'unknown' is not assignable to type 'number'.
+main.ts:6 ERROR NullInjectorError: R3InjectorError(AppModule)[PaginationComponent -> PaginationComponent -> PaginationComponent]: 
+  NullInjectorError: No provider for PaginationComponent!
+    at NullInjector.get (core.mjs:7493:27)
+    at R3Injector.get (core.mjs:7914:33)
+    at R3Injector.get (core.mjs:7914:33)
+    at R3Injector.get (core.mjs:7914:33)
+    at ChainedInjector.get (core.mjs:12084:36)
+    at lookupTokenUsingModuleInjector (core.mjs:3201:39)
+    at getOrCreateInjectable (core.mjs:3246:12)
+    at Module.ɵɵdirectiveInject (core.mjs:10041:12)
+    at NodeInjectorFactory.AppComponent_Factory [as factory] (app.component.ts:16:26)
+    at getNodeInjectable (core.mjs:3431:44)
+
