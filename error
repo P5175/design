@@ -1,140 +1,61 @@
-home.html
+import { Component, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 
-<hr>
-<div id="body">
-    <div id="home">
-        <div>
-            <button id="yourfeed" (click)="toggle('yourfeed')" [class.active]="activebutton=='yourfeed'"
-                [class.inactive]="activebutton=='globalfeed'">your feed</button>
-            <button id="globalfeed" (click)="toggle('globalfeed')" [class.active]="activebutton=='globalfeed'"
-                [class.inactive]="activebutton=='yourfeed'">global feed</button>
-
-            <div id="cards" class="cards" *ngFor="let card of cardarray" >
-                <div id="user">
-                    <div>{{card.authorName}}||{{card.date|date:'dd/MM/yyyy'}}</div>
-                    <div class="like-div"><button #like_button class="like-button" (click)="toggleLike(card.cardId)"><span>likes</span><span>{{card.likes}}</span></button></div>
-                </div>
-                <div id="title">
-                    {{card.title}}
-                </div>
-                <div id="description">
-                    {{card.description}}
-                </div>
-                <div id="tag">
-                    <div [routerLink]="['/article',card.cardId]" style="cursor: pointer;">read more....</div>
-                    <div id="tagflex">
-                        <div *ngFor="let tag of card.tags"><span>{{tag}}</span></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-        <div>
-
-        </div>
-    </div>
-    <div id="popular-tag">
-        <div>popular tag</div>
-     <div #popular_tag></div>
-    </div>
-</div>
-
-
-
-home.ts
-
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Card } from 'src/model/card.model';
-import { User } from 'src/model/user.model';
-import { DataService } from 'src/services/data.service';
 
 @Component({
-  selector: 'app-home',
-  templateUrl: './home.component.html',
-  styleUrls: ['./home.component.css']
+  selector: 'app-pagination',
+  templateUrl: './pagination.component.html',
+  styleUrls: ['./pagination.component.css']
 })
-export class HomeComponent implements OnInit, AfterViewInit {
-  cardarray: Card[] = [];
-  users: User[] = [];
-  activebutton = 'globalfeed';
-  populartag: string[] = [];
+export class PaginationComponent implements OnInit
+  
+{
+  @Input() total = 10;
+  @Input() page = 5;
+  @Input() pageSize = 5;
 
-  @ViewChild('popular_tag') popular_tag!: ElementRef<HTMLDivElement>;
-  @ViewChild('like_button') like_button!: ElementRef<HTMLDivElement>;
-  constructor(private dataservice: DataService) {
+  public totalPages!: number;
+  public visiblePages!: number[];
+  public visibleRangeLength:number=5;
+  pageSizes: number[] = [5, 10, 25, 50];
+
+  ngOnInit(): void {
+    this.updateVisiblePages();
   }
-  ngAfterViewInit(): void {
-    this.calculatepopulartag();
-   console.log(this.like_button);
-   console.log(this.popular_tag);
-   
+
+  public selectPage(page: number): void {
+   this.page=page;
+    this.updateVisiblePages();
     
   }
-  ngOnInit(): void {
-    this.dataservice.cardarray$.subscribe(val => this.cardarray = val);
-    this.dataservice.users$.subscribe(val => this.users = val);
+
+  public selectPageSize(pageSize: string): void {
+   this.pageSize=+pageSize;
+    this.updateTotalPages();
+    this.updateVisiblePages();
+    
   }
 
-  toggle(button: string) {
-    this.activebutton = button;
-    // console.log(this.activebutton);
+  private updateVisiblePages(): void {
+    const length = Math.min(this.totalPages, this.visibleRangeLength);
 
+    const startIndex = Math.max(
+      Math.min(
+        this.page - Math.ceil(length / 2),
+        this.totalPages - length
+      ),
+      0
+    );
+
+    this.visiblePages = Array.from(
+      new Array(length).keys(),
+      (item) => item + startIndex + 1
+    );
   }
 
-  toggleLike(id: number) {
-    const user = this.users.find((u) => u.userId.toString() == localStorage.getItem('userid'));
-    const card = this.cardarray.find((c) => c.cardId == id);
-    if (card) {
-      if (user?.followingIds.includes(id)) {
-
-
-        card.likes--;
-       let i =user?.followingIds.indexOf(id);
-        user.followingIds.splice(i,1);
-        
-        if(this.like_button){
-         
-          
-this.like_button.nativeElement.classList.toggle("like-active");}
-      } else {
-
-        card.likes++;
-        user?.followingIds.push(id);
-      
-        if(this.like_button){
-          
-          this.like_button.nativeElement.classList.toggle("like-active");}
-      }
-    }
+  private updateTotalPages(): void {
+    this.totalPages = Math.ceil(this.total / this.pageSize);
   }
-
-  calculatepopulartag() {
-    const tagmap = new Map<string, { count: number, totallikes: number }>();
-    for (const card of this.cardarray) {
-      for (const tag of card.tags) {
-        if (tagmap.has(tag)) {
-          const tagdata = tagmap.get(tag);
-          if (tagdata) {
-            tagdata.count++;
-            tagdata.totallikes += card.likes;
-          }
-        } else {
-          tagmap.set(tag, { count: 1, totallikes: card.likes })
-        }
-      }
-    }
-
-    this.populartag = Array.from(tagmap.entries()).sort((a, b) => b[1].count - a[1].count).map(([val]) => val).slice(0, 5);
-    console.log(this.populartag);
-    for (let i = 0; i < this.populartag.length; i++) {
-      const tag = document.createElement('span');
-
-
-      tag.innerText = this.populartag[i];
-      this.popular_tag.nativeElement!.appendChild(tag);
-    }
-  }
-
-
 }
- in this in ngafterviewinit when i do console.log then this popular_tag is printed but this.like_button is not printed
+Invalid array length
+    at PaginationComponent.updateVisiblePages
