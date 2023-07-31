@@ -35,13 +35,17 @@ export class AppComponent implements OnInit  {
   private pagesub!:Subscription;
   private pagesizesub!:Subscription;
   
-  constructor(private paginationcomponent:PaginationComponent){
-    
-  }
+  
   ngOnInit(): void {
-    this.paginationcomponent.page$.subscribe(data=>{
+   
+    this.PaginationComponent.page$.subscribe(data=>{
       this.page=data;
     });
+    this.PaginationComponent.pageSize$.subscribe(data=>{
+      this.pageSize=data;
+    });
+    // console.log(this.page,this.pageSize);
+    
   }
 
   page:number=1;
@@ -64,7 +68,6 @@ export class AppComponent implements OnInit  {
     this.visibleItems = { items, total: this.items.length };
   }
 }
-
 
 pagination.html
 
@@ -171,16 +174,16 @@ export class PaginationComponent implements OnInit
 
 
 
-main.ts:6 ERROR NullInjectorError: R3InjectorError(AppModule)[PaginationComponent -> PaginationComponent -> PaginationComponent]: 
-  NullInjectorError: No provider for PaginationComponent!
-    at NullInjector.get (core.mjs:7493:27)
-    at R3Injector.get (core.mjs:7914:33)
-    at R3Injector.get (core.mjs:7914:33)
-    at R3Injector.get (core.mjs:7914:33)
-    at ChainedInjector.get (core.mjs:12084:36)
-    at lookupTokenUsingModuleInjector (core.mjs:3201:39)
-    at getOrCreateInjectable (core.mjs:3246:12)
-    at Module.ɵɵdirectiveInject (core.mjs:10041:12)
-    at NodeInjectorFactory.AppComponent_Factory [as factory] (app.component.ts:16:26)
-    at getNodeInjectable (core.mjs:3431:44)
+
+   ERROR TypeError: Cannot read properties of undefined (reading 'page$')
+    at AppComponent.ngOnInit (app.component.ts:25:30)
+    at callHook (core.mjs:2434:22)
+    at callHooks (core.mjs:2403:17)
+    at executeInitAndCheckHooks (core.mjs:2354:9)
+    at refreshView (core.mjs:10341:21)
+    at detectChangesInternal (core.mjs:11529:9)
+    at RootViewRef.detectChanges (core.mjs:12020:9)
+    at ApplicationRef.tick (core.mjs:25310:22)
+    at ApplicationRef._loadComponent (core.mjs:25348:14)
+    at ApplicationRef.bootstrap 
 
