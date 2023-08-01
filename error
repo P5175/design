@@ -223,4 +223,4 @@ this.tag=tag;
 }
 
 
-in this when tagfeed must display none when user click any tag then it must display and both button with id yourfeed and globalfeed must be applied only inactive class
+in start yourfeed has inactive class and globalfeed has active class  and tag button has must have display none and then we click on any of tag of popular tag then this yourfeed and globalfeed has to be active class and tag button has to be active 
