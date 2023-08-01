@@ -1,58 +1,5 @@
-home.html
-
-
-<hr>
-<div id="body">
-    <div id="home">
-        <div>
-            <button id="yourfeed" (click)="toggle('yourfeed')" [class.active]="activebutton=='yourfeed'"
-                [class.inactive]="activebutton=='globalfeed'">your feed</button>
-            <button id="globalfeed" (click)="toggle('globalfeed')" [class.active]="activebutton=='globalfeed'"
-                [class.inactive]="activebutton=='yourfeed'">global feed</button>
-
-
-
-               
-<div class="fit-card">
-            <div id="cards" class="cards" *ngFor="let card of visibleItems.items" >
-                <div id="user">
-                    <div>{{card.authorName}}||{{card.date|date:'dd/MM/yyyy'}}</div>
-                    <div class="like-div"><button #like_button class="like-button" (click)="toggleLike(card.cardId)"><span>likes</span><span>{{card.likes}}</span></button></div>
-                </div>
-                <div id="title">
-                    {{card.title}}
-                </div>
-                <div id="description">
-                    {{card.description}}
-                </div>
-                <div id="tag">
-                    <div [routerLink]="['/article',card.cardId]" style="cursor: pointer;">read more....</div>
-                    <div id="tagflex">
-                        <div *ngFor="let tag of card.tags"><span>{{tag}}</span></div>
-                    </div>
-                </div>
-            </div>
-</div>
-            <div class="pagination-wrapper">
-                <app-pagination [page]="page" [pageSize]="pageSize" [total]="visibleItems.total" (pageemit)="pageemit($event)" (pagesizeemit)="pagesizeemit($event)" ></app-pagination>
-              
-                
-            </div>
-        </div>
-        <div>
-
-        </div>
-    </div>
-    <div id="popular-tag">
-        <div>popular tag</div>
-     <div #popular_tag></div>
-    </div>
-</div>
-
-
-home.ts
-
-import { AfterViewInit, Component, ElementRef, OnInit, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { HtmlParser } from '@angular/compiler';
+import { AfterViewInit, Component, ElementRef, OnInit, QueryList, Renderer2, ViewChild, ViewChildren } from '@angular/core';
 import { Card } from 'src/model/card.model';
 import { User } from 'src/model/user.model';
 import { DataService } from 'src/services/data.service';
@@ -73,14 +20,14 @@ export class HomeComponent implements OnInit, AfterViewInit {
 
   @ViewChild('popular_tag') popular_tag!: ElementRef<HTMLDivElement>;
   @ViewChildren('like_button') like_button!: QueryList<ElementRef<HTMLDivElement>>;
-  constructor(private dataservice: DataService) {
+  constructor(private render: Renderer2, private dataservice: DataService) {
   }
   ngAfterViewInit(): void {
     this.calculatepopulartag();
-   console.log(this.like_button);
-   console.log(this.popular_tag);
-   
-    
+    console.log(this.like_button);
+    console.log(this.popular_tag);
+
+
   }
   ngOnInit(): void {
     this.dataservice.cardarray$.subscribe(val => this.cardarray = val);
@@ -98,34 +45,50 @@ export class HomeComponent implements OnInit, AfterViewInit {
     const user = this.users.find((u) => u.userId.toString() == localStorage.getItem('userid'));
     const card = this.cardarray.find((c) => c.cardId == id);
     if (card) {
-      if (user?.followingIds.includes(id)) {
+      if (user?.favoriteCardIds.includes(id)) {
 
 
         card.likes--;
-        
-       let i =user?.followingIds.indexOf(id);
-        user.followingIds.splice(i,1);
-        
-        if(this.like_button){
-         
-    const array=this.like_button.toArray();
-    console.log(array);
-    
-    
-}
+
+        let i = user?.favoriteCardIds.indexOf(id);
+        user.favoriteCardIds.splice(i, 1);
+
+        if (this.like_button) {
+
+          const array = this.like_button.toArray();
+          console.log(array);
+
+
+        }
       } else {
 
         card.likes++;
-        user?.followingIds.push(id);
-      
-        if(this.like_button){
-          const array=this.like_button.toArray();
+        user?.favoriteCardIds.push(id);
+
+        if (this.like_button) {
+          const array = this.like_button.toArray();
           console.log(array);
-          }
+        }
+      }
+    }
+    const cardelement = this.findcardElementById(id);
+    if (cardelement) {
+      if (user?.favoriteCardIds.includes(id)) {
+        this.render.addClass(cardelement, 'like-active');
+      } else {
+        this.render.removeClass(cardelement, 'like-active');
       }
     }
   }
 
+
+  findcardElementById(id: number): HTMLElement | null {
+    const cardelement = this.like_button.find((ElementRef) => {
+      const cardId = parseInt(ElementRef.nativeElement.getAttribute('data-card-id') || '', 10);
+      return cardId === id;
+    })
+    return cardelement ? cardelement.nativeElement : null;
+  }
   calculatepopulartag() {
     const tagmap = new Map<string, { count: number, totallikes: number }>();
     for (const card of this.cardarray) {
@@ -146,6 +109,9 @@ export class HomeComponent implements OnInit, AfterViewInit {
     console.log(this.populartag);
     for (let i = 0; i < this.populartag.length; i++) {
       const tag = document.createElement('span');
+      tag.setAttribute('id', this.populartag[i]);
+     
+      
 
 
       tag.innerText = this.populartag[i];
@@ -153,22 +119,22 @@ export class HomeComponent implements OnInit, AfterViewInit {
     }
   }
 
-  page:number=1;
-  pageSize:number=10;
-  
+  page: number = 1;
+  pageSize: number = 10;
+
 
   public visibleItems: PaginatedResponse<number> = {
     items: this.cardarray.slice(0, 10),
     total: this.cardarray.length,
   };
-pageemit(event:any){
-  this.page=event;
-  this.onPageChange();
-}
-pagesizeemit(event:any){
-  this.pageSize=event;
-  this.onPageChange();
-}
+  pageemit(event: any) {
+    this.page = event;
+    this.onPageChange();
+  }
+  pagesizeemit(event: any) {
+    this.pageSize = event;
+    this.onPageChange();
+  }
   public onPageChange(): void {
     const startIndex = (this.page - 1) * this.pageSize;
 
@@ -180,8 +146,10 @@ pagesizeemit(event:any){
 
 
     this.visibleItems = { items, total: this.cardarray.length };
-  } 
+  }
 
 
 }
- in this togglelike method called then i want one class added to that card and on another togglelike on same card must remove it class ,it means we have to add and remove class on each click of card button
+
+
+in this on calculateopopulartag method on dynamic span tag i want add method that run onclick 
