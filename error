@@ -1,6 +1,5 @@
 article.component.ts
 
-
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Card } from 'src/model/card.model';
@@ -23,17 +22,20 @@ constructor(private route:ActivatedRoute,private dataservice:DataService){
 }
   ngOnInit(): void {
   this.route.paramMap.subscribe(params=>{
-    this.cardId=params.get("cardid")??"";
+    this.cardId!=params.get("cardid");
+    this.dataservice.cardarray$.subscribe(val=>this.cardarray=val);
+  this.card!=this.cardarray.find(card=>card.cardId==Number(this.cardId)) ;
+  console.log(this.cardId);
   })
-  this.dataservice.cardarray$.subscribe(val=>this.cardarray=val);
-  this.card!=this.cardarray.find(card=>card.cardId==Number(this.cardId));
-  console.log(this.card);
+  
   
  }
 
 
 
 }
+
+
 
 
 dataservice
@@ -101,5 +103,5 @@ users$=new BehaviorSubject(this.users);
 }
 
 
-in this when console.log card then it give undefined
+in this when console.log cardid then it give undefined
 
