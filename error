@@ -2,6 +2,7 @@ editor.html
 
 
 
+
 <div id="pform" class="pform">
     <form [formGroup]="articleForm"  id="form" class="form">
         <div id="ptitle" class="ptitle center">
@@ -23,8 +24,11 @@ editor.html
                             [(ngModel)]="smalltag" />
                     </div>
                     <div #tagContainer id="dtags" class="dtags"
-                        [ngStyle]="{ display: card.tags.length == 0 ? 'none' : 'flex' }"
-                        style="display: flex; flex-wrap: wrap"></div>
+                        [ngStyle]="{ display: spanTemp.length == 0 ? 'none' : 'flex' }"
+                        style="display: flex; flex-wrap: wrap">
+                    <span *ngFor="let item of spanTemp;let i =index" (dblclick)="removetag(i)">{{item}}</span>
+    
+                    </div>
                 </div>
             </div>
         </div>
@@ -36,110 +40,124 @@ editor.html
 
 
 
-editor.css
+
+editor.ts
 
 
-#pform{
-     display: flex;
-     flex-direction: column;
-     align-items: center;
-     justify-content: center;
+import { Component, ElementRef, ViewChild, ViewEncapsulation } from '@angular/core';
+import { FormArray, FormBuilder, Validators } from '@angular/forms';
+import { Route, Router } from '@angular/router';
+import { first } from 'rxjs';
+import { Card } from 'src/model/card.model';
+import { DataService } from 'src/services/data.service';
+
+@Component({
+  selector: 'app-editor',
+  templateUrl: './editor.component.html',
+  styleUrls: ['./editor.component.css'],
+  // encapsulation: ViewEncapsulation.None
+})
+export class EditorComponent {
+  @ViewChild('tagContainer', { static: true }) tagContainer!: ElementRef<HTMLDivElement>;
+  articleForm;
+  smalltag = "";
+  spanTemp: string[] = [];
+  cardId = 1;
+  card: Card = {
+    cardId: 0,
+    authorName: '',
+    authorId: 0,
+    title: '',
+    description: '',
+    tags: [],
+    date: '',
+    likes: 0
+  }
+  constructor(private formbuilder: FormBuilder, private dataservice: DataService, private router: Router) {
+    this.articleForm = this.formbuilder.group({
+      title: ["", [Validators.required]],
+      description: ["", [Validators.required]],
+      tags: [""]
+    });
+    this.dataservice.cardid$.subscribe(val => this.cardId = val)
+
+  };
+
+  
+  removetag(i:number) {
+    console.log(i);
     
-     min-height: 100vh;}
+    this.spanTemp.slice(i,1);
+
+
+    console.log(this.spanTemp);
+
+  }
+
+
+  onSubmit() {
     
-    #form{
-     display: flex;
-     flex-direction: column;
-     width: 40%;
-    
-     
-    }
-    
-    #form div{
-     display: flex;
-    
-    
-    
-    }
-    #ptitle,#pdescription,#divtag,#button  {
+
+    this.card.cardId = this.cardId;
+    this.card.authorId = Number(localStorage.getItem('userid'));
+    this.card.title = this.articleForm.value.title ?? "";
+    this.card.description = this.articleForm.value.description ?? "";
+    this.card.date = new Date().toISOString();
+    this.card.tags=this.spanTemp;
+    this.card.authorName = localStorage.getItem('username') ?? "";
    
-       
-        margin: 3px;
-      
+    this.dataservice.onSubmitArticle(this.card);
+    // this.tagContainer.nativeElement.innerHTML = "";
+    this.articleForm.reset();
+    this.card = {
+      cardId: 0,
+      authorName: '',
+      authorId: 0,
+      title: '',
+      description: '',
+      tags: [],
+      date: '',
+      likes: 0
     }
-    .ptags div{
-     width: 100%;
-    }
-    #form div label{
-        font-size: larger;
-     width: 40%;
-    margin-right: 5px;
-     text-align: right;
-    }
-    #form div input{
-        font-size: 20px;
-        height: 30px;
-     width: 100%;
-     border:1px solid black;
-     border-radius: 2px;
-    }
-    #button{
-    
-    display: flex;
-    justify-content: flex-end;
-    }
-    
-    #divtag{
-    display: flex;
-    flex-direction: column;
-    
-    margin-bottom: 10px;
-    }
-    
-    #divtag  span{
-    
-     display:flex;
-     background-color: rgb(179, 174, 174);
-     margin: 5px;
-     padding: 3px 8px;
-     border-radius: 4px;
-    
-    }
-    button{
-        font-size: larger;
-        height: 30px;
-        
-    }
-    
-    
-    
-    @media only screen and (max-width: 1071px) {
-     #form div{
-      display: flex;
-     flex-direction: column;
-     
-     
-     }
-     #form div label{
-      text-align: justify;
-     }
-     #ptags{
-        display: flex;
-    align-items: center;
-    justify-content: center;
-     }
-     #button{
-        width: 100%;
-     }
-    
-}
+this.spanTemp=[];
+    this.cardId++;
+    this.dataservice.cardid$.next(this.cardId);
+    this.router.navigateByUrl("");
+  }
 
-.center{
-    display: flex;
-    align-items: center;
-    justify-content: center;
+  enter(event: any) {
+    
+
+    if (event.key === "Enter" && this.smalltag.trim() != "") {
+      event.preventDefault();
+      if (this.spanTemp.includes(this.smalltag.trim())) {
+        this.articleForm.get('tags')?.reset();
+      } else {
+
+        this.spanTemp.push(this.smalltag.trim());
+
+     console.log(this.spanTemp);
+     
+        this.articleForm.get('tags')?.reset();
+      }
+
+
+    }
+    if (event.key === "Enter" && this.smalltag?.trim() == "") {
+      event.preventDefault();
+      this.articleForm.get('tags')?.reset();
+    }
+
+
+   
+
+
+
+
+  }
+
 }
 
 
 
-in this why #divtag span style not apply 
+wht slice method not work in removetag method
