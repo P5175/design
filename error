@@ -1,95 +1,86 @@
-app.html
+card.html
 
 <div class="container">
+  <div class="main-container">
+    <div class="first-card-container">
+      <div *ngFor="let card of left_cards;let i=index" [ngClass]="{'selected':left_currentcard==card}"
+        (click)="selectCardLeft(card)">{{card}}</div>
+    </div>
+    <div class="swap-button">
+      <button [disabled]="right_cards.length==left_cards.length" (click)="toRight()">right</button>
+      <button [disabled]="right_cards.length==0" (click)="toLeft()">left</button>
+    </div>
+    <div class="second-card-container">
+      <div *ngFor="let card of right_cards;let i=index" [ngClass]="{'selected':right_currentcard==card}"
+        (click)="selectCardRight(card)">{{card}}</div>
+    </div>
+  </div>
   <div class="input-container">
-    <form  >
+    <form #cardForm="ngForm" (ngSubmit)="addCard()">
       <div class="input-tag">
-        <label for="tag-input"> Enter Text:</label>
-        <input   type="text" id="tag-input" name="tag-input" [(ngModel)]="newTagValue" required>
+        <label for="card-input"> Card:</label>
+        <input type="text" id="card-input" name="card-input" [(ngModel)]="newCardValue" required>
+      </div>
+      <div class="input-button">
+        <button type="submit">Add Card</button>
       </div>
     </form>
   </div>
-  <div class="change-container">
-    <div class="select-container">
-      <label for="text-color">Text Color:</label>
-      <select id="text-color" [(ngModel)]="selectedTextColor">
-        <option *ngFor="let color of color" [value]="color">{{ color }}</option>
-      </select>
-    </div>
-    <div class="select-container">
-      <label for="background-color">Background Color:</label>
-      <select id="background-color" [(ngModel)]="selectedBackgroundColor">
-        <option *ngFor="let backgroundColor of background_color" [value]="backgroundColor">{{ backgroundColor }}</option>
-      </select>
-    </div>
-    <div class="select-container">
-      <label for="font-size-select">Font Size:</label>
-      <select id="font-size-select" [(ngModel)]="selectedFontSize">
-        <option *ngFor="let fontSize of font_size" [value]="fontSize">{{ fontSize }}</option>
-      </select>
-    </div>
-  </div>
-  <div class="result-container" *ngIf="newTagValue!=''">
-   <span [ngStyle]="getStyle()"> {{newTagValue}}</span>
-  </div>
-</div>
+</div> 
+
+card.ts
+
+import { Component, Renderer2 } from '@angular/core';
+
+@Component({
+  selector: 'app-cards',
+  templateUrl: './cards.component.html',
+  styleUrls: ['./cards.component.css']
+})
+export class CardsComponent {
+left_cards:string[]=[];
+right_cards:string[]=[];
+left_currentcard:string="";
+right_currentcard:string="";
+newCardValue:string="";
 
 
-app.css  
 
-.container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-.input-container{
-    margin-bottom: 10px;
+addCard(){
+  if(this.newCardValue!=""){
+  if (!this.left_cards.includes(this.newCardValue)) {
+   
+    
+    this.left_cards.push(this.newCardValue);
+    console.log(this.left_cards);
+    this.newCardValue = ""; 
+  }}
 }
-  .change-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    width: 400px;
-    margin-bottom: 10px;
+selectCardLeft(card: string) {
+  this.left_currentcard = card;
+  
+  
+}
+
+selectCardRight(card: string) {
+  this.right_currentcard = card;
+  
+}
+
+toRight() {
+  if (this.left_currentcard !== "" && !this.right_cards.includes(this.left_currentcard)) {
+    this.right_cards.push(this.left_currentcard);
+    this.left_currentcard = "";
+    this.right_currentcard = "";
   }
-  .select-container {
-    display: flex;
-    flex-direction: column;
+}
+
+toLeft() {
+  if (this.right_currentcard !== "") {
+    this.right_cards = this.right_cards.filter(card => card !== this.right_currentcard);
+    this.left_currentcard = "";
+    this.right_currentcard = "";
   }
-  .result-container {
-    display: flex;
-    align-items: center;
-    max-width: 100%;
-    overflow-x: auto;
-    margin: 10px;
-  }
-  .input-tag label{
-    margin-right: 5px;
-  }
-  .result-container span {
-    padding: 10px;
-    border: 1px solid black;
-    border-radius: 5px;
-  }
-  input {
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-    background-color: #A67F78;
-  }
-  label{
-    color: #E1DCD9;
-  }
-  select{
-    padding: 5px;
-    border: 1px solid black;
-    border-radius: 5px;
-    background-color: #A67F78;
-  }
-  select option:checked {
-    background-color:rgb(104, 81, 97) ;
-    color: #fff;
-  }
-  suggest best css color for this
+}
+}
+ convert this code into component
