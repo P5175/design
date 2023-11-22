@@ -1,3 +1,41 @@
+this is the error
+main.cpp: In function ‘std::string temp(int)’:
+main.cpp:55:33: error: no matching function for call to ‘std::vector::push_back(std::string)’
+   55 |               current.push_back (to_string (count));
+      |               ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/11/vector:67,
+                 from main.cpp:10:
+/usr/include/c++/11/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = char; _Alloc = std::allocator; std::vector<_Tp, _Alloc>::value_type = char]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/11/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘std::string’ {aka ‘std::__cxx11::basic_string’} to ‘const value_type&’ {aka ‘const char&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/11/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = char; _Alloc = std::allocator; std::vector<_Tp, _Alloc>::value_type = char]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/11/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘std::string’ {aka ‘std::__cxx11::basic_string’} to ‘std::vector::value_type&&’ {aka ‘char&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+main.cpp:62:27: error: no matching function for call to ‘std::vector::push_back(std::string)’
+   62 |         current.push_back (to_string (count));
+      |         ~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~
+In file included from /usr/include/c++/11/vector:67,
+                 from main.cpp:10:
+/usr/include/c++/11/bits/stl_vector.h:1187:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(const value_type&) [with _Tp = char; _Alloc = std::allocator; std::vector<_Tp, _Alloc>::value_type = char]’
+ 1187 |       push_back(const value_type& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/11/bits/stl_vector.h:1187:35: note:   no known conversion for argument 1 from ‘std::string’ {aka ‘std::__cxx11::basic_string’} to ‘const value_type&’ {aka ‘const char&’}
+ 1187 |       push_back(const value_type& __x)
+      |                 ~~~~~~~~~~~~~~~~~~^~~
+/usr/include/c++/11/bits/stl_vector.h:1203:7: note: candidate: ‘void std::vector<_Tp, _Alloc>::push_back(std::vector<_Tp, _Alloc>::value_type&&) [with _Tp = char; _Alloc = std::allocator; std::vector<_Tp, _Alloc>::value_type = char]’
+ 1203 |       push_back(value_type&& __x)
+      |       ^~~~~~~~~
+/usr/include/c++/11/bits/stl_vector.h:1203:30: note:   no known conversion for argument 1 from ‘std::string’ {aka ‘std::__cxx11::basic_string’} to ‘std::vector::value_type&&’ {aka ‘char&&’}
+ 1203 |       push_back(value_type&& __x)
+      |                 ~~~~~~~~~~~~~^~~
+
+
 /******************************************************************************
 
                               Online C++ Compiler.
@@ -7,71 +45,65 @@ Write your code in this editor and press "Run" button to compile and execute it.
 *******************************************************************************/
 
 #include <iostream>
-
+#include <vector>
 using namespace std;
 
-int main()
+string temp (int n);
+
+int
+main ()
 {
-    // Write C++ code here
-     int n;
-   cout << "enter number";
-   cin >> n;
-string s3= temp(n);
-       cout << s3;
-    return 0;
+  // Write C++ code here
+  int n;
+  cout << "enter number";
+  cin >> n;
+  string s3 = temp (n);
+  cout << s3;
+  return 0;
 }
-string temp(int n){
-        if(n==1){
-            return "1";
-        }
-        string s=temp(n-1);
-        int count=0;
-        char number=0;
-        string s1="";
-        for(int i=1;i<=s.size();i++){
-            if(i==1){
-                number=s[i];
-                count++;
-            }else if(s[i]==s[i-1]){
-                count++;
-            }else{
-                s1+=to_string(count);
-                s1+=number;
-                count=1;
-                number=s[i];
-            }
-        }
-        return s;
+
+string
+temp (int n)
+{
+    string s;
+  vector < char >previous;
+  vector < char >current;
+  previous.push_back ('1');
+  if (n == 1)
+    {
+      return "1";
     }
-give error
+  int count = 0;
+  char number;
+  for (int i = 1; i < n; i++)
+    {
+      for (int j = 0; j < previous.size()-1; j++)
+	{
+	  if (j = 1)
+	    {
+	      number = previous[j];
+	      count++;
+	    }
+	  else if (previous[j] == previous[j - 1])
+	    {
+	      count++;
+	    }
+	  else
+	    {
+	      current.push_back (to_string (count));
+	      current.push_back (number);
+	      count = 1;
+	      number = previous[j];
+	    }
 
-   OnlineGDB beta
-online compiler and debugger for c/c++
-code. compile. run. debug. share.
-IDE
-My Projects
-Classroom new
-Learn Programming
-Programming Questions
-Jobs new
-Sign Up
-Login
-About • FAQ • Blog • Terms of Use • Contact Us • GDB Tutorial • Credits • Privacy
-© 2016 - 2023 GDB Online
-       Language 
-C++
-  
-main.cpp
-        return s;
+	}
+	current.push_back (to_string (count));
+	      current.push_back (number);
     }
-
-
-   
-input
-stderr
-Compilation failed due to following error(s).main.cpp: In function ‘int main()’:
-main.cpp:19:12: error: ‘temp’ was not declared in this scope; did you mean ‘tm’?
-   19 | string s3= temp(n);
-      |            ^~~~
-      |            tm
-in c++
+  previous = current;
+  current.clear ();
+for(int k=0;k<previous.size();k++){
+    s+=previous[k];
+}
+return s;
+}
