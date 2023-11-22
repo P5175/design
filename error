@@ -1,20 +1,26 @@
-//{ Driver Code Starts
-//Initial template for C++
+/******************************************************************************
 
-#include<bits/stdc++.h> 
+                              Online C++ Compiler.
+               Code, Compile, Run and Debug C++ program online.
+Write your code in this editor and press "Run" button to compile and execute it.
+
+*******************************************************************************/
+
+#include <iostream>
+
 using namespace std;
 
-// } Driver Code Ends
-//User function template for C++
-
-class Solution
+int main()
 {
-  public:
-    string lookandsay(int n) {
-        // code here
-      
-    }   
-    string temp(int n){
+    // Write C++ code here
+     int n;
+   cout << "enter number";
+   cin >> n;
+string s3= temp(n);
+       cout << s3;
+    return 0;
+}
+string temp(int n){
         if(n==1){
             return "1";
         }
@@ -30,49 +36,42 @@ class Solution
                 count++;
             }else{
                 s1+=to_string(count);
-                s1.append(number);
+                s1+=number;
                 count=1;
                 number=s[i];
             }
         }
         return s;
     }
-};
+give error
 
-//{ Driver Code Starts.
-int main() {
-    int t;
-    cin>>t;
-    while(t--)
-    {
-        int n;
-        cin>>n;
-        Solution obj;
-        cout<<obj.lookandsay(n)<<endl;
+   OnlineGDB beta
+online compiler and debugger for c/c++
+code. compile. run. debug. share.
+IDE
+My Projects
+Classroom new
+Learn Programming
+Programming Questions
+Jobs new
+Sign Up
+Login
+About • FAQ • Blog • Terms of Use • Contact Us • GDB Tutorial • Credits • Privacy
+© 2016 - 2023 GDB Online
+       Language 
+C++
+  
+main.cpp
+        return s;
     }
-    return 0;
-}
-// } Driver Code Ends
 
 
-
-
-
-
-
-
-
-
-
-
-error
-
-
-./Solution.cpp: In member function 'std::__cxx11::string Solution::temp(int)':
-./Solution.cpp:33:33: error: no matching function for call to 'std::__cxx11::basic_string<char>::append(char&)'
-                 s1.append(number);
-                                 ^
-In file included from /usr/local/include/c++/5.4.0/string:52:0,
-                 from /usr/local/include/c++/5.4.0/bits/locale_classes.h:40,
-                 from /usr/local/include/c++/5.4.0/bits/ios_base.h:41,
-                 from /usr...
+   
+input
+stderr
+Compilation failed due to following error(s).main.cpp: In function ‘int main()’:
+main.cpp:19:12: error: ‘temp’ was not declared in this scope; did you mean ‘tm’?
+   19 | string s3= temp(n);
+      |            ^~~~
+      |            tm
+in c++
