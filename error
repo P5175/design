@@ -1,53 +1,228 @@
-i clone angular project with electron now in npm i it gave error and after if try npm run build then it giving me this error
-npm ERR! file C:\windows\system32\cmd.exe
-npm ERR! code ELIFECYCLE
-npm ERR! errno ENOENT
-npm ERR! syscall spawn
-npm ERR! gem-pulse@0.0.0 build: `ng build --base-href ./`
-npm ERR! spawn ENOENT
-npm ERR!
-npm ERR! Failed at the gem-pulse@0.0.0 build script.
-npm ERR! This is probably not a problem with npm. There is likely additional logging output above.
-npm WARN Local package.json exists, but node_modules missing, did you mean to install?
+i clone project from git but after that  i deleted pacakege.json and running npm install then it is hang on some stage
+this is package.json
+{
+  "name": "gem-pulse",
+  "version": "0.0.0",
+  "main": "main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "electron": "electron .",
+    "build": "ng build --base-href ./",
+    "electron-build": "ng build --configuration=production && electron-builder"
+  },
+  "private": true,
+  "dependencies": {
+    "@angular/animations": "^16.2.0",
+    "@angular/common": "^16.2.0",
+    "@angular/compiler": "^16.2.0",
+    "@angular/core": "^16.2.0",
+    "@angular/forms": "^16.2.0",
+    "@angular/platform-browser": "^16.2.0",
+    "@angular/platform-browser-dynamic": "^16.2.0",
+    "@angular/router": "^16.2.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "zone.js": "~0.13.0"
+  },
+  "devDependencies": {
+    "@angular-devkit/build-angular": "^16.2.12",
+    "@angular/cli": "^16.2.12",
+    "@angular/compiler-cli": "^16.2.0",
+    "@types/jasmine": "~4.3.0",
+    "autoprefixer": "^10.4.18",
+    "electron": "^29.1.0",
+    "electron-builder": "^24.12.0",
+    "jasmine-core": "~4.6.0",
+    "karma": "~6.4.0",
+    "karma-chrome-launcher": "~3.2.0",
+    "karma-coverage": "~2.2.0",
+    "karma-jasmine": "~5.1.0",
+    "karma-jasmine-html-reporter": "~2.1.0",
+    "postcss": "^8.4.35",
+    "tailwindcss": "^3.4.1",
+    "typescript": "~5.1.3"
+  }
+}
 
-npm ERR! A complete log of this run can be found in:
-npm ERR!     C:\Users\prathamkumarb\AppData\Roaming\npm-cache\_logs\2024-03-06T06_41_54_601Z-debug.log
+this is main.js
+const { app, BrowserWindow,Menu  } = require('electron');
+const path = require('path');
+const fs = require('fs');
+const { exec } = require('child_process');
 
 
-this is the log file
-0 info it worked if it ends with ok
-1 verbose cli [ 'C:\\Program Files\\nodejs\\node.exe',
-1 verbose cli   'C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js',
-1 verbose cli   'run',
-1 verbose cli   'build' ]
-2 info using npm@6.4.1
-3 info using node@v10.15.3
-4 verbose run-script [ 'prebuild', 'build', 'postbuild' ]
-5 info lifecycle gem-pulse@0.0.0~prebuild: gem-pulse@0.0.0
-6 info lifecycle gem-pulse@0.0.0~build: gem-pulse@0.0.0
-7 verbose lifecycle gem-pulse@0.0.0~build: unsafe-perm in lifecycle true
-8 verbose lifecycle gem-pulse@0.0.0~build: PATH: C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\node-gyp-bin;C:\projects\GemPulseSoftware\node_modules\.bin;C:\windows\system32;C:\windows;C:\windows\System32\Wbem;C:\windows\System32\WindowsPowerShell\v1.0\;C:\windows\System32\OpenSSH\;C:\Program Files\Microsoft SQL Server\130\Tools\Binn\;C:\Program Files\nodejs\;C:\Program Files\Microsoft VS Code\bin;C:\Users\prathamkumarb\AppData\Local\Microsoft\WindowsApps;C:\projects\Git\cmd;C:\Users\prathamkumarb\AppData\Roaming\npm
-9 verbose lifecycle gem-pulse@0.0.0~build: CWD: C:\projects\GemPulseSoftware
-10 silly lifecycle gem-pulse@0.0.0~build: Args: [ '/d /s /c', 'ng build --base-href ./' ]
-11 info lifecycle gem-pulse@0.0.0~build: Failed to exec build script
-12 verbose stack Error: gem-pulse@0.0.0 build: `ng build --base-href ./`
-12 verbose stack spawn ENOENT
-12 verbose stack     at ChildProcess.<anonymous> (C:\Program Files\nodejs\node_modules\npm\node_modules\npm-lifecycle\lib\spawn.js:48:18)
-12 verbose stack     at ChildProcess.emit (events.js:189:13)
-12 verbose stack     at maybeClose (internal/child_process.js:970:16)
-12 verbose stack     at Process.ChildProcess._handle.onexit (internal/child_process.js:259:5)
-13 verbose pkgid gem-pulse@0.0.0
-14 verbose cwd C:\projects\GemPulseSoftware
-15 verbose Windows_NT 10.0.22621
-16 verbose argv "C:\\Program Files\\nodejs\\node.exe" "C:\\Program Files\\nodejs\\node_modules\\npm\\bin\\npm-cli.js" "run" "build"
-17 verbose node v10.15.3
-18 verbose npm  v6.4.1
-19 error file C:\windows\system32\cmd.exe
-20 error code ELIFECYCLE
-21 error errno ENOENT
-22 error syscall spawn
-23 error gem-pulse@0.0.0 build: `ng build --base-href ./`
-23 error spawn ENOENT
-24 error Failed at the gem-pulse@0.0.0 build script.
-24 error This is probably not a problem with npm. There is likely additional logging output above.
-25 verbose exit [ 1, true ]
+let win;
+
+function createWindow() {
+    win = new BrowserWindow({
+        width: 800,
+        height: 600,
+        webPreferences: {
+            nodeIntegration: true
+        }
+    });
+
+    win.loadURL(`file://${path.join(__dirname, 'dist', 'gem-pulse', 'index.html')}`);
+
+    win.on('closed', () => {
+        win = null;
+    });
+}
+
+function buildAngularProject(angularProjectDirectory) {
+    // Delete the dist directory to ensure a clean build
+    const distDirectory = path.join(angularProjectDirectory, 'dist');
+    if (fs.existsSync(distDirectory)) {
+        fs.rmdirSync(distDirectory, { recursive: true });
+    }
+
+    // Run ng build command
+    exec('ng build --base-href ./', { cwd: angularProjectDirectory }, (err, stdout, stderr) => {
+        if (err) {
+            console.error('Error building Angular project:', err);
+            return;
+        }
+
+        console.log(stdout);
+        console.error(stderr);
+
+        createWindow();
+    });
+}
+
+
+app.on('ready', ()=>{
+    createWindow();
+    // const angularProjectDirectory = path.join(__dirname, 'dist', 'my-electron-app');
+    
+    // Start watching all files in the Angular project directory
+    // buildAngularProject(angularProjectDirectory);
+    Menu.setApplicationMenu(null);
+});
+
+app.on('window-all-closed', () => {
+    if (process.platform !== 'darwin') {
+        app.quit();
+    }
+});
+
+app.on('activate', () => {
+    if (win === null) {
+        createWindow();
+    }
+});
+
+this.is angular.json
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "GemPulse": {
+      "projectType": "application",
+      "schematics": {
+        "@schematics/angular:component": {
+          "style": "scss"
+        }
+      },
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular-devkit/build-angular:browser",
+          "options": {
+            "outputPath": "dist/gem-pulse",
+            "index": "src/index.html",
+            "main": "src/main.ts",
+            "polyfills": [
+              "zone.js"
+            ],
+            "tsConfig": "tsconfig.app.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "10mb",
+                  "maximumError": "10mb"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "2kb",
+                  "maximumError": "4kb"
+                }
+              ],
+              "outputHashing": "all"
+            },
+            "development": {
+              "buildOptimizer": false,
+              "optimization": false,
+              "vendorChunk": true,
+              "extractLicenses": false,
+              "sourceMap": true,
+              "namedChunks": true
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular-devkit/build-angular:dev-server",
+          "configurations": {
+            "production": {
+              "browserTarget": "GemPulse:build:production"
+            },
+            "development": {
+              "browserTarget": "GemPulse:build:development"
+            }
+          },
+          "defaultConfiguration": "development"
+        },
+        "extract-i18n": {
+          "builder": "@angular-devkit/build-angular:extract-i18n",
+          "options": {
+            "browserTarget": "GemPulse:build"
+          }
+        },
+        "test": {
+          "builder": "@angular-devkit/build-angular:karma",
+          "options": {
+            "polyfills": [
+              "zone.js",
+              "zone.js/testing"
+            ],
+            "tsConfig": "tsconfig.spec.json",
+            "inlineStyleLanguage": "scss",
+            "assets": [
+              "src/favicon.ico",
+              "src/assets"
+            ],
+            "styles": [
+              "src/styles.scss"
+            ],
+            "scripts": []
+          }
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "f7e8f62a-1737-4e81-ac12-d7c2193d13ea"
+  }
+}
+
+
+
