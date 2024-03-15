@@ -7,35 +7,10 @@ Write your code in this editor and press "Run" button to compile and execute it.
 *******************************************************************************/
 
 #include <iostream>
+#include <vector>
+#include <string>
 
-int main()
-{
-   int cache_size=3;
-   int cache_time=2;
-   int server_time=5;
-   vector<string> urls{ "hacker-rank", "google", "yahoo","gmail","yahoo","hacker-rank","gmail" };
-  vector<string> temp{};
-  vector<int> result{};
-  
-  for(int i=0;i<urls.size();i++){
-      if(check(urls[i],temp)){
-          result.push_back(cache_time);
-      }else{
-          for(int j=0; j<temp.size()-1;j++){
-              temp[j]=temp[j+1];
-          }
-          temp[temp.size()-1]=urls[i];
-          result.push_back(server_time)
-      }
-  }
-  
-  for(int i=0;i<result.size();i++){
-      cout<<result[i]<<endl;
-  }
-    return 0;
-}
-
-bool check(string s,vector<string>& temp){
+bool check(std::string s,std::vector<std::string>& temp){
     for(int i=0;i<temp.size();i++){
         if(temp[i]==s){
             return true;
@@ -43,93 +18,38 @@ bool check(string s,vector<string>& temp){
     }
     return false;
 }
-main.cpp: In function ‘int main()’:
-main.cpp:16:4: error: ‘vector’ was not declared in this scope
-   16 |    vector<string> urls{ "hacker-rank", "google", "yahoo","gmail","yahoo","hacker-rank","gmail" };
-      |    ^~~~~~
-main.cpp:16:11: error: ‘string’ was not declared in this scope; did you mean ‘std::string’?
-   16 |    vector<string> urls{ "hacker-rank", "google", "yahoo","gmail","yahoo","hacker-rank","gmail" };
-      |           ^~~~~~
-      |           std::string
-In file included from /usr/include/c++/11/iosfwd:39,
-                 from /usr/include/c++/11/ios:38,
-                 from /usr/include/c++/11/ostream:38,
-                 from /usr/include/c++/11/iostream:39,
-                 from main.cpp:9:
-/usr/include/c++/11/bits/stringfwd.h:79:33: note: ‘std::string’ declared here
-   79 |   typedef basic_string<char>    string;
-      |                                 ^~~~~~
-main.cpp:16:19: error: ‘urls’ was not declared in this scope
-   16 |    vector<string> urls{ "hacker-rank", "google", "yahoo","gmail","yahoo","hacker-rank","gmail" };
-      |                   ^~~~
-main.cpp:17:18: error: ‘temp’ was not declared in this scope; did you mean ‘tm’?
-   17 |   vector<string> temp{};
-      |                  ^~~~
-      |                  tm
-main.cpp:18:10: error: expected primary-expression before ‘int’
-   18 |   vector<int> result{};
-      |          ^~~
-main.cpp:21:10: error: ‘check’ was not declared in this scope
-   21 |       if(check(urls[i],temp)){
-      |          ^~~~~
-main.cpp:22:11: error: ‘result’ was not declared in this scope
-   22 |           result.push_back(cache_time);
-      |           ^~~~~~
-main.cpp:28:11: error: ‘result’ was not declared in this scope
-   28 |           result.push_back(server_time)
-      |           ^~~~~~
-main.cpp:32:17: error: ‘result’ was not declared in this scope
-   32 |   for(int i=0;i<result.size();i++){
-      |                 ^~~~~~
-main.cpp:33:7: error: ‘cout’ was not declared in this scope; did you mean ‘std::cout’?
-   33 |       cout<<result[i]<<endl;
-      |       ^~~~
-      |       std::cout
-In file included from main.cpp:9:
-/usr/include/c++/11/iostream:61:18: note: ‘std::cout’ declared here
-   61 |   extern ostream cout;          /// Linked to standard output
-      |                  ^~~~
-main.cpp:33:24: error: ‘endl’ was not declared in this scope; did you mean ‘std::endl’?
-   33 |       cout<<result[i]<<endl;
-      |                        ^~~~
-      |                        std::endl
-In file included from /usr/include/c++/11/iostream:39,
-                 from main.cpp:9:
-/usr/include/c++/11/ostream:684:5: note: ‘std::endl’ declared here
-  684 |     endl(basic_ostream<_CharT, _Traits>& __os)
-      |     ^~~~
-main.cpp: At global scope:
-main.cpp:38:12: error: ‘string’ was not declared in this scope; did you mean ‘std::string’?
-   38 | bool check(string s,vector<string>& temp){
-      |            ^~~~~~
-      |            std::string
-In file included from /usr/include/c++/11/iosfwd:39,
-                 from /usr/include/c++/11/ios:38,
-                 from /usr/include/c++/11/ostream:38,
-                 from /usr/include/c++/11/iostream:39,
-                 from main.cpp:9:
-/usr/include/c++/11/bits/stringfwd.h:79:33: note: ‘std::string’ declared here
-   79 |   typedef basic_string<char>    string;
-      |                                 ^~~~~~
-main.cpp:38:21: error: ‘vector’ was not declared in this scope
-   38 | bool check(string s,vector<string>& temp){
-      |                     ^~~~~~
-main.cpp:38:28: error: ‘string’ was not declared in this scope; did you mean ‘std::string’?
-   38 | bool check(string s,vector<string>& temp){
-      |                            ^~~~~~
-      |                            std::string
-In file included from /usr/include/c++/11/iosfwd:39,
-                 from /usr/include/c++/11/ios:38,
-                 from /usr/include/c++/11/ostream:38,
-                 from /usr/include/c++/11/iostream:39,
-                 from main.cpp:9:
-/usr/include/c++/11/bits/stringfwd.h:79:33: note: ‘std::string’ declared here
-   79 |   typedef basic_string<char>    string;
-      |                                 ^~~~~~
-main.cpp:38:37: error: ‘temp’ was not declared in this scope; did you mean ‘tm’?
-   38 | bool check(string s,vector<string>& temp){
-      |                                     ^~~~
-      |                                     tm
-main.cpp:38:41: error: expression list treated as compound expression in initializer [-fpermissive]
-   38 | bool check(string s,vector<string>& temp){
-      |          
+
+int main()
+{
+   int cache_size=2;
+   int cache_time=2;
+   int server_time=3;
+   int n=5;
+   std::vector<std::string> urls{  "google","yahoo","google","yahoo","coursera" };
+   std::vector<std::string> temp{};
+   std::vector<int> result{};
+  
+  for(int i=0;i<n;i++){
+      if(check(urls[i],temp)){
+          result.push_back(cache_time);
+      }else{
+          if(temp.size()==cache_size){
+              for(int j=0;j<temp.size()-1;j++){
+                  temp[j]=temp[j+1];
+              }
+              result.push_back(server_time);
+              temp.push_back(urls[i]);
+          }else{
+              result.push_back(server_time);
+              temp.push_back(urls[i]);
+          }
+      }   
+  }
+  
+  for(int i=0;i<result.size();i++){
+      std::cout<<result[i]<<std::endl;
+  }
+    return 0;
+}
+
+
